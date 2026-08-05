@@ -9,7 +9,7 @@ Welcome to the **Level 6 Supermoon Implementation** of the Midnight Network Dark
 | Requirement | Deliverable Link | Description |
 |-------------|------------------|-------------|
 | **Live Demo** | [midnight-dark-pool-dex.vercel.app](https://midnight-dark-pool-dex.vercel.app/) | The live Next.js application connected to the Preprod network. |
-| **Demo Video** | [youtube.com/watch?v=midnight_darkpool_demo](https://youtube.com/watch?v=midnight_darkpool_demo) | Full MVP walkthrough showcasing ZK proofs and wallet integration. |
+| **Demo Video** | [youtu.be/sGedRuCPU3Q](https://youtu.be/sGedRuCPU3Q) | Full MVP walkthrough showcasing ZK proofs and wallet integration. |
 | **70+ Testers** | [USERS.md](USERS.md) | Exported JSON list of 70 verified wallet addresses that interacted with the DEX. |
 | **User Feedback** | [docs/FEEDBACK.md](docs/FEEDBACK.md) | Aggregated feedback, bug reports, and UX ratings for the DEX pivot. |
 | **Architecture** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Detailed Mermaid.js diagrams showing the ZK privacy boundary and dark matching flow. |
