@@ -1,0 +1,89 @@
+pragma language_version 0.23;
+import CompactStandardLibrary;
+
+export enum OrderSide {
+    BUY,
+    SELL
+}
+
+export struct Order {
+    trader: Bytes<32>;
+    side: OrderSide;
+    tokenPair: Bytes<32>;
+    amountCommitment: Bytes<32>;
+    priceCommitment: Bytes<32>;
+    isFilled: Boolean;
+}
+
+export ledger orders: Map<Bytes<32>, Order>;
+export ledger totalValueShielded: Uint<128>;
+
+// Submit a hidden order to the dark pool
+export circuit submitOrder(
+    orderId: Bytes<32>,
+    tokenPair: Bytes<32>,
+    side: OrderSide,
+    amount: Uint<64>,
+    price: Uint<64>,
+    _secret: Bytes<32>
+): [] {
+    assert(!orders.member(orderId), "Order already exists");
+    assert(amount > 0, "Amount must be positive");
+    assert(price > 0, "Price must be positive");
+    
+    const traderPubKey = persistentHash<Vector<2, Bytes<32>>>([pad(32, "darkpool:pk:"), _secret]);
+    
+    // Commit to the actual values using the secret
+    const amtComm = persistentCommit<Uint<64>>(amount, _secret);
+    const prcComm = persistentCommit<Uint<64>>(price, _secret);
+    
+    orders.insert(orderId, Order {
+        trader: disclose(traderPubKey),
+        side: disclose(side),
+        tokenPair: disclose(tokenPair),
+        amountCommitment: amtComm,
+        priceCommitment: prcComm,
+        isFilled: false
+    });
+    
+    totalValueShielded = totalValueShielded + (amount as Uint<128>);
+}
+
+// A relayer or matching engine can prove two orders match without revealing their exact values
+// (In a real implementation, this would involve ZK proof of matching price limits)
+export circuit matchOrders(
+    buyOrderId: Bytes<32>,
+    sellOrderId: Bytes<32>,
+    buyAmount: Uint<64>,
+    buyPrice: Uint<64>,
+    sellAmount: Uint<64>,
+    sellPrice: Uint<64>,
+    _buySecret: Bytes<32>,
+    _sellSecret: Bytes<32>
+): [] {
+    assert(orders.member(buyOrderId), "Buy order missing");
+    assert(orders.member(sellOrderId), "Sell order missing");
+    
+    let buyOrder = orders.lookup(buyOrderId);
+    let sellOrder = orders.lookup(sellOrderId);
+    
+    assert(!buyOrder.isFilled && !sellOrder.isFilled, "Orders already filled");
+    assert(buyOrder.side == OrderSide.BUY && sellOrder.side == OrderSide.SELL, "Invalid sides");
+    assert(buyOrder.tokenPair == sellOrder.tokenPair, "Pair mismatch");
+    
+    // Verify commitments
+    assert(persistentCommit<Uint<64>>(buyAmount, _buySecret) == buyOrder.amountCommitment, "Buy amount mismatch");
+    assert(persistentCommit<Uint<64>>(buyPrice, _buySecret) == buyOrder.priceCommitment, "Buy price mismatch");
+    assert(persistentCommit<Uint<64>>(sellAmount, _sellSecret) == sellOrder.amountCommitment, "Sell amount mismatch");
+    assert(persistentCommit<Uint<64>>(sellPrice, _sellSecret) == sellOrder.priceCommitment, "Sell price mismatch");
+    
+    // ZK Constraint: Buy price must be >= Sell price for a valid match
+    assert(buyPrice >= sellPrice, "No price overlap");
+    
+    // Mark as filled
+    buyOrder.isFilled = true;
+    sellOrder.isFilled = true;
+    
+    orders.insert(buyOrderId, buyOrder);
+    orders.insert(sellOrderId, sellOrder);
+}
