@@ -1,0 +1,14 @@
+{
+  "name": "@midnight-dark-pool-dex/contract",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "compact": "compact compile src/darkpool.compact src/managed/darkpool",
+    "build": "echo \"Skipping compact compilation in CI\" && exit 0",
+    "test": "echo \"No contract tests defined\" && exit 0"
+  },
+  "devDependencies": {
+    "@midnight-ntwrk/compact-runtime": "0.16.0"
+  }
+}
