@@ -1,5 +1,5 @@
 # Midnight Dark Pool DEX
-![CI](https://github.com/your-username/midnight-dark-pool-dex/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/efekrbas/midnight-dark-pool-dex/actions/workflows/ci.yml/badge.svg)
 > Institutional-grade liquidity, complete privacy. Trade digital assets without exposing your strategy to front-running bots.
 
 ## Live Demo
@@ -36,7 +36,7 @@ This product is built for institutional traders, whales, and privacy-conscious u
 ## Setup & Run Locally
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/midnight-dark-pool-dex.git
+   git clone https://github.com/efekrbas/midnight-dark-pool-dex.git
    cd midnight-dark-pool-dex
    ```
 2. **Install dependencies**
