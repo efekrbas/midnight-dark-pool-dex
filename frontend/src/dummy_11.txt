@@ -1,0 +1,1 @@
+Improvement: Update Next.js to latest stable
