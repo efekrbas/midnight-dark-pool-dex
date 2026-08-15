@@ -1,46 +1,42 @@
-# Tester Onboarding Guide: Midnight Preprod Network
+# User Guide: Midnight Dark Pool DEX
 
-Welcome to the Midnight Level 6 Sealed-Bid Marketplace! This guide will walk you through setting up your wallet, acquiring testnet tokens, and participating in your first privacy-preserving auction.
+Welcome to the **Midnight Dark Pool DEX** on the Preprod Network! 
 
-## Step 1: Install a Compatible Wallet
-Currently, the marketplace supports **Lace** and the **1AM** wallet.
-1. Download the [Lace Wallet Browser Extension](https://www.lace.io/) or 1AM.
-2. Follow the setup wizard to create a new wallet. **Store your seed phrase securely.**
-3. Open the wallet settings and ensure your network is set to **Midnight Preprod**.
+Unlike traditional decentralized exchanges, our Dark Pool DEX uses Midnight's advanced Zero-Knowledge (ZK) technology to keep your trades completely private. Your order size and price are hidden from the public until a match is found, protecting you from front-running and MEV bots.
 
-## Step 2: Acquire tNIGHT (Testnet Tokens)
-You need tNIGHT to pay for transaction fees, submit bids, and define reserve prices.
-1. Visit the [Midnight Testnet Faucet](https://faucet.preprod.midnight.network/).
-2. Copy your receiving address from the Lace/1AM extension.
-3. Paste your address into the faucet and request tokens.
-4. Wait 1-2 minutes for the tokens to appear in your wallet balance.
+## Getting Started on Preprod
 
-## Step 3: Connect to the Marketplace
-1. Navigate to the marketplace application (e.g., `localhost:3000` or our live deployment URL).
-2. Click **Connect Wallet** in the top right corner.
-3. Your wallet extension will pop up asking for permission to connect to the dApp. Click **Approve**.
+To use the DEX, you'll need to set up your environment for the Midnight Preprod network.
 
-## Step 4: Participate in an Auction
-**To Place a Bid:**
-1. Browse the "Open" auctions on the dashboard.
-2. Click on an asset you want to bid on.
-3. Enter your bid amount (must be higher than the public `highestBid`).
-4. Click **Sign & Submit Bid**.
-5. *What happens behind the scenes:* Your browser generates a Zero-Knowledge proof. Your bid amount remains entirely private; the contract only verifies that your bid is valid.
-6. Approve the transaction in your wallet.
+1. **Install Lace Wallet:** Download and install the [Lace Wallet Browser Extension](https://www.lace.io/). Follow the setup wizard and securely back up your seed phrase.
+2. **Switch to Preprod:** In your Lace wallet settings, change the active network to **Midnight Preprod**.
+3. **Get Test Tokens (tNIGHT):** Visit the [Midnight Testnet Faucet](https://faucet.preprod.midnight.network/). Copy your wallet address, paste it into the faucet, and request your free test tokens. They will arrive in 1-2 minutes.
 
-**To Create an Auction:**
-1. Click **Create Auction** in the top navigation.
-2. Fill out the asset title, description, and hidden reserve price.
-3. Your reserve price is kept completely private until the auction settles.
+## Your First Transaction
 
-## Step 5: Auction Settlement
-When the auction countdown ends, the asset state changes to **Ended**.
-1. The highest bidder or the seller can click **Settle Auction**.
-2. The smart contract evaluates the hidden ZK commitments.
-3. If the highest bid meets the hidden reserve price, ownership of the asset is transferred to the winner, and the tNIGHT funds are unshielded and sent to the seller.
+Once your wallet is funded, you are ready to place a private trade!
 
-## Provide Feedback!
-Your experience matters. Click the floating **Feedback** button in the bottom right corner of the app to submit Bug Reports, Feature Requests, or General Feedback. All submissions are automatically aggregated into our test suite.
+### 1. Connect Your Wallet
+Navigate to the Dark Pool DEX application and click **Connect Wallet** in the top right corner. Approve the connection in your Lace extension.
 
-<!-- Verified for Lace Wallet Preprod testnet -->
+### 2. View the Blurred Depth Chart
+Instead of a traditional order book that reveals everyone's exact trades, you will see an **Estimated Depth Chart (Blurred Liquidity)**. This "heat map" gives you a general idea of market liquidity without exposing individual traders' strategies.
+
+### 3. Place a Hidden Order
+- Select the asset pair you want to trade.
+- Enter your limit price and order size.
+- Click **Submit Hidden Order**.
+- **ZK Magic in Action:** You will see a glowing animation on your screen. This means your browser is generating a Zero-Knowledge proof locally. Your exact numbers are encrypted into a ZK commitment—no one else can see them!
+- Approve the transaction in your Lace wallet to submit your encrypted order to the blockchain.
+
+### 4. Wait for a Match
+The smart contract will continuously check for matches in the background. If another user submits an order that crosses your price, the contract will mathematically prove the match using the ZK proofs and execute the trade automatically. 
+
+### 5. Canceling an Order
+If your order hasn't matched yet and you change your mind, you can safely cancel it.
+- Go to your **Open Orders** tab.
+- Click **Cancel**.
+- This will retract your commitment on-chain *without* ever revealing what your original order size was!
+
+---
+*Thank you for testing the Midnight Dark Pool DEX! Your privacy is our priority.*

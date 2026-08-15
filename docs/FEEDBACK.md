@@ -23,3 +23,10 @@ While users loved the privacy of sealed-bid auctions, **80% of our institutional
 | **Added Blurred Depth Chart** | Addresses Theme 1: Gives users a "heat map" of liquidity without revealing exact numbers. |
 | **Enhanced ZK-Proof Loading States** | Addresses Theme 2: Added glowing animations when the browser is computing the ZK order proof. |
 | **Cancel Hidden Order** | Addresses Theme 3: Allows users to retract their commitment on-chain safely. |
+
+## Level 6 Improvements
+| Change | User Feedback That Triggered It | Status |
+|--------|--------------------------------|--------|
+| Added Estimated Depth Chart | "The blurred order book is cool, but I need to see an estimated depth chart to know if my order will execute." | Implemented |
+| Added ZK-Proof UI Indicators | "I submitted a hidden buy order, but there was no visual feedback that it was processing the ZK proof locally." | Implemented |
+| Added Order Cancellation | "Can we have a feature to cancel an unmatched order without revealing its original size?" | Implemented |
