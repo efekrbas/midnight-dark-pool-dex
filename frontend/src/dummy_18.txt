@@ -1,0 +1,1 @@
+Improvement: Enhance error boundary for UI crashes
