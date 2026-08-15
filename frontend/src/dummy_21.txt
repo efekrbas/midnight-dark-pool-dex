@@ -1,0 +1,1 @@
+Improvement: Add translation support for UI
