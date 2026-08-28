@@ -9,7 +9,7 @@ This document compiles the user research, survey responses, and feedback impleme
 - **Net Promoter Score (NPS):** **+92** (92% Promoters, 8% Passives, 0% Detractors)
 - **Top Rated Feature:** Zero-Knowledge Hidden Order Matching & MEV Resistance (96% satisfaction)
 - **Survey & Data Links:**
-  - **Google Feedback Form:** [Midnight Dark Pool DEX Survey](https://forms.gle/mockformlink123)
+  - **Google Feedback Form:** [Midnight Dark Pool DEX Survey](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform)
   - **Public Responses Sheet (Excel / Google Sheets):** [Google Sheets Live Data](https://docs.google.com/spreadsheets/d/1mock_sheet/edit?usp=sharing)
   - **Exported CSV Archive:** [`docs/feedback_responses.csv`](feedback_responses.csv)
 
