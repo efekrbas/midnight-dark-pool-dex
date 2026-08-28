@@ -1,4 +1,4 @@
-name: Level 6 Marketplace CI Pipeline
+name: Midnight Dark Pool DEX CI Pipeline
 
 on:
   push:
@@ -8,41 +8,53 @@ on:
 
 jobs:
   test-frontend:
+    name: Frontend Quality & Typecheck
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20.x
+      uses: actions/setup-node@v4
       with:
-        node-version: 18.x
+        node-version: 20.x
         cache: 'npm'
-        cache-dependency-path: frontend/package-lock.json
-    - name: Install dependencies
+        cache-dependency-path: frontend/package.json
+
+    - name: Install Frontend Dependencies
       working-directory: ./frontend
-      run: npm ci
-    - name: Run Linter
+      run: npm install --legacy-peer-deps
+
+    - name: Run TypeScript Typecheck
       working-directory: ./frontend
-      run: npm run lint
-    - name: Run Tests
+      run: npx tsc --noEmit
+
+    - name: Run Unit Tests
       working-directory: ./frontend
       run: npm test
 
   test-contracts:
+    name: Smart Contracts & ZK Circuits
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js 18.x
-      uses: actions/setup-node@v3
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js 20.x
+      uses: actions/setup-node@v4
       with:
-        node-version: 18.x
+        node-version: 20.x
         cache: 'npm'
-        cache-dependency-path: contracts/package-lock.json
-    - name: Install dependencies
+        cache-dependency-path: contracts/package.json
+
+    - name: Install Contracts Dependencies
       working-directory: ./contracts
-      run: npm ci
-    - name: Compile Compact Contracts
+      run: npm install --legacy-peer-deps
+
+    - name: Verify Compact Circuit Definitions
       working-directory: ./contracts
       run: npm run build
-    - name: Run Integration Tests
+
+    - name: Run Contract Integration Tests
       working-directory: ./contracts
       run: npm test
