@@ -26,10 +26,10 @@
 
 ## 📜 Smart Contract Addresses
 
-| Network | Contract Address | Indexer / Verification Link |
+| Network | Contract Address | Explorer / Verification Link |
 |---|---|---|
-| **Midnight Preprod** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [Midnight Preprod Indexer](https://indexer.preprod.midnight.network/api/v1/graphql) |
-| **Midnight Preview** | `mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231` | [Midnight Preview Indexer](https://indexer.preview.midnight.network/api/v1/graphql) |
+| **Midnight Preprod** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [View Verified Compact Circuits](https://midnight-dark-pool-dex.vercel.app/circuits) · [Network Status](https://midnight-dark-pool-dex.vercel.app/network) |
+| **Midnight Preview** | `mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231` | [View Verified Compact Circuits](https://midnight-dark-pool-dex.vercel.app/circuits) · [ZK Verifier](https://midnight-dark-pool-dex.vercel.app/verify) |
 
 ---
 
