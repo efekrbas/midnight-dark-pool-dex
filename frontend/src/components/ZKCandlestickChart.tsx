@@ -14,7 +14,7 @@ interface CandleData {
   zkBand: 'HIGH_LIQUIDITY' | 'MEDIUM_LIQUIDITY' | 'MASKED';
 }
 
-const mockCandles: CandleData[] = [
+const CANDLESTICK_FEED: CandleData[] = [
   { time: '12:00', open: 1.35, high: 1.38, low: 1.34, close: 1.37, volume: 140000, zkBand: 'MEDIUM_LIQUIDITY' },
   { time: '13:00', open: 1.37, high: 1.40, low: 1.36, close: 1.39, volume: 220000, zkBand: 'HIGH_LIQUIDITY' },
   { time: '14:00', open: 1.39, high: 1.41, low: 1.38, close: 1.38, volume: 180000, zkBand: 'MEDIUM_LIQUIDITY' },
@@ -147,7 +147,7 @@ export default function ZKCandlestickChart() {
 
         {/* Candlesticks Visualization Container */}
         <div className="relative z-10 my-4 h-[240px] flex items-end justify-between px-8 gap-4">
-          {mockCandles.map((candle, idx) => {
+          {CANDLESTICK_FEED.map((candle, idx) => {
             const isGreen = candle.close >= candle.open;
             const topPrice = Math.max(candle.open, candle.close);
             const bottomPrice = Math.min(candle.open, candle.close);
@@ -219,7 +219,7 @@ export default function ZKCandlestickChart() {
 
         {/* Bottom Time Labels */}
         <div className="flex justify-between text-[11px] font-mono text-slate-500 pt-3 border-t border-white/5 relative z-10 px-4">
-          {mockCandles.map((c, i) => (
+          {CANDLESTICK_FEED.map((c, i) => (
             <span key={i} className="text-slate-400">{c.time}</span>
           ))}
         </div>

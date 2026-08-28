@@ -5,7 +5,7 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { Sparkles, Eye } from 'lucide-react';
 
-const MOCK_SELLS = [
+const INITIAL_SELLS = [
   { price: '1.455', heat: 80 },
   { price: '1.440', heat: 45 },
   { price: '1.432', heat: 90 },
@@ -14,7 +14,7 @@ const MOCK_SELLS = [
   { price: '1.422', heat: 20 },
 ];
 
-const MOCK_BUYS = [
+const INITIAL_BUYS = [
   { price: '1.418', heat: 50 },
   { price: '1.415', heat: 70 },
   { price: '1.410', heat: 35 },
@@ -22,6 +22,7 @@ const MOCK_BUYS = [
   { price: '1.390', heat: 25 },
   { price: '1.385', heat: 95 },
 ];
+
 
 export default function DarkOrderBook() {
   const container = useRef<HTMLDivElement>(null);
@@ -64,7 +65,7 @@ export default function DarkOrderBook() {
       
       {/* Sells */}
       <div className="flex flex-col-reverse gap-1 mb-3">
-        {MOCK_SELLS.map((level, i) => (
+        {INITIAL_SELLS.map((level, i) => (
           <div key={i} className="sell-row relative group cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 border border-transparent hover:border-red-500/20">
             <div 
               className="absolute top-0 right-0 h-full bg-red-500/10 group-hover:bg-red-500/20 rounded-lg origin-right transition-all duration-500"
@@ -90,7 +91,7 @@ export default function DarkOrderBook() {
 
       {/* Buys */}
       <div className="flex flex-col gap-1 mt-3">
-        {MOCK_BUYS.map((level, i) => (
+        {INITIAL_BUYS.map((level, i) => (
           <div key={i} className="buy-row relative group cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 transition-all duration-300 border border-transparent hover:border-emerald-500/20">
             <div 
               className="absolute top-0 right-0 h-full bg-emerald-500/10 group-hover:bg-emerald-500/20 rounded-lg origin-right transition-all duration-500"

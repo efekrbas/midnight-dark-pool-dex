@@ -4,7 +4,7 @@ import BidModal from '../src/components/BidModal';
 import { NotificationProvider } from '../src/context/NotificationContext';
 
 describe('BidModal Component', () => {
-  const mockAuction = {
+  const sampleAuction = {
     title: 'Rare Digital Art #102',
     highestBid: '500'
   };
@@ -12,7 +12,7 @@ describe('BidModal Component', () => {
   it('renders the bid modal correctly', () => {
     render(
       <NotificationProvider>
-        <BidModal auction={mockAuction} onClose={() => {}} />
+        <BidModal auction={sampleAuction} onClose={() => {}} />
       </NotificationProvider>
     );
 
@@ -23,7 +23,7 @@ describe('BidModal Component', () => {
   it('prevents submission if bid is lower than current highest public bid', () => {
     render(
       <NotificationProvider>
-        <BidModal auction={mockAuction} onClose={() => {}} />
+        <BidModal auction={sampleAuction} onClose={() => {}} />
       </NotificationProvider>
     );
 

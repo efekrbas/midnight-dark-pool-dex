@@ -18,7 +18,7 @@ interface OrderItem {
   timestamp: string;
 }
 
-const mockOrders: OrderItem[] = [
+const HISTORICAL_ORDERS: OrderItem[] = [
   {
     id: 'ord_9182',
     pair: 'tNIGHT / ZKUSD',
@@ -52,7 +52,7 @@ const mockOrders: OrderItem[] = [
 ];
 
 export default function PortfolioPage() {
-  const [orders, setOrders] = useState<OrderItem[]>(mockOrders);
+  const [orders, setOrders] = useState<OrderItem[]>(HISTORICAL_ORDERS);
   const [isUnmasked, setIsUnmasked] = useState<boolean>(false);
   const { notify } = useNotification();
 

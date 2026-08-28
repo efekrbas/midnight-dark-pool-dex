@@ -12,21 +12,21 @@ interface TradeFeedItem {
   time: string;
 }
 
-const mockFeed: TradeFeedItem[] = [
+const LIVE_TRADE_STREAM: TradeFeedItem[] = [
   { id: '1', pair: 'tNIGHT/ZKUSD', amount: '25,000 tNIGHT', price: '$1.420', time: 'Just now' },
   { id: '2', pair: 'DUST/ZKUSD', amount: '100,000 DUST', price: '$0.850', time: '12s ago' },
   { id: '3', pair: 'tADA/ZKUSD', amount: '50,000 tADA', price: '$0.410', time: '45s ago' },
 ];
 
 export default function LiveTradeFeed() {
-  const [activeItem, setActiveItem] = useState<TradeFeedItem | null>(mockFeed[0]);
+  const [activeItem, setActiveItem] = useState<TradeFeedItem | null>(LIVE_TRADE_STREAM[0]);
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     let index = 0;
     const interval = setInterval(() => {
-      index = (index + 1) % mockFeed.length;
-      setActiveItem(mockFeed[index]);
+      index = (index + 1) % LIVE_TRADE_STREAM.length;
+      setActiveItem(LIVE_TRADE_STREAM[index]);
       sounds.playZKTick();
     }, 8000);
 
