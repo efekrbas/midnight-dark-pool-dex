@@ -1,1 +1,0 @@
-Improvement: Refactor zero-knowledge proof generation
