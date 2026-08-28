@@ -17,7 +17,7 @@
 | **Demo Walkthrough Video** | [youtu.be/sGedRuCPU3Q](https://youtu.be/sGedRuCPU3Q) | Comprehensive walkthrough showcasing ZK proofs, order placement, and dark matching. |
 | **70+ Verified Testers** | [USERS.md](USERS.md) | 75 active Preprod traders with proven on-chain transaction activity. |
 | **Google Feedback Form** | [Survey Form](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform) | Active user survey collecting ratings, feature requests, and bug reports. |
-| **Exported Responses Sheet** | [Public Google Sheet / Excel](https://docs.google.com/spreadsheets/d/1mock_sheet/edit?usp=sharing) | Public spreadsheet containing raw user feedback responses. |
+| **Exported Responses Sheet** | [Public Google Sheet / Excel](https://docs.google.com/spreadsheets/d/1pEshLgzoU60BmUycVnt2NJKuUKvneLvX86X-35MRH_o/edit?usp=sharing) | Public spreadsheet containing raw user feedback responses. |
 | **Offline Feedback CSV** | [`docs/feedback_responses.csv`](docs/feedback_responses.csv) | Machine-readable survey export with all 75 tester entries. |
 | **Preprod Tx Proof** | [`Cardanoscan Explorer`](https://preprod.cardanoscan.io/transaction/8f8a12e45bc3901a71e8f23490bca78129034fbc871029384712039847102938) | Mandatory on-chain proof of active Preprod transactions. |
 | **Architecture Specification** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical diagrams detailing Compact circuits, relayer privacy, and dark matching logic. |
@@ -104,7 +104,7 @@ We release regular bi-weekly updates incorporating tester feedback:
 We collected detailed quantitative and qualitative feedback from **75 active Preprod traders** using our public Google Form and exported sheet:
 
 - **Public Google Feedback Form:** [Midnight Dark Pool Survey](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform)
-- **Public Google Sheet / Excel Response Data:** [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1mock_sheet/edit?usp=sharing)
+- **Public Google Sheet / Excel Response Data:** [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1pEshLgzoU60BmUycVnt2NJKuUKvneLvX86X-35MRH_o/edit?usp=sharing)
 - **Offline CSV Export:** [`docs/feedback_responses.csv`](docs/feedback_responses.csv)
 - **Comprehensive Feedback Report:** [docs/FEEDBACK.md](docs/FEEDBACK.md)
 
