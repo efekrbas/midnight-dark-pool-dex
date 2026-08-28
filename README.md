@@ -52,14 +52,10 @@ Traditional Decentralized Exchanges (DEXs) broadcast every order directly to a p
 
 ## 📢 Social Media & Community Channels
 
-We actively engage with our growing community across multiple social channels:
+We actively engage with our community through our official X (Twitter) channel and public community updates:
 
 - **X (Twitter):** [@MNDarkPool](https://x.com/MNDarkPool) — *Official announcements, release updates, and feature highlights.*
 - **Latest Product Launch Post:** [View Launch Tweet](https://x.com/MNDarkPool/status/2088590481567441022)
-- **Discord Community:** [discord.gg/darkpooldex](https://discord.gg/darkpooldex) — *Trader discussions, feedback channels, and live support.*
-- **Medium Publications:** [medium.com/@darkpooldex](https://medium.com/@darkpooldex) — *Deep-dive articles on Midnight ZK circuits and institutional dark pools.*
-- **Telegram Group:** [t.me/MidnightDarkPoolDEX](https://t.me/MidnightDarkPoolDEX) — *Community news and instant notification alerts.*
-- **LinkedIn:** [linkedin.com/company/darkpooldex](https://linkedin.com/company/darkpooldex) — *Institutional outreach and enterprise partnerships.*
 
 ### Social Media Growth & Community Traction
 
@@ -67,7 +63,6 @@ We actively engage with our growing community across multiple social channels:
 |---|---|---|---|
 | **Active Preprod Testers** | 25 Users | **75 Users** | **+200%** 🚀 |
 | **X (Twitter) Followers** | 320 Followers | **1,840+ Followers** | **+475%** 🚀 |
-| **Discord Members** | 180 Members | **950+ Members** | **+427%** 🚀 |
 | **Total Testnet Volume** | 45,000 tNIGHT | **620,000+ tNIGHT** | **+1,277%** 🚀 |
 | **Zero-Knowledge Proofs Computed** | 110 Proofs | **1,450+ Proofs** | **+1,218%** 🚀 |
 
