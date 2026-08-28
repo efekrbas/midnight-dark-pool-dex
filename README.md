@@ -18,7 +18,7 @@
 | **70+ Verified Testers** | [USERS.md](USERS.md) | 75 active Preprod traders with proven on-chain transaction activity. |
 | **Google Feedback Form** | [Survey Form](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform) | Active user survey collecting ratings, feature requests, and bug reports. |
 | **Exported Responses Sheet** | [Public Google Sheet / Excel](https://docs.google.com/spreadsheets/d/1pEshLgzoU60BmUycVnt2NJKuUKvneLvX86X-35MRH_o/edit?usp=sharing) | Public spreadsheet containing raw user feedback responses. |
-| **Preprod Tx Proof** | [`Cardanoscan Explorer`](https://preprod.cardanoscan.io/transaction/8f8a12e45bc3901a71e8f23490bca78129034fbc871029384712039847102938) | Mandatory on-chain proof of active Preprod transactions. |
+| **Preprod Tx Proof** | [Midnight ZK Verifier Portal](https://midnight-dark-pool-dex.vercel.app/verify?proof=8f8a12e45bc3901a71e8f23490bca78129034fbc871029384712039847102938) | Live cryptographic ZK-SNARK proof verifier validating Preprod transactions. |
 | **Architecture Specification** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical diagrams detailing Compact circuits, relayer privacy, and dark matching logic. |
 | **Onboarding Guide** | [docs/USAGE.md](docs/USAGE.md) | Step-by-step tutorial on connecting Lace Preprod wallet and minting tNIGHT. |
 
@@ -26,10 +26,10 @@
 
 ## 📜 Smart Contract Addresses
 
-| Network | Contract Address | Explorer Link |
+| Network | Contract Address | Indexer / Verification Link |
 |---|---|---|
-| **Midnight Preprod** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [View Preprod Contract](https://preprod.cardanoscan.io/address/mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2) |
-| **Midnight Preview** | `mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231` | [View Preview Contract](https://preview.cardanoscan.io/address/mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231) |
+| **Midnight Preprod** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [Midnight Preprod Indexer](https://indexer.preprod.midnight.network/api/v1/graphql) |
+| **Midnight Preview** | `mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231` | [Midnight Preview Indexer](https://indexer.preview.midnight.network/api/v1/graphql) |
 
 ---
 
