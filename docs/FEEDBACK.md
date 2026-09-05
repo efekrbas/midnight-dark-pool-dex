@@ -10,7 +10,7 @@ This document compiles the user research, survey responses, and feedback impleme
 - **Top Rated Feature:** Zero-Knowledge Hidden Order Matching & MEV Resistance (96% satisfaction)
 - **Survey & Data Links:**
   - **Google Feedback Form:** [Midnight Dark Pool DEX Survey](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform)
-  - **Public Responses Sheet (Excel / Google Sheets):** [Google Sheets Live Data](https://docs.google.com/spreadsheets/d/1pEshLgzoU60BmUycVnt2NJKuUKvneLvX86X-35MRH_o/edit?usp=sharing)
+  - **Public Responses Sheet (Excel / Google Sheets):** [Google Sheets Live Data](https://docs.google.com/spreadsheets/d/1iuFjE8k5GM-2rzFb480tCWs1osk9T4SPUKzvsMV31Ic/edit?usp=sharing)
 
 ---
 
@@ -60,5 +60,5 @@ This document compiles the user research, survey responses, and feedback impleme
 | 15 | "Explain ZK proof math for newcomers" | Added dedicated Zero-Knowledge circuit FAQ section in documentation | [`85969a0`](https://github.com/efekrbas/midnight-dark-pool-dex/commit/85969a0) |
 
 ---
-*For full individual survey records of all 75 testers, see the [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1pEshLgzoU60BmUycVnt2NJKuUKvneLvX86X-35MRH_o/edit?usp=sharing).*
+*For full individual survey records of all 75 testers, see the [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1iuFjE8k5GM-2rzFb480tCWs1osk9T4SPUKzvsMV31Ic/edit?usp=sharing).*
 
