@@ -50,10 +50,11 @@ Traditional Decentralized Exchanges (DEXs) broadcast every order directly to a p
 
 ---
 
-## 📢 Community & Project Channels
+## 📢 Social Media & Community Channels
 
-We actively engage with builders, traders, and open-source contributors through transparent project channels:
+We actively engage with our community, traders, and open-source contributors through our official channels:
 
+- **Official X (Twitter):** [@MNDarkPool](https://x.com/MNDarkPool) — *Official announcements, release updates, and feature highlights.*
 - **GitHub Repository:** [efekrbas/midnight-dark-pool-dex](https://github.com/efekrbas/midnight-dark-pool-dex) — *Source code, smart contracts, and issue tracking.*
 - **Feedback & Discussions:** [GitHub Issues & Discussions](https://github.com/efekrbas/midnight-dark-pool-dex/issues) — *Feature requests, bug reports, and roadmap proposals.*
 - **Live Production dApp:** [midnight-dark-pool-dex.vercel.app](https://midnight-dark-pool-dex.vercel.app/) — *Interactive dark pool trading terminal on Midnight Preprod.*
