@@ -55,7 +55,12 @@ export default function DarkOrderBook() {
   }, { scope: container });
 
   return (
-    <div ref={container} className="flex flex-col text-sm font-mono select-none">
+    <div 
+      ref={container} 
+      role="region" 
+      aria-label="Shielded Dark Pool Order Book" 
+      className="flex flex-col text-sm font-mono select-none w-full max-w-full overflow-x-hidden"
+    >
       <div className="grid grid-cols-2 text-slate-400 text-xs pb-2.5 px-2 border-b border-white/10 mb-2.5 font-sans font-medium">
         <span>Price (ZKUSD)</span>
         <span className="text-right flex items-center justify-end gap-1">
@@ -66,7 +71,12 @@ export default function DarkOrderBook() {
       {/* Sells */}
       <div className="flex flex-col-reverse gap-1 mb-3">
         {INITIAL_SELLS.map((level, i) => (
-          <div key={i} className="sell-row relative group cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-red-500/10 transition-all duration-300 border border-transparent hover:border-red-500/20">
+          <div 
+            key={i} 
+            role="row"
+            aria-label={`Ask level at price ${level.price}`}
+            className="sell-row relative group cursor-pointer px-2.5 py-2 min-h-[36px] rounded-lg hover:bg-red-500/10 transition-all duration-300 border border-transparent hover:border-red-500/20"
+          >
             <div 
               className="absolute top-0 right-0 h-full bg-red-500/10 group-hover:bg-red-500/20 rounded-lg origin-right transition-all duration-500"
               style={{ width: `${level.heat}%` }}
@@ -92,7 +102,12 @@ export default function DarkOrderBook() {
       {/* Buys */}
       <div className="flex flex-col gap-1 mt-3">
         {INITIAL_BUYS.map((level, i) => (
-          <div key={i} className="buy-row relative group cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-emerald-500/10 transition-all duration-300 border border-transparent hover:border-emerald-500/20">
+          <div 
+            key={i} 
+            role="row"
+            aria-label={`Bid level at price ${level.price}`}
+            className="buy-row relative group cursor-pointer px-2.5 py-2 min-h-[36px] rounded-lg hover:bg-emerald-500/10 transition-all duration-300 border border-transparent hover:border-emerald-500/20"
+          >
             <div 
               className="absolute top-0 right-0 h-full bg-emerald-500/10 group-hover:bg-emerald-500/20 rounded-lg origin-right transition-all duration-500"
               style={{ width: `${level.heat}%` }}

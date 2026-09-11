@@ -125,15 +125,18 @@ export default function OrderEntry() {
 
             <div className="form-item">
               <div className="flex justify-between text-xs text-gray-400 mb-1.5 font-mono">
-                <label>Limit Price (ZKUSD)</label>
+                <label htmlFor="limit-price-input">Limit Price (ZKUSD)</label>
                 <span className="text-slate-500">Bal: $14,052.00</span>
               </div>
               <div className="relative">
                 <input 
+                  id="limit-price-input"
+                  name="limitPrice"
                   type="number" 
                   step="0.001"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
+                  aria-label="Order limit price in ZKUSD"
                   className="w-full bg-slate-900/90 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono text-sm shadow-inner"
                   placeholder="1.420"
                 />
@@ -143,14 +146,17 @@ export default function OrderEntry() {
 
             <div className="form-item">
               <div className="flex justify-between text-xs text-gray-400 mb-1.5 font-mono">
-                <label>Amount (tNIGHT)</label>
+                <label htmlFor="order-amount-input">Amount (tNIGHT)</label>
                 <span className="text-slate-500">Bal: 1,000.00</span>
               </div>
               <div className="relative">
                 <input 
+                  id="order-amount-input"
+                  name="orderAmount"
                   type="number" 
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
+                  aria-label="Order token amount in tNIGHT"
                   className="w-full bg-slate-900/90 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-mono text-sm shadow-inner"
                   placeholder="0.00"
                 />
