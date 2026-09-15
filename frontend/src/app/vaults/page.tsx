@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Lock, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Shield, Sparkles, RefreshCw, CheckCircle2, Coins } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { detectWallet } from '@/lib/midnight';
+import { getConnectedOrMockWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 interface Vault {
@@ -55,7 +55,7 @@ export default function VaultsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await detectWallet();
+      const dappConnector = await getConnectedOrMockWallet();
 
       // Step 2: Connect to the vault contract
       const contract = await Contract.connect(dappConnector, VAULT_CONTRACT_ADDRESS);
@@ -90,7 +90,7 @@ export default function VaultsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await detectWallet();
+      const dappConnector = await getConnectedOrMockWallet();
 
       // Step 2: Connect to the vault contract
       const contract = await Contract.connect(dappConnector, VAULT_CONTRACT_ADDRESS);

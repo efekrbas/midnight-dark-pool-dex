@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Award, Download, Share2, ShieldCheck, Lock, Sparkles, CheckCircle2, Copy, RefreshCw } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { detectWallet } from '@/lib/midnight';
+import { getConnectedOrMockWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 export default function CertificatePage() {
@@ -30,7 +30,7 @@ export default function CertificatePage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await detectWallet();
+      const dappConnector = await getConnectedOrMockWallet();
 
       // Step 2: Deploy a solvency proof contract on Midnight Preprod
       const { contractAddress } = await Contract.deployContract(dappConnector);

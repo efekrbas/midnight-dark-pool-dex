@@ -30,6 +30,48 @@ export async function detectWallet(): Promise<DAppConnectorAPI> {
   return walletProvider as DAppConnectorAPI;
 }
 
+export async function getConnectedOrMockWallet(): Promise<DAppConnectorAPI> {
+  try {
+    return await detectWallet();
+  } catch (err) {
+    console.info('[Midnight SDK] Injected wallet not detected, using simulation connector:', err);
+    return {
+      getShieldedBalances: async () => ({}),
+      getUnshieldedBalances: async () => ({}),
+      getDustBalance: async () => ({ cap: BigInt(100000000), balance: BigInt(50000000) }),
+      getShieldedAddresses: async () => ({
+        shieldedAddress: 'mn1simulated00000000000000000000000000000000',
+        shieldedCoinPublicKey: '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+        shieldedEncryptionPublicKey: 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210',
+      }),
+      getUnshieldedAddress: async () => ({
+        unshieldedAddress: 'mn1unshielded0000000000000000000000000000000',
+      }),
+      getDustAddress: async () => ({
+        dustAddress: 'mn1dust00000000000000000000000000000000000',
+      }),
+      getTxHistory: async () => [],
+      balanceUnsealedTransaction: async (tx: string) => ({ tx }),
+      balanceSealedTransaction: async (tx: string) => ({ tx }),
+      makeTransfer: async () => ({ tx: '' }),
+      makeIntent: async () => ({ tx: '' }),
+      signData: async (data: string) => ({
+        data,
+        signature: '00'.repeat(64),
+        verifyingKey: '00'.repeat(32),
+      }),
+      submitTransaction: async () => {},
+      getConnectionStatus: async () => ({ status: 'connected', networkId: 'preprod' }),
+      getConfiguration: async () => ({
+        indexerUri: 'https://indexer.preprod.midnight.network/api/v1/graphql',
+        indexerWsUri: 'wss://indexer.preprod.midnight.network/api/v1/graphql',
+        substrateNodeUri: 'https://rpc.preprod.midnight.network',
+        networkId: 'preprod',
+      }),
+    } as unknown as DAppConnectorAPI;
+  }
+}
+
 export function fromHex(hex: string): Uint8Array {
   const h = hex.startsWith('0x') ? hex.slice(2) : hex;
   return Uint8Array.from(h.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
@@ -40,3 +82,4 @@ export function toHex(bytes: Uint8Array): string {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
+

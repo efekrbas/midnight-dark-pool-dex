@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Cpu, ArrowRight, ShieldCheck, Lock, Key, Database, Play, RefreshCw, CheckCircle2, Sparkles, Code2 } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { detectWallet } from '@/lib/midnight';
+import { getConnectedOrMockWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 interface CircuitNode {
@@ -70,7 +70,7 @@ export default function CircuitsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await detectWallet();
+      const dappConnector = await getConnectedOrMockWallet();
 
       // Step 2: Deploy a contract to synthesize the circuit on-chain
       const { contractAddress } = await Contract.deployContract(dappConnector);

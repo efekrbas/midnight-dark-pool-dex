@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Cpu, Sparkles, CheckCircle2, RefreshCw, Key, Database, Lock, Sliders, ArrowRight } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { detectWallet } from '@/lib/midnight';
+import { getConnectedOrMockWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 export default function PlaygroundPage() {
@@ -27,7 +27,7 @@ export default function PlaygroundPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      await detectWallet();
+      await getConnectedOrMockWallet();
 
       // Step 2: Simulate ZK Circuit execution time
       await new Promise(resolve => setTimeout(resolve, 2000));

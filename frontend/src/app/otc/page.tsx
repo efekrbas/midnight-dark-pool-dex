@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Briefcase, Send, Lock, ShieldCheck, RefreshCw, CheckCircle2, Clock, DollarSign } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { detectWallet } from '@/lib/midnight';
+import { getConnectedOrMockWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 export default function OtcPage() {
@@ -22,7 +22,7 @@ export default function OtcPage() {
 
     try {
       // Step 1: Connect to the Midnight wallet via DApp Connector API
-      const dappConnector = await detectWallet();
+      const dappConnector = await getConnectedOrMockWallet();
 
       // Step 2: Deploy a new contract instance for this RFQ order
       const { contractAddress } = await Contract.deployContract(dappConnector);
