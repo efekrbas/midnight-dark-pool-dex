@@ -132,34 +132,34 @@ export default function Navbar() {
             <Link
               href="/about"
               onClick={() => sounds.playClick()}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
             >
               <Info className="w-3.5 h-3.5 text-teal-400" />
-              <span className="hidden md:inline">About</span>
+              <span>About</span>
             </Link>
 
             <Link
               href="/docs"
               onClick={() => sounds.playClick()}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+              className="hidden lg:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
             >
               <BookOpen className="w-3.5 h-3.5 text-teal-400" />
-              <span className="hidden md:inline">Docs</span>
+              <span>Docs</span>
             </Link>
 
             <Link
               href="/analytics"
               onClick={() => sounds.playClick()}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+              className="hidden xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
             >
               <Activity className="w-3.5 h-3.5 text-teal-400" />
-              <span className="hidden md:inline">{t('analytics')}</span>
+              <span>{t('analytics')}</span>
             </Link>
 
             <Link
               href="/benchmark"
               onClick={() => sounds.playClick()}
-              className="hidden xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+              className="hidden 2xl:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
             >
               <Cpu className="w-3.5 h-3.5 text-teal-400" />
               <span>{t('benchmark')}</span>
@@ -184,7 +184,7 @@ export default function Navbar() {
             </Link>
 
             {/* More Menu Dropdown for smaller screens */}
-            <div className="relative 2xl:hidden">
+            <div className="relative xl:hidden">
               <button
                 onClick={() => {
                   sounds.playClick();
@@ -200,6 +200,17 @@ export default function Navbar() {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowMoreMenu(false)} />
                   <div className="absolute top-full left-0 mt-2 w-44 bg-slate-900/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.8)] z-50 p-1.5 space-y-1 animate-fadeIn font-mono text-xs">
+                    <Link
+                      href="/analytics"
+                      onClick={() => {
+                        sounds.playClick();
+                        setShowMoreMenu(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      <Activity className="w-3.5 h-3.5 text-teal-400" />
+                      <span>Analytics</span>
+                    </Link>
                     <Link
                       href="/benchmark"
                       onClick={() => {
@@ -349,7 +360,7 @@ export default function Navbar() {
                 sounds.playClick();
                 setShowTour(true);
               }}
-              className="px-2.5 py-1.5 rounded-xl bg-teal-500/10 border border-teal-500/30 hover:bg-teal-500/20 text-teal-300 text-xs font-semibold flex items-center gap-1.5 transition-all hidden lg:flex"
+              className="px-2.5 py-1.5 rounded-xl bg-teal-500/10 border border-teal-500/30 hover:bg-teal-500/20 text-teal-300 text-xs font-semibold flex items-center gap-1.5 transition-all hidden 2xl:flex"
             >
               <Compass className="w-3.5 h-3.5 text-teal-400" />
               <span>Take Tour</span>
