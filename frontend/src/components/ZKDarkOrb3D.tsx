@@ -3,86 +3,111 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 
 /**
- * Midnight-themed Moon Phases Cycle visualization
- * Inspired by the "New Moon to Full" Midnight branding
- * Shows moon phases orbiting in a cycle with starfield background
+ * Midnight Moon Phase Cycle Visualization
+ * Displays an elliptical orbit of 8 realistic moon phases connected by orbital lines,
+ * with the official Midnight Network emblem (from photo 1) positioned in the center,
+ * backed by celestial radial glow and starfield.
  */
 export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const starsRef = useRef<{ x: number; y: number; size: number; twinkleSpeed: number; brightness: number }[]>([]);
   const initRef = useRef(false);
+  const logoImgRef = useRef<HTMLImageElement | null>(null);
+
+  // Preload Midnight logo image (1st photo)
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/midnight-symbol-transparent.png';
+    img.onload = () => {
+      logoImgRef.current = img;
+    };
+  }, []);
 
   const drawMoon = useCallback((
     ctx: CanvasRenderingContext2D,
     x: number, y: number, radius: number,
-    phase: number, // 0 = new moon (dark), 0.5 = full moon (bright), 1 = new moon again
+    phase: number, // 0 = new moon, 0.5 = full moon, 1 = new moon
     glowAmount: number
   ) => {
-    // Moon glow
-    if (glowAmount > 0.1) {
-      const glow = ctx.createRadialGradient(x, y, radius * 0.8, x, y, radius * 2.5);
-      glow.addColorStop(0, `rgba(200, 210, 230, ${glowAmount * 0.12})`);
-      glow.addColorStop(0.5, `rgba(150, 170, 210, ${glowAmount * 0.04})`);
+    // Atmospheric aura for brighter phases
+    if (glowAmount > 0.15) {
+      const glow = ctx.createRadialGradient(x, y, radius * 0.7, x, y, radius * 2.6);
+      glow.addColorStop(0, `rgba(210, 225, 255, ${glowAmount * 0.18})`);
+      glow.addColorStop(0.5, `rgba(130, 160, 230, ${glowAmount * 0.06})`);
       glow.addColorStop(1, 'transparent');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(x, y, radius * 2.5, 0, Math.PI * 2);
+      ctx.arc(x, y, radius * 2.6, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Moon base (dark side)
+    // Base moon sphere (dark side)
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = '#1a1a2e';
+    ctx.fillStyle = '#121324';
     ctx.fill();
 
-    // Subtle crater texture on dark side
+    // Subtle edge rim on dark side
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
-    // Lit portion based on phase
-    // phase 0 = new (all dark), 0.25 = first quarter, 0.5 = full, 0.75 = last quarter
-    const illumination = Math.sin(phase * Math.PI); // 0 at new, 1 at full
+    // Illuminated portion based on phase
+    const illumination = Math.sin(phase * Math.PI); // 0 at new moon, 1 at full moon
 
-    if (illumination > 0.01) {
+    if (illumination > 0.02) {
       ctx.save();
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.clip();
 
-      // Determine the lit area shape
+      // Terminator curve
+      const isWaxing = phase <= 0.5;
       const terminator = Math.cos(phase * Math.PI * 2) * radius;
 
       ctx.beginPath();
-      // Right half arc
-      ctx.arc(x, y, radius, -Math.PI / 2, Math.PI / 2);
-      // Terminator curve (elliptical)
-      ctx.ellipse(x, y, Math.abs(terminator), radius, 0, Math.PI / 2, -Math.PI / 2, terminator > 0);
+      if (isWaxing) {
+        // Waxing: lit on the right side
+        ctx.arc(x, y, radius, -Math.PI / 2, Math.PI / 2, false);
+        ctx.ellipse(x, y, Math.max(0.1, Math.abs(terminator)), radius, 0, Math.PI / 2, -Math.PI / 2, terminator > 0);
+      } else {
+        // Waning: lit on the left side
+        ctx.arc(x, y, radius, Math.PI / 2, -Math.PI / 2, false);
+        ctx.ellipse(x, y, Math.max(0.1, Math.abs(terminator)), radius, 0, -Math.PI / 2, Math.PI / 2, terminator < 0);
+      }
       ctx.closePath();
 
-      // Moon surface gradient (lit side)
+      // Spherical gradient on lit face
+      const gradX = isWaxing ? x + radius * 0.2 : x - radius * 0.2;
       const moonGrad = ctx.createRadialGradient(
-        x + radius * 0.15, y - radius * 0.1, radius * 0.1,
-        x, y, radius
+        gradX, y - radius * 0.15, radius * 0.05,
+        x, y, radius * 1.1
       );
-      moonGrad.addColorStop(0, '#e8e8f0');
-      moonGrad.addColorStop(0.3, '#d0d0de');
-      moonGrad.addColorStop(0.7, '#b8b8cc');
-      moonGrad.addColorStop(1, '#9898aa');
+      moonGrad.addColorStop(0, '#f2f4ff');
+      moonGrad.addColorStop(0.25, '#dbe0f2');
+      moonGrad.addColorStop(0.65, '#a4a9c2');
+      moonGrad.addColorStop(1, '#6f748f');
       ctx.fillStyle = moonGrad;
+      ctx.fill();
+
+      // Soft crater detail
+      ctx.fillStyle = 'rgba(80, 85, 110, 0.15)';
+      ctx.beginPath();
+      ctx.arc(x + radius * 0.1, y - radius * 0.1, radius * 0.18, 0, Math.PI * 2);
+      ctx.arc(x - radius * 0.15, y + radius * 0.2, radius * 0.14, 0, Math.PI * 2);
+      ctx.arc(x + radius * 0.25, y + radius * 0.15, radius * 0.1, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.restore();
     }
 
-    // Rim light (thin bright edge)
+    // Outer spherical rim highlight
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(180, 190, 220, ${0.08 + illumination * 0.12})`;
+    ctx.strokeStyle = `rgba(200, 215, 255, ${0.06 + illumination * 0.14})`;
     ctx.lineWidth = 0.8;
     ctx.stroke();
   }, []);
@@ -97,139 +122,188 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     // === STARFIELD ===
     if (!initRef.current || starsRef.current.length === 0) {
       starsRef.current = [];
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 90; i++) {
         starsRef.current.push({
           x: Math.random(),
           y: Math.random(),
-          size: Math.random() * 1.5 + 0.3,
-          twinkleSpeed: Math.random() * 2 + 0.5,
-          brightness: Math.random() * 0.4 + 0.1,
+          size: Math.random() * 1.6 + 0.3,
+          twinkleSpeed: Math.random() * 2.5 + 0.6,
+          brightness: Math.random() * 0.45 + 0.1,
         });
       }
       initRef.current = true;
     }
 
     for (const star of starsRef.current) {
-      const alpha = star.brightness + Math.sin(t * star.twinkleSpeed + star.x * 10) * 0.08;
+      const alpha = star.brightness + Math.sin(t * star.twinkleSpeed + star.x * 12) * 0.1;
       ctx.beginPath();
       ctx.arc(star.x * w, star.y * h, star.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(180, 200, 255, ${alpha})`;
+      ctx.fillStyle = `rgba(190, 210, 255, ${Math.max(0.04, alpha)})`;
       ctx.fill();
     }
 
-    // === ORBITAL PATH (blue arc connecting moon phases) ===
-    const orbitRadiusX = scale * 0.32;
-    const orbitRadiusY = scale * 0.28;
-    const orbitTilt = 0.15;
+    // === ORBITAL PATHS (concentric faint dashed ellipses matching branding) ===
+    const orbitRadiusX = scale * 0.35;
+    const orbitRadiusY = scale * 0.27;
+    const orbitTilt = -0.12; // Slight tilt like reference
 
-    // Draw orbital path
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(orbitTilt);
+
+    // Outer orbit line
     ctx.beginPath();
-    ctx.ellipse(cx, cy, orbitRadiusX, orbitRadiusY, orbitTilt, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(60, 80, 180, 0.15)';
+    ctx.ellipse(0, 0, orbitRadiusX * 1.04, orbitRadiusY * 1.04, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(90, 120, 230, 0.08)';
     ctx.lineWidth = 1;
+    ctx.setLineDash([2, 5]);
+    ctx.stroke();
+
+    // Main orbit line
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orbitRadiusX, orbitRadiusY, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(110, 145, 255, 0.2)';
+    ctx.lineWidth = 1.2;
     ctx.setLineDash([4, 6]);
     ctx.stroke();
-    ctx.setLineDash([]);
 
-    // Subtle blue glow on orbital path
+    // Inner orbit line
     ctx.beginPath();
-    ctx.ellipse(cx, cy, orbitRadiusX, orbitRadiusY, orbitTilt, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(40, 60, 200, 0.06)';
-    ctx.lineWidth = 6;
+    ctx.ellipse(0, 0, orbitRadiusX * 0.96, orbitRadiusY * 0.96, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(80, 110, 220, 0.07)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 7]);
     ctx.stroke();
 
-    // === MOON PHASES arranged around the orbit ===
+    // Subtle blue glow ring
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orbitRadiusX, orbitRadiusY, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(70, 110, 255, 0.05)';
+    ctx.lineWidth = 8;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    ctx.restore();
+
+    // === 8 MOON PHASES orbiting in cycle ===
     const phaseCount = 8;
-    const rotationOffset = t * 0.05; // Slow rotation
+    const rotationOffset = t * 0.04; // Smooth slow orbit
 
-    // Draw connecting lines first (behind moons)
-    for (let i = 0; i < phaseCount; i++) {
-      const angle1 = (i / phaseCount) * Math.PI * 2 + rotationOffset;
-      const angle2 = ((i + 1) / phaseCount) * Math.PI * 2 + rotationOffset;
-
-      const x1 = cx + Math.cos(angle1 + orbitTilt) * orbitRadiusX;
-      const y1 = cy + Math.sin(angle1 + orbitTilt) * orbitRadiusY;
-      const x2 = cx + Math.cos(angle2 + orbitTilt) * orbitRadiusX;
-      const y2 = cy + Math.sin(angle2 + orbitTilt) * orbitRadiusY;
-
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = 'rgba(60, 80, 200, 0.12)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Glow dot at connection points
-      const glowGrad = ctx.createRadialGradient(x1, y1, 0, x1, y1, 4);
-      glowGrad.addColorStop(0, 'rgba(80, 100, 220, 0.25)');
-      glowGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = glowGrad;
-      ctx.beginPath();
-      ctx.arc(x1, y1, 4, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Draw moons (sorted by Y for depth)
+    // Calculate positions
     const moons: { x: number; y: number; phase: number; size: number; glow: number }[] = [];
+    const points: { x: number; y: number }[] = [];
 
     for (let i = 0; i < phaseCount; i++) {
       const angle = (i / phaseCount) * Math.PI * 2 + rotationOffset;
-      const mx = cx + Math.cos(angle + orbitTilt) * orbitRadiusX;
-      const my = cy + Math.sin(angle + orbitTilt) * orbitRadiusY;
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
 
-      // Phase: 0=new, 0.5=full, 1=new
+      // Rotate with orbit tilt
+      const rx = cosA * orbitRadiusX;
+      const ry = sinA * orbitRadiusY;
+      const mx = cx + rx * Math.cos(orbitTilt) - ry * Math.sin(orbitTilt);
+      const my = cy + rx * Math.sin(orbitTilt) + ry * Math.cos(orbitTilt);
+
+      points.push({ x: mx, y: my });
+
       const moonPhase = i / phaseCount;
-
-      // Size variation: full moon is bigger
       const illumination = Math.sin(moonPhase * Math.PI);
-      const moonSize = scale * (0.03 + illumination * 0.02);
+      const moonSize = scale * (0.028 + illumination * 0.016);
 
       moons.push({ x: mx, y: my, phase: moonPhase, size: moonSize, glow: illumination });
     }
 
-    // Sort by y so "closer" moons draw on top
-    moons.sort((a, b) => a.y - b.y);
+    // Draw connecting chords and nodal glow dots
+    for (let i = 0; i < phaseCount; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % phaseCount];
 
-    for (const moon of moons) {
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.strokeStyle = 'rgba(80, 120, 240, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Vertex dot
+      ctx.beginPath();
+      ctx.arc(p1.x, p1.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(120, 160, 255, 0.35)';
+      ctx.fill();
+    }
+
+    // Sort moons by Y for natural perspective depth
+    const sortedMoons = [...moons].sort((a, b) => a.y - b.y);
+    for (const moon of sortedMoons) {
       drawMoon(ctx, moon.x, moon.y, moon.size, moon.phase, moon.glow);
     }
 
-    // === CENTER: Large "Full Moon" hero ===
-    const heroRadius = scale * 0.1;
-    const heroPulse = 1 + Math.sin(t * 0.8) * 0.01;
+    // === CENTER: MIDNIGHT EMBLEM (1st Photo) ===
+    const heroRadius = scale * 0.12;
+    const heroPulse = 1 + Math.sin(t * 1.2) * 0.015;
     const heroR = heroRadius * heroPulse;
 
-    // Hero moon glow
-    const heroGlow = ctx.createRadialGradient(cx, cy, heroR * 0.5, cx, cy, heroR * 3);
-    heroGlow.addColorStop(0, 'rgba(200, 210, 240, 0.1)');
-    heroGlow.addColorStop(0.3, 'rgba(100, 120, 200, 0.04)');
-    heroGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = heroGlow;
+    // Ambient moonlight glow radiating outward from center
+    const ambientGlow = ctx.createRadialGradient(cx, cy, heroR * 0.2, cx, cy, heroR * 2.8);
+    ambientGlow.addColorStop(0, 'rgba(170, 195, 255, 0.18)');
+    ambientGlow.addColorStop(0.35, 'rgba(80, 115, 230, 0.08)');
+    ambientGlow.addColorStop(0.7, 'rgba(40, 60, 160, 0.02)');
+    ambientGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = ambientGlow;
     ctx.beginPath();
-    ctx.arc(cx, cy, heroR * 3, 0, Math.PI * 2);
+    ctx.arc(cx, cy, heroR * 2.8, 0, Math.PI * 2);
     ctx.fill();
 
-    // Hero moon body
-    drawMoon(ctx, cx, cy, heroR, 0.5, 1.0);
+    // Dark backdrop disc so orbital lines pass behind cleanly
+    ctx.beginPath();
+    ctx.arc(cx, cy, heroR * 1.05, 0, Math.PI * 2);
+    ctx.fillStyle = '#07080f';
+    ctx.fill();
 
-    // Midnight logo overlay on center moon (3 dots)
-    const dotSize = heroR * 0.1;
-    const dotGapY = heroR * 0.28;
-    ctx.globalAlpha = 0.6;
-    for (let i = -1; i <= 1; i++) {
-      ctx.fillStyle = '#0A0A0A';
-      ctx.fillRect(cx - dotSize / 2, cy + i * dotGapY - dotSize / 2, dotSize, dotSize);
+    // Faint outer rim on center disc
+    ctx.beginPath();
+    ctx.arc(cx, cy, heroR * 1.05, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Render official 1st photo emblem
+    if (logoImgRef.current && logoImgRef.current.complete) {
+      ctx.save();
+      // Draw centered image
+      const imgSize = heroR * 2.1;
+      ctx.drawImage(
+        logoImgRef.current,
+        cx - imgSize / 2,
+        cy - imgSize / 2,
+        imgSize,
+        imgSize
+      );
+      ctx.restore();
+    } else {
+      // Vector fallback matching 1st photo precisely
+      ctx.save();
+      const ringR = heroR * 0.72;
+      const ringThick = heroR * 0.12;
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = ringThick;
+      ctx.stroke();
+
+      // 3 vertical white squares in top half (Midnight 12:00 hand)
+      const sqSize = heroR * 0.13;
+      const sqY1 = cy - heroR * 0.52;
+      const sqY2 = cy - heroR * 0.32;
+      const sqY3 = cy - heroR * 0.12;
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(cx - sqSize / 2, sqY1 - sqSize / 2, sqSize, sqSize);
+      ctx.fillRect(cx - sqSize / 2, sqY2 - sqSize / 2, sqSize, sqSize);
+      ctx.fillRect(cx - sqSize / 2, sqY3 - sqSize / 2, sqSize, sqSize);
+      ctx.restore();
     }
-    ctx.globalAlpha = 1;
-
-    // === BOTTOM GLOW FLARE ===
-    const flareGrad = ctx.createRadialGradient(cx, cy + scale * 0.3, 0, cx, cy + scale * 0.3, scale * 0.25);
-    flareGrad.addColorStop(0, `rgba(100, 140, 255, ${0.04 + Math.sin(t * 1.5) * 0.015})`);
-    flareGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = flareGrad;
-    ctx.beginPath();
-    ctx.arc(cx, cy + scale * 0.3, scale * 0.25, 0, Math.PI * 2);
-    ctx.fill();
 
   }, [drawMoon]);
 
@@ -249,7 +323,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
-      initRef.current = false; // regenerate stars on resize
+      initRef.current = false;
     };
 
     resize();
@@ -277,8 +351,8 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
   return (
     <div className={`relative ${className} flex items-center justify-center`}>
       <canvas ref={canvasRef} className="w-full h-full" />
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono text-white/25 tracking-[0.15em] uppercase pointer-events-none flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full border border-white/5 backdrop-blur-md">
-        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono text-white/30 tracking-[0.16em] uppercase pointer-events-none flex items-center gap-2 bg-black/60 px-3.5 py-1.2 rounded-full border border-white/10 backdrop-blur-md">
+        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
         Midnight · Moon Phase Cycle
       </div>
     </div>
