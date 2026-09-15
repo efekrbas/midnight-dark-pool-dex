@@ -110,7 +110,7 @@ export default function Navbar() {
           </Link>
 
           {/* Navigation Links - Primary */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2 min-w-0 overflow-hidden">
             <Link
               href="/trade"
               onClick={() => sounds.playClick()}
@@ -352,7 +352,7 @@ export default function Navbar() {
           </div>
 
           {/* Right Action Tools */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2.5">
+          <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
             
             {/* Guided Tour Button */}
             <button
@@ -426,7 +426,7 @@ export default function Navbar() {
             ) : (
               <button
                 onClick={handleConnect}
-                className="glass-button px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono border border-teal-500/30 text-teal-400 hover:text-teal-300 hover:border-teal-500/50 shadow-lg shadow-teal-500/20"
+                className="glass-button px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono border border-teal-500/30 text-teal-400 hover:text-teal-300 hover:border-teal-500/50 shadow-lg shadow-teal-500/20 shrink-0 whitespace-nowrap"
               >
                 {t('connectWallet')}
               </button>
