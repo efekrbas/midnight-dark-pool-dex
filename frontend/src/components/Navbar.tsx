@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { Hexagon, Volume2, VolumeX, Command, Lock, Activity, Briefcase, Sparkles, Cpu, HelpCircle, ShieldCheck, LogOut, Copy, ChevronDown, Check, Compass, Sliders, MoreHorizontal, Coins, Award, Globe, Trophy, Code2, Zap } from 'lucide-react';
+import { Hexagon, Volume2, VolumeX, Command, Lock, Activity, Briefcase, Sparkles, Cpu, HelpCircle, ShieldCheck, LogOut, Copy, ChevronDown, Check, Compass, Sliders, MoreHorizontal, Coins, Award, Globe, Trophy, Code2, Zap, BookOpen, Info } from 'lucide-react';
 import { useState } from 'react';
 import OnboardingModal from './OnboardingModal';
 import CommandPalette from './CommandPalette';
@@ -127,6 +127,24 @@ export default function Navbar() {
             >
               <Briefcase className="w-3.5 h-3.5 text-teal-400" />
               <span className="hidden sm:inline">{t('portfolio')}</span>
+            </Link>
+
+            <Link
+              href="/about"
+              onClick={() => sounds.playClick()}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+            >
+              <Info className="w-3.5 h-3.5 text-teal-400" />
+              <span className="hidden md:inline">About</span>
+            </Link>
+
+            <Link
+              href="/docs"
+              onClick={() => sounds.playClick()}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all text-xs font-semibold"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-teal-400" />
+              <span className="hidden md:inline">Docs</span>
             </Link>
 
             <Link
@@ -292,6 +310,29 @@ export default function Navbar() {
                     >
                       <Sparkles className="w-3.5 h-3.5 text-teal-400" />
                       <span>Quests</span>
+                    </Link>
+                    <div className="h-px bg-white/10 my-1" />
+                    <Link
+                      href="/about"
+                      onClick={() => {
+                        sounds.playClick();
+                        setShowMoreMenu(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      <Info className="w-3.5 h-3.5 text-teal-400" />
+                      <span>About Us</span>
+                    </Link>
+                    <Link
+                      href="/docs"
+                      onClick={() => {
+                        sounds.playClick();
+                        setShowMoreMenu(false);
+                      }}
+                      className="w-full px-3 py-2 rounded-xl flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5 transition-all"
+                    >
+                      <BookOpen className="w-3.5 h-3.5 text-teal-400" />
+                      <span>Documentation</span>
                     </Link>
                   </div>
                 </>

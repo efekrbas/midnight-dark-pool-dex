@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Hexagon, GitBranch, MessageCircle, ExternalLink, Shield, Lock, Sparkles } from 'lucide-react';
+import { Hexagon, GitBranch, MessageCircle, ExternalLink, Shield, Lock, Sparkles, BookOpen, Info } from 'lucide-react';
 
 const footerLinks = {
   product: [
@@ -10,6 +10,7 @@ const footerLinks = {
     { label: 'Portfolio', href: '/portfolio' },
     { label: 'Analytics', href: '/analytics' },
     { label: 'Vaults', href: '/vaults' },
+    { label: 'About Us', href: '/about' },
   ],
   tools: [
     { label: 'ZK Benchmark', href: '/benchmark' },
@@ -18,6 +19,7 @@ const footerLinks = {
     { label: 'Network Map', href: '/network' },
   ],
   resources: [
+    { label: 'Documentation & Guide', href: '/docs' },
     { label: 'Midnight Docs', href: 'https://docs.midnight.network', external: true },
     { label: 'Compact Lang', href: 'https://docs.midnight.network/develop/tutorial', external: true },
     { label: 'GitHub', href: 'https://github.com/midnight-ntwrk', external: true },
@@ -90,15 +92,21 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {footerLinks.resources.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-slate-400 hover:text-white transition-colors font-mono flex items-center gap-1"
-                  >
-                    {link.label}
-                    <ExternalLink className="w-2.5 h-2.5 opacity-50" />
-                  </a>
+                  {'external' in link && link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-slate-400 hover:text-white transition-colors font-mono flex items-center gap-1"
+                    >
+                      {link.label}
+                      <ExternalLink className="w-2.5 h-2.5 opacity-50" />
+                    </a>
+                  ) : (
+                    <Link href={link.href} className="text-xs text-slate-400 hover:text-white transition-colors font-mono flex items-center gap-1">
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

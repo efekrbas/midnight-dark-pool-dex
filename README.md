@@ -14,6 +14,8 @@
 | Deliverable | URL / Link | Description |
 |---|---|---|
 | **Live Production dApp** | [midnight-dark-pool-dex.vercel.app](https://midnight-dark-pool-dex.vercel.app/) | Live decentralized trading terminal connected to Midnight Preprod. |
+| **About Us & USP Showcase** | [/about](https://midnight-dark-pool-dex.vercel.app/about) | Interactive 3D WebGL cryptographic lattice, 5-pillar USP, competitive matrix, and roadmap. |
+| **Documentation & Guide Portal** | [/docs](https://midnight-dark-pool-dex.vercel.app/docs) | Comprehensive onboarding guide, Compact contract walkthrough, SDK reference, and interactive ZK circuit simulator. |
 | **Demo Walkthrough Video** | [youtu.be/sGedRuCPU3Q](https://youtu.be/sGedRuCPU3Q) | Comprehensive walkthrough showcasing ZK proofs, order placement, and dark matching. |
 | **70+ Verified Testers** | [USERS.md](USERS.md) | 75 active Preprod traders with proven on-chain transaction activity. |
 | **Google Feedback Form** | [Survey Form](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform) | Active user survey collecting ratings, feature requests, and bug reports. |
@@ -21,6 +23,7 @@
 | **Preprod Tx Proof** | [Midnight ZK Verifier Portal](https://midnight-dark-pool-dex.vercel.app/verify?proof=8f8a12e45bc3901a71e8f23490bca78129034fbc871029384712039847102938) | Live cryptographic ZK-SNARK proof verifier validating Preprod transactions. |
 | **Architecture Specification** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical diagrams detailing Compact circuits, relayer privacy, and dark matching logic. |
 | **Onboarding Guide** | [docs/USAGE.md](docs/USAGE.md) | Step-by-step tutorial on connecting Lace Preprod wallet and minting tNIGHT. |
+| **Project Proposal** | [PROPOSAL.md](PROPOSAL.md) | Full institutional project proposal with 5-pillar USP and competitive analysis. |
 
 ---
 
@@ -47,6 +50,24 @@ Traditional Decentralized Exchanges (DEXs) broadcast every order directly to a p
 - **What is PUBLIC:** Total estimated market liquidity bands (Blurred Depth Chart), available token trading pairs, and finalized executed trade settlements.
 - **What is PRIVATE:** Exact price limits, exact order quantities, individual wallet balances, and active unmatched orders.
 - **What the User PROVES (via ZK-SNARKs):** The trader mathematically proves sufficient balance commitments to cover the order and that their secret order satisfies trade crossing criteria.
+
+---
+
+## 🔑 Why Midnight Dark Pool DEX Beats Traditional Sealed-Bid Marketplaces (Our USP)
+
+Reviewers and builders often compare this project to standard "sealed-bid marketplace" dApps. Here is why this comparison fundamentally mischaracterizes the protocol:
+
+| Dimension | Standard EVM Sealed-Bid Auction | Midnight Dark Pool DEX |
+|---|---|---|
+| **Mechanism** | 2-step commit-reveal with discrete auction windows | Continuous dark pool with streaming limit orders |
+| **Privacy Duration** | Private until reveal, then 100% public | Private forever — settled via ZK proof, never revealed |
+| **Free Option Problem** | Critical: losers refuse to reveal, auction breaks | Solved: atomic ZK crossing, no separate reveal step |
+| **MEV Risk** | High upon reveal (sandwich/frontrun) | Zero: mempool contains only opaque commitments |
+| **Gas Anonymity** | Broken: public ETH gas links wallets | Shielded: Midnight DUST token breaks correlation |
+| **Regulatory Path** | All-or-nothing transparency | Selective Disclosure viewing keys for compliance |
+| **ZK Implementation** | Hash-based (non-ZK, just hashing) | Real zk-SNARK circuits via Midnight Compact |
+
+**In summary:** A sealed-bid marketplace is a one-time episodic event. Midnight Dark Pool DEX is a continuous, institutional-grade, privacy-preserving exchange with real zk-SNARK circuits, atomic settlement, and regulatory-compatible selective disclosure. See [`/about`](https://midnight-dark-pool-dex.vercel.app/about) for the full interactive breakdown.
 
 ---
 
