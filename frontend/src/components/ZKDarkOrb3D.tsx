@@ -39,12 +39,11 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     ctx.fillStyle = '#0A0A0A';
     ctx.fill();
 
-    // === SMALL DOT ON OUTSIDE OF RING (upper-left, ~10 o'clock) ===
-    const dotAngle = -Math.PI * 0.62; // ~10 o'clock position
-    const dotDistance = logoRadius + ringThickness / 2 + scale * 0.012;
-    const outerDotRadius = scale * 0.014;
-    const outerDotX = cx + Math.cos(dotAngle) * dotDistance;
-    const outerDotY = cy + Math.sin(dotAngle) * dotDistance;
+    // === SMALL DOT SITTING ON THE RING (~10 o'clock position) ===
+    const dotAngle = -Math.PI * 0.6;
+    const outerDotRadius = ringThickness * 0.7;
+    const outerDotX = cx + Math.cos(dotAngle) * logoRadius;
+    const outerDotY = cy + Math.sin(dotAngle) * logoRadius;
 
     ctx.beginPath();
     ctx.arc(outerDotX, outerDotY, outerDotRadius, 0, Math.PI * 2);
