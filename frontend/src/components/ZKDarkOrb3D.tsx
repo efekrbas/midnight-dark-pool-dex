@@ -270,7 +270,9 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     // Render official 1st photo emblem
     if (logoImgRef.current && logoImgRef.current.complete) {
       ctx.save();
-      // Draw centered image
+      ctx.beginPath();
+      ctx.arc(cx, cy, heroR * 1.04, 0, Math.PI * 2);
+      ctx.clip();
       const imgSize = heroR * 2.1;
       ctx.drawImage(
         logoImgRef.current,
@@ -351,9 +353,11 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
   return (
     <div className={`relative ${className} flex items-center justify-center`}>
       <canvas ref={canvasRef} className="w-full h-full" />
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono text-white/30 tracking-[0.16em] uppercase pointer-events-none flex items-center gap-2 bg-black/60 px-3.5 py-1.2 rounded-full border border-white/10 backdrop-blur-md">
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono tracking-[0.16em] uppercase pointer-events-none flex items-center gap-2 bg-black/60 px-3.5 py-1 rounded-full border border-white/10 backdrop-blur-md">
         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-        Midnight · Moon Phase Cycle
+        <span className="text-white/60 font-semibold">MIDNIGHT</span>
+        <span className="text-white/20">/</span>
+        <span className="text-white/40">MOON PHASE CYCLE</span>
       </div>
     </div>
   );
