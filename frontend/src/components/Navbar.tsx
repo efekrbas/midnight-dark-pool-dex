@@ -367,10 +367,14 @@ export default function Navbar() {
             </button>
 
             {/* Theme Selector */}
-            <ThemeSelector />
+            <div className="hidden xl:block">
+              <ThemeSelector />
+            </div>
 
             {/* Language Selector */}
-            <LanguageSelector />
+            <div className="hidden xl:block">
+              <LanguageSelector />
+            </div>
 
             {/* Shortcuts Help Button */}
             <button
@@ -378,7 +382,7 @@ export default function Navbar() {
                 sounds.playClick();
                 setShowShortcuts(true);
               }}
-              className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white transition-all hidden sm:block"
+              className="p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white transition-all hidden xl:block"
               title="Keyboard Shortcuts (?)"
             >
               <HelpCircle className="w-4 h-4 text-teal-400" />
@@ -390,7 +394,7 @@ export default function Navbar() {
                 sounds.playClick();
                 setShowCommandPalette(true);
               }}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 hover:border-teal-500/40 text-slate-400 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-all hidden md:flex"
+              className="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 hover:border-teal-500/40 text-slate-400 hover:text-white text-xs font-mono flex items-center gap-1.5 transition-all hidden xl:flex"
               title="Command Palette (Ctrl + K)"
             >
               <Command className="w-3.5 h-3.5 text-teal-400" />
