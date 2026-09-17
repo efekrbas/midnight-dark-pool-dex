@@ -1,42 +1,69 @@
 # User Guide: Midnight Dark Pool DEX
 
-Welcome to the **Midnight Dark Pool DEX** on the Preprod Network! 
+Welcome to the **Midnight Dark Pool DEX** on the Midnight Preprod Network! 
 
-Unlike traditional decentralized exchanges, our Dark Pool DEX uses Midnight's advanced Zero-Knowledge (ZK) technology to keep your trades completely private. Your order size and price are hidden from the public until a match is found, protecting you from front-running and MEV bots.
-
-## Getting Started on Preprod
-
-To use the DEX, you'll need to set up your environment for the Midnight Preprod network.
-
-1. **Install Lace Wallet:** Download and install the [Lace Wallet Browser Extension](https://www.lace.io/). Follow the setup wizard and securely back up your seed phrase.
-2. **Switch to Preprod:** In your Lace wallet settings, change the active network to **Midnight Preprod**.
-3. **Get Test Tokens (tNIGHT):** Visit the [Midnight Testnet Faucet](https://faucet.preprod.midnight.network/). Copy your wallet address, paste it into the faucet, and request your free test tokens. They will arrive in 1-2 minutes.
-
-## Your First Transaction
-
-Once your wallet is funded, you are ready to place a private trade!
-
-### 1. Connect Your Wallet
-Navigate to the Dark Pool DEX application and click **Connect Wallet** in the top right corner. Approve the connection in your Lace extension.
-
-### 2. View the Blurred Depth Chart
-Instead of a traditional order book that reveals everyone's exact trades, you will see an **Estimated Depth Chart (Blurred Liquidity)**. This "heat map" gives you a general idea of market liquidity without exposing individual traders' strategies.
-
-### 3. Place a Hidden Order
-- Select the asset pair you want to trade.
-- Enter your limit price and order size.
-- Click **Submit Hidden Order**.
-- **ZK Magic in Action:** You will see a glowing animation on your screen. This means your browser is generating a Zero-Knowledge proof locally. Your exact numbers are encrypted into a ZK commitment—no one else can see them!
-- Approve the transaction in your Lace wallet to submit your encrypted order to the blockchain.
-
-### 4. Wait for a Match
-The smart contract will continuously check for matches in the background. If another user submits an order that crosses your price, the contract will mathematically prove the match using the ZK proofs and execute the trade automatically. 
-
-### 5. Canceling an Order
-If your order hasn't matched yet and you change your mind, you can safely cancel it.
-- Go to your **Open Orders** tab.
-- Click **Cancel**.
-- This will retract your commitment on-chain *without* ever revealing what your original order size was!
+Unlike traditional decentralized exchanges, our Dark Pool DEX uses Midnight's advanced Zero-Knowledge (ZK) technology and Compact smart contracts to keep your trading intent completely private. Order sizes and limit prices remain hidden from observers until crossing matches are settled atomically on-chain.
 
 ---
-*Thank you for testing the Midnight Dark Pool DEX! Your privacy is our priority.*
+
+## 1. Getting Started on Preprod
+
+To use the DEX, configure your browser environment for the Midnight Preprod network:
+
+1. **Install Lace / 1AM Wallet:** Install the [Lace Wallet Browser Extension](https://www.lace.io/) or the Midnight 1AM wallet extension.
+2. **Switch Network:** In your wallet network settings, select **Midnight Preprod**.
+3. **Obtain Test Tokens (tNIGHT):** Visit the official [Midnight Preprod Faucet](https://faucet.preprod.midnight.network/). Copy your unshielded or shielded wallet address, paste it into the faucet, and request test tokens. Tokens will arrive within 1–2 minutes.
+
+---
+
+## 2. Trading Workflow
+
+### Step 1: Connect Your Wallet
+Navigate to the Dark Pool DEX application and click **Connect Wallet** in the navbar. Approve the connection request in your Lace or 1AM extension. Your unshielded and shielded addresses will be detected automatically.
+
+### Step 2: Deposit into Contract Escrow (Real Asset Settlement)
+Because trades settle atomically on-chain without exposing private keys:
+1. Navigate to the **Vaults** or **Deposit** tab.
+2. Specify the asset (e.g., `tNIGHT` or `ZKUSD`) and amount to deposit.
+3. Confirm the `deposit` transaction in your wallet.
+4. Your deposit is credited to your private commitment in the contract's on-chain `balances` ledger.
+
+### Step 3: Inspect the Blurred Depth Chart
+Instead of a public mempool order book, the DEX presents an **Estimated Depth Chart (Blurred Liquidity Heatmap)**.
+> **Note:** Market levels in demo mode are labelled `[DEMO DATA - SIMULATED LEVELS]` to clearly differentiate simulated UI liquidity visualization from live on-chain contract state.
+
+### Step 4: Place a Shielded Limit Order
+1. Select your trading pair (e.g., `tNIGHT / ZKUSD`).
+2. Enter your secret limit price and order quantity.
+3. Click **Submit Hidden Order**.
+4. **ZK Proving Pipeline:**
+   - The browser generates a cryptographic commitment (`amtComm` and `priceComm`) blinded by a 256-bit random salt.
+   - The private state is securely saved into your browser's **AES-GCM 256 encrypted storage**.
+   - Your wallet signs the unproven transaction, generates the ZK-SNARK proof via the proving provider, and submits it to Midnight Preprod.
+   - The genuine transaction hash is returned and displayed on screen.
+
+### Step 5: Continuous Dark Matching & Partial Fills
+- When an opposing order satisfies the price crossing condition (`buyPrice >= sellPrice`), the contract's `matchOrders` circuit executes the trade.
+- If order sizes differ, the contract automatically executes a **partial fill**, updating the remaining order balance while transitioning status to `PARTIALLY_FILLED`.
+- Base tokens and quote proceeds are atomically credited to buyer and seller escrow balances inside the contract.
+
+### Step 6: Order Cancellation & Refunds
+If your order has not been fully filled and you wish to retract it:
+1. Navigate to your **Open Orders** section.
+2. Click **Cancel Order**.
+3. The circuit proves your order ownership via your private `callerSecret` witness.
+4. The remaining unfilled escrowed funds are **immediately refunded** back to your available balance in the contract.
+
+---
+
+## 3. Independent Verification
+
+You can verify any transaction or contract state independently without relying on frontend metadata:
+
+1. Open the **Verify** portal at [`/verify`](https://midnight-dark-pool-dex.vercel.app/verify).
+2. Enter your transaction hash or the 64-character contract address.
+3. The page directly queries the live Midnight Preprod GraphQL Indexer:
+   ```
+   https://indexer.preprod.midnight.network/api/v4/graphql
+   ```
+4. If confirmed, block height, confirmation count, and state transition proofs will be displayed live.

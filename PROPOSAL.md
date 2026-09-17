@@ -35,18 +35,22 @@ Standard sealed-bid auction dApps rely on a vulnerable 2-phase commit-reveal mec
 
 ## Technical Architecture
 
-### Smart Contract: `darkpool.compact` (Midnight Compact v0.23)
+### Smart Contract: `darkpool.compact` (Midnight Compact)
 
-- **Order Submission Circuit (`submitOrder`)**: Generates `persistentCommit<Uint<64>>` cryptographic commitments for both amount and price, blinded by a user-held secret salt. Only the commitment hashes and a blinded trader key are stored on-chain.
-- **Matching Circuit (`matchOrders`)**: Verifies commitment integrity, checks the ZK price-crossing constraint (`buyPrice >= sellPrice`), and atomically marks both orders as filled — all without decrypting any plaintext values.
-- **State Model**: Public state stores only hashed commitments and order metadata. Private state (exact prices, amounts, secrets) remains exclusively in user local storage.
+- **Escrow & Settlement (`deposit`, `withdraw`)**: Real on-chain asset escrow managed via contract `balances` ledger. Users deposit base or quote tokens prior to trading; withdrawals authenticate caller ownership via private witness.
+- **Order Submission Circuit (`submitOrder`)**: Deducts deposited funds into order escrow, generates `persistentCommit<Uint<64>>` cryptographic commitments for both order amount and limit price blinded by a secret salt, binds order ownership to `callerCommit`, and registers the order on-chain with `OPEN` status.
+- **Cancellation & Refund Circuit (`cancelOrder`)**: Proves order ownership via `witness callerSecret(): Bytes<32>`, verifies status is `OPEN` or `PARTIALLY_FILLED`, transitions status to `CANCELLED`, and atomically refunds remaining unfilled tokens back to the user's available balance in the contract escrow.
+- **Matching Circuit (`matchOrders`)**: Proves crossing price inequality (`buyPrice >= sellPrice`) in zero knowledge, calculates execution amounts, supports partial fills (`PARTIALLY_FILLED` / `FILLED`), and performs atomic real asset settlement between buyer and seller in the `balances` ledger.
+- **Private-State Persistence**: Exact prices, order amounts, and secret salts are persisted locally using AES-GCM 256 client-side encryption.
+- **On-Chain Indexer Verification**: Public contract state, order commitments, and transaction confirmations are queried live from the Midnight Preprod GraphQL Indexer (`https://indexer.preprod.midnight.network/api/v4/graphql`).
 
-### Frontend Architecture
+### Frontend & SDK Integration
 
-- **Next.js 16 + React 19** with server-side rendering and client-side WASM ZK prover.
-- **Interactive 3D WebGL** cryptographic lattice visualization (Three.js).
-- **GSAP + Framer Motion** for premium animations.
-- **Midnight DApp Connector API** for Lace/1AM wallet integration.
+- **Next.js 16 + React 19** with client-side Zero-Knowledge proving via Midnight Compact runtime.
+- **Midnight DApp Connector API**: Direct integration with Lace and 1AM wallet extensions using genuine `callTx.*` methods and real transaction hashes returned from the network.
+- **Live Preprod Indexer Verification**: `/verify` independently checks contract action status and transaction block confirmations against Preprod indexer v4.
+- **Encrypted Local Storage**: AES-GCM 256 secure vault for private trading states (`callerSecret`, order salts).
+- **Interactive 3D WebGL** cryptographic lattice visualization (Three.js) and GSAP micro-animations.
 
 ---
 

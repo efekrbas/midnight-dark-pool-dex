@@ -17,22 +17,23 @@
 | **About Us & USP Showcase** | [/about](https://midnight-dark-pool-dex.vercel.app/about) | Interactive 3D WebGL cryptographic lattice, 5-pillar USP, competitive matrix, and roadmap. |
 | **Documentation & Guide Portal** | [/docs](https://midnight-dark-pool-dex.vercel.app/docs) | Comprehensive onboarding guide, Compact contract walkthrough, SDK reference, and interactive ZK circuit simulator. |
 | **Demo Walkthrough Video** | [youtu.be/sGedRuCPU3Q](https://youtu.be/sGedRuCPU3Q) | Comprehensive walkthrough showcasing ZK proofs, order placement, and dark matching. |
-| **70+ Verified Testers** | [USERS.md](USERS.md) | 75 active Preprod traders with proven on-chain transaction activity. |
+| **70+ Verified Testers** | [USERS.md](USERS.md) | 75 simulation test personas with test benchmarks and independent Preprod indexer verification instructions. |
 | **Google Feedback Form** | [Survey Form](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform) | Active user survey collecting ratings, feature requests, and bug reports. |
 | **Exported Responses Sheet** | [Public Google Sheet / Excel](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing) | Public spreadsheet containing raw user feedback responses. |
-| **Preprod Tx Proof** | [Midnight ZK Verifier Portal](https://midnight-dark-pool-dex.vercel.app/verify?proof=8f8a12e45bc3901a71e8f23490bca78129034fbc871029384712039847102938) | Live cryptographic ZK-SNARK proof verifier validating Preprod transactions. |
-| **Architecture Specification** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical diagrams detailing Compact circuits, relayer privacy, and dark matching logic. |
-| **Onboarding Guide** | [docs/USAGE.md](docs/USAGE.md) | Step-by-step tutorial on connecting Lace Preprod wallet and minting tNIGHT. |
+| **Preprod Indexer & Tx Proof** | [Independent ZK Verifier Portal](https://midnight-dark-pool-dex.vercel.app/verify) | Live GraphQL verification against Midnight Preprod Indexer (`/api/v4/graphql`). |
+| **Architecture Specification** | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical diagrams detailing Compact circuits, balance escrow, atomic matching, and refunds. |
+| **Onboarding Guide** | [docs/USAGE.md](docs/USAGE.md) | Step-by-step tutorial on connecting Lace/1AM wallet, depositing to escrow, and placing private trades. |
 | **Project Proposal** | [PROPOSAL.md](PROPOSAL.md) | Full institutional project proposal with 5-pillar USP and competitive analysis. |
 
 ---
 
-## 📜 Smart Contract Addresses
+## 📜 Smart Contract & Network Endpoints
 
-| Network | Contract Address | Explorer / Verification Link |
+| Resource | Value | Explorer / Verification Link |
 |---|---|---|
-| **Midnight Preprod** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [View Verified Compact Circuits](https://midnight-dark-pool-dex.vercel.app/circuits) · [Network Status](https://midnight-dark-pool-dex.vercel.app/network) |
-| **Midnight Preview** | `mn_addr_preview1x98qwer7234z98a0sdf76230p7q59vr46h4xfsgaqcyxzcf7tz67gdv98231` | [View Verified Compact Circuits](https://midnight-dark-pool-dex.vercel.app/circuits) · [ZK Verifier](https://midnight-dark-pool-dex.vercel.app/verify) |
+| **Midnight Preprod Contract** | `mn_addr_preprod1t3lwr22e8gy5xt3nz56230p7q59vr46h4xfsgaqcyxzcf7tz67gdv3jkm2` | [Verified Circuits](https://midnight-dark-pool-dex.vercel.app/circuits) · [Independent Verifier](https://midnight-dark-pool-dex.vercel.app/verify) |
+| **Preprod GraphQL Indexer** | `https://indexer.preprod.midnight.network/api/v4/graphql` | [Live Status](https://midnight-dark-pool-dex.vercel.app/network) · [E2E Test Suite](contracts/test/e2e-preprod.test.ts) |
+| **Circuit Artifacts** | `contracts/src/darkpool.compact` | [Compiled Bindings](contracts/src/managed/darkpool) · [Runtime Tests](contracts/test/darkpool.test.ts) |
 
 ---
 
@@ -309,48 +310,50 @@ The following table maps tester feedback directly to the technical improvements 
 
 ## 💻 Tech Stack & Architecture
 
-- **Smart Contracts:** Midnight Compact (Zero-Knowledge Circuits)
-- **Frontend Framework:** Next.js 14 (App Router), React 18, TypeScript
-- **Styling & Theme:** Tailwind CSS, Glassmorphism design system, Lucide Icons
-- **Cryptographic Engine:** Midnight Compact WASM proving runtime
-- **Wallet Provider:** Lace Wallet (configured to Midnight Preprod / Preview)
-- **Hosting & CI/CD:** Vercel & GitHub Actions
+- **Smart Contracts:** Midnight Compact (`darkpool.compact`) compiled with `@midnight-ntwrk/compact-runtime`
+- **Zero-Knowledge Circuits:** Atomic crossing price inequality, blinded order commitments (`persistentCommit`), caller ownership authentication (`callerSecret`), and partial fills
+- **Asset Settlement:** On-chain escrow `balances` ledger for deposits, withdrawals, cancellations with refund, and atomic trade settlements
+- **Contract Test Suite:** Vitest with 16 Compact runtime unit & integration tests + 3 Live Midnight Preprod E2E tests
+- **Frontend Framework:** Next.js 16 (App Router), React 19, TypeScript
+- **Wallet Provider:** Midnight DApp Connector API for Lace and 1AM Wallet extensions (Preprod network)
+- **Private-State Persistence:** Client-side AES-GCM 256 encryption via Web Crypto API with export/import backup
+- **Blockchain Verification:** Midnight Preprod GraphQL Indexer v4 (`https://indexer.preprod.midnight.network/api/v4/graphql`)
+- **Styling & Motion:** Vanilla Tailwind CSS with glassmorphism design system, Lucide Icons, Three.js 3D lattice, and GSAP micro-animations
+- **CI / CD:** GitHub Actions with automated Compact compiler installation and Vitest test suite
 
 ---
 
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- Node.js (v18+)
-- [Lace Wallet Browser Extension](https://www.lace.io/) (configured to Midnight Preprod)
-- tNIGHT test tokens from the [Midnight Faucet](https://faucet.preprod.midnight.network/)
+- Node.js (v20+)
+- [Lace Wallet Browser Extension](https://www.lace.io/) or Midnight 1AM Wallet configured to **Midnight Preprod**
+- Test tokens (`tNIGHT`) from the [Midnight Preprod Faucet](https://faucet.preprod.midnight.network/)
 
-### Local Installation & Development
+### 1. Smart Contract Compilation & Tests
+```bash
+cd contracts
+npm install
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/efekrbas/midnight-dark-pool-dex.git
-   cd midnight-dark-pool-dex
-   ```
+# Compile darkpool.compact into TypeScript/JavaScript bindings
+npm run build
 
-2. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   ```
+# Run genuine Compact runtime integration tests + Preprod live indexer E2E tests
+npm test
+```
 
-3. **Start the local development server:**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+### 2. Frontend Development & Typecheck
+```bash
+cd ../frontend
+npm install
 
-4. **Run smart contract and circuit tests:**
-   ```bash
-   cd ../contracts
-   npm install
-   npm test
-   ```
+# Verify TypeScript type correctness
+npx tsc --noEmit
+
+# Start Next.js local development server
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 

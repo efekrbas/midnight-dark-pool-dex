@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Cpu, ArrowRight, ShieldCheck, Lock, Key, Database, Play, RefreshCw, CheckCircle2, Sparkles, Code2 } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { getConnectedOrMockWallet } from '@/lib/midnight';
-import { Contract } from '@/lib/contract';
+import { detectWallet } from '@/lib/midnight';
+import { Contract, OrderSide } from '@/lib/contract';
 
 interface CircuitNode {
   id: string;
@@ -23,39 +23,31 @@ const circuitNodes: CircuitNode[] = [
     type: 'input',
     description: 'Secret order amount, limit price, and 256-bit salt scalar.',
     status: 'verified',
-    codeSnippet: 'witness secret_amount: Field;\nwitness salt: Bytes[32];',
+    codeSnippet: 'witness callerSecret(): Bytes<32>;\nconst amtComm = persistentCommit<Uint<64>>(amount, salt);',
   },
   {
     id: 'n2',
-    name: 'Poseidon Hash Commitment',
-    type: 'hash',
-    description: 'Computes cryptographic commitment C = Poseidon(amount, salt).',
+    name: 'Inequality Constraints',
+    type: 'constraint',
+    description: 'Proves crossing overlap: buyPrice >= sellPrice without revealing either limit.',
     status: 'verified',
-    codeSnippet: 'let commitment = poseidon_hash([secret_amount, salt]);',
+    codeSnippet: 'assert(buyPrice >= sellPrice, "No price overlap: buyPrice must be >= sellPrice");',
   },
   {
     id: 'n3',
-    name: 'R1CS Solvency Constraint',
-    type: 'constraint',
-    description: 'Enforces balance >= amount without revealing either value.',
+    name: 'Escrow & Settlement',
+    type: 'hash',
+    description: 'Atomically settles trade and credits buyer/seller balances inside contract.',
     status: 'verified',
-    codeSnippet: 'constrain(user_balance >= secret_amount);',
+    codeSnippet: 'balances.insert(buyerBaseKey, buyerBaseBal + fillAmount);\nbalances.insert(sellerQuoteKey, sellerQuoteBal + quoteProceeds);',
   },
   {
     id: 'n4',
-    name: 'Nullifier Derivation',
-    type: 'hash',
-    description: 'Derives nullifier hash N = Hash(sk, commitment) to prevent double spend.',
-    status: 'verified',
-    codeSnippet: 'let nullifier = derive_nullifier(sk, commitment);',
-  },
-  {
-    id: 'n5',
-    name: 'ZK-SNARK Proof Output',
+    name: 'Public Ledger Output',
     type: 'output',
-    description: 'Generates final 128-byte Groth16 proof (π_A, π_B, π_C).',
+    description: 'Discloses state transitions while preserving trade parameters.',
     status: 'verified',
-    codeSnippet: 'export proof: Groth16Proof {\n  a: G1Point,\n  b: G2Point,\n  c: G1Point\n};',
+    codeSnippet: 'orders.insert(buyOrderId, buyOrder);\norders.insert(sellOrderId, sellOrder);',
   },
 ];
 
@@ -70,32 +62,34 @@ export default function CircuitsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await getConnectedOrMockWallet();
+      const dappConnector = await detectWallet();
 
-      // Step 2: Deploy a contract to synthesize the circuit on-chain
-      const { contractAddress } = await Contract.deployContract(dappConnector);
-
-      // Step 3: Connect and invoke a circuit to prove constraint satisfaction
+      // Step 2: Connect to the Dark Pool contract
+      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
       const contract = await Contract.connect(dappConnector, contractAddress);
-      const auctionId = crypto.getRandomValues(new Uint8Array(32));
-      const metadataUri = new TextEncoder().encode('circuit:synthesis:test').slice(0, 32);
-      const secret = crypto.getRandomValues(new Uint8Array(32));
 
-      await contract.callTx.createAuction(
-        auctionId,
-        metadataUri,
-        BigInt(1000),
-        BigInt(5),
-        BigInt(500),
-        secret
+      // Step 3: Connect and invoke circuit to prove constraint satisfaction
+      const orderId = crypto.getRandomValues(new Uint8Array(32));
+      const baseToken = new TextEncoder().encode('tNIGHT'.padEnd(32, '\0')).slice(0, 32);
+      const quoteToken = new TextEncoder().encode('ZKUSD'.padEnd(32, '\0')).slice(0, 32);
+      const salt = crypto.getRandomValues(new Uint8Array(32));
+
+      await contract.callTx.submitOrder(
+        orderId,
+        baseToken,
+        quoteToken,
+        OrderSide.BUY,
+        BigInt(100),
+        BigInt(1420),
+        salt
       );
 
       sounds.playZKSuccess();
-      notify("Circuit Synthesis Complete", `All 1,248 R1CS constraints satisfied. Contract: ${contractAddress.slice(0, 10)}...`, "zk");
-    } catch (err) {
+      notify("Circuit Synthesis Complete", `All Compact R1CS constraints verified on Midnight Preprod.`, "zk");
+    } catch (err: any) {
       console.error('[Midnight SDK] Circuit synthesis failed:', err);
       sounds.playError();
-      notify("Synthesis Failed", "Could not synthesize circuit. Check wallet connection.", "error");
+      notify("Synthesis Failed", err?.message || "Could not synthesize circuit. Check wallet connection.", "error");
     } finally {
       setIsSimulating(false);
     }

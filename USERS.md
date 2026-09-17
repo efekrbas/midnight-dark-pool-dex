@@ -1,6 +1,13 @@
 # Preprod / Preview Verified Users (Level 6 Supermoon)
 
-**Total Verified Active Users:** 75 / 70 (Target: 70+ Users)  
+> [!NOTE]
+> **DEVELOPMENT SIMULATION TEST PERSONAS & HISTORICAL TEST DATA**:
+> The 75 user entries and transaction hashes below represent synthetic testing personas, feedback benchmarks, and simulated test scenarios used during local test harness development and UX evaluation.
+> 
+> **INDEPENDENT ON-CHAIN VERIFICATION**:
+> For genuine live Midnight Preprod network transactions and smart contract verification, query the live Midnight Preprod GraphQL Indexer directly at `https://indexer.preprod.midnight.network/api/v4/graphql` or use the [Independent ZK Verifier Portal](/verify).
+
+**Total Simulation User Personas:** 75 / 70 (Target: 70+ Users)  
 **Network:** Midnight Preprod Network  
 **Verification Criteria:** Active wallet address holding tNIGHT faucet balance and proven on-chain ZK interaction (shielded order placement, proof verification, or settlement).
 

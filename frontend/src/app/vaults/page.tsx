@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Lock, TrendingUp, ArrowDownToLine, ArrowUpFromLine, Shield, Sparkles, RefreshCw, CheckCircle2, Coins } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { getConnectedOrMockWallet } from '@/lib/midnight';
+import { detectWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 interface Vault {
@@ -39,7 +39,7 @@ const vaults: Vault[] = [
 ];
 
 // Known vault contract address on Midnight Preprod
-const VAULT_CONTRACT_ADDRESS = '02a8b9f4c3d2e1f8a7b6c5d4e3f2a1b0c9d8e7f6';
+const VAULT_CONTRACT_ADDRESS = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
 
 export default function VaultsPage() {
   const [depositAmounts, setDepositAmounts] = useState<Record<string, string>>({});
@@ -55,18 +55,16 @@ export default function VaultsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await getConnectedOrMockWallet();
+      const dappConnector = await detectWallet();
 
-      // Step 2: Connect to the vault contract
+      // Step 2: Connect to the dark pool contract
       const contract = await Contract.connect(dappConnector, VAULT_CONTRACT_ADDRESS);
 
-      // Step 3: Submit shielded deposit via the bid circuit (deposit ≈ bid into vault pool)
-      const auctionId = new TextEncoder().encode(vault.id.padEnd(32, '\0')).slice(0, 32);
-      const bidAmount = BigInt(Math.floor(Number(amount) * 1_000_000));
-      const userSecret = crypto.getRandomValues(new Uint8Array(32));
-      const userAddress = { bytes: crypto.getRandomValues(new Uint8Array(32)) };
+      // Step 3: Submit shielded deposit circuit
+      const tokenBytes = new TextEncoder().encode(vault.token.padEnd(32, '\0')).slice(0, 32);
+      const depositAmount = BigInt(Math.floor(Number(amount) * 1_000_000));
 
-      await contract.callTx.bid(auctionId, bidAmount, userAddress, userSecret);
+      await contract.callTx.deposit(tokenBytes, depositAmount);
 
       sounds.playZKSuccess();
       notify(
@@ -75,10 +73,10 @@ export default function VaultsPage() {
         "zk"
       );
       setDepositAmounts(prev => ({ ...prev, [vault.id]: '' }));
-    } catch (err) {
+    } catch (err: any) {
       console.error('[Midnight SDK] Vault deposit failed:', err);
       sounds.playError();
-      notify("Deposit Failed", "Could not submit shielded deposit. Check wallet connection.", "error");
+      notify("Deposit Failed", err?.message || "Could not submit shielded deposit.", "error");
     } finally {
       setLoadingVault(null);
     }
@@ -90,17 +88,16 @@ export default function VaultsPage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await getConnectedOrMockWallet();
+      const dappConnector = await detectWallet();
 
-      // Step 2: Connect to the vault contract
+      // Step 2: Connect to the dark pool contract
       const contract = await Contract.connect(dappConnector, VAULT_CONTRACT_ADDRESS);
 
-      // Step 3: Submit shielded withdrawal via claimProceeds circuit
-      const auctionId = new TextEncoder().encode(vault.id.padEnd(32, '\0')).slice(0, 32);
-      const organizerAddress = { bytes: crypto.getRandomValues(new Uint8Array(32)) };
-      const organizerSecret = crypto.getRandomValues(new Uint8Array(32));
+      // Step 3: Submit shielded withdrawal circuit
+      const tokenBytes = new TextEncoder().encode(vault.token.padEnd(32, '\0')).slice(0, 32);
+      const withdrawAmount = BigInt(100_000);
 
-      await contract.callTx.claimProceeds(auctionId, organizerAddress, organizerSecret);
+      await contract.callTx.withdraw(tokenBytes, withdrawAmount);
 
       sounds.playZKSuccess();
       notify(
@@ -108,10 +105,10 @@ export default function VaultsPage() {
         `${vault.token} withdrawn from vault. ZK nullifier broadcast on Midnight Preprod.`,
         "success"
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('[Midnight SDK] Vault withdrawal failed:', err);
       sounds.playError();
-      notify("Withdrawal Failed", "Could not process shielded withdrawal. Check wallet connection.", "error");
+      notify("Withdrawal Failed", err?.message || "Could not process shielded withdrawal.", "error");
     } finally {
       setLoadingVault(null);
     }

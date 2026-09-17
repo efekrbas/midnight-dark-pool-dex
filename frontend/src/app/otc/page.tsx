@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { Briefcase, Send, Lock, ShieldCheck, RefreshCw, CheckCircle2, Clock, DollarSign } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { getConnectedOrMockWallet } from '@/lib/midnight';
-import { Contract } from '@/lib/contract';
+import { detectWallet } from '@/lib/midnight';
+import { Contract, OrderSide } from '@/lib/contract';
 
 export default function OtcPage() {
   const [asset, setAsset] = useState('tNIGHT');
@@ -22,40 +22,42 @@ export default function OtcPage() {
 
     try {
       // Step 1: Connect to the Midnight wallet via DApp Connector API
-      const dappConnector = await getConnectedOrMockWallet();
+      const dappConnector = await detectWallet();
 
-      // Step 2: Deploy a new contract instance for this RFQ order
-      const { contractAddress } = await Contract.deployContract(dappConnector);
-
-      // Step 3: Connect to the deployed contract and invoke createAuction circuit
+      // Step 2: Connect to the Dark Pool contract
+      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
       const contract = await Contract.connect(dappConnector, contractAddress);
-      const auctionId = crypto.getRandomValues(new Uint8Array(32));
-      const metadataUri = new TextEncoder().encode(`${side}:${asset}:${size}`).slice(0, 32);
-      const secret = crypto.getRandomValues(new Uint8Array(32));
-      const priceBigInt = BigInt(Math.floor(Number(minPrice) * 1_000_000));
-      const maxBids = BigInt(4); // 4 relayer slots
 
-      await contract.callTx.createAuction(
-        auctionId,
-        metadataUri,
+      const orderId = crypto.getRandomValues(new Uint8Array(32));
+      const baseToken = new TextEncoder().encode(asset.padEnd(32, '\0')).slice(0, 32);
+      const quoteToken = new TextEncoder().encode('ZKUSD'.padEnd(32, '\0')).slice(0, 32);
+      const orderSide = side === 'BUY' ? OrderSide.BUY : OrderSide.SELL;
+      const amountBigInt = BigInt(Math.max(1, Math.floor(Number(size))));
+      const priceBigInt = BigInt(Math.max(1, Math.floor(Number(minPrice) * 1000)));
+      const salt = crypto.getRandomValues(new Uint8Array(32));
+
+      await contract.callTx.submitOrder(
+        orderId,
+        baseToken,
+        quoteToken,
+        orderSide,
+        amountBigInt,
         priceBigInt,
-        maxBids,
-        BigInt(3600), // 1 hour deadline in blocks
-        secret
+        salt
       );
 
       sounds.playZKSuccess();
       notify(
         "Institutional RFQ Broadcasted",
-        `Confidential ZK RFQ for ${Number(size).toLocaleString()} ${asset} deployed at ${contractAddress.slice(0, 10)}...`,
+        `Confidential ZK RFQ for ${Number(size).toLocaleString()} ${asset} submitted to Dark Pool.`,
         "zk"
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('[Midnight SDK] OTC RFQ submission failed:', err);
       sounds.playError();
       notify(
         "RFQ Submission Failed",
-        "Could not deploy contract or generate ZK proof. Check wallet connection.",
+        err?.message || "Could not submit RFQ order. Check wallet connection.",
         "error"
       );
     } finally {

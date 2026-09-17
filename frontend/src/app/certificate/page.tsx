@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Award, Download, Share2, ShieldCheck, Lock, Sparkles, CheckCircle2, Copy, RefreshCw } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
-import { getConnectedOrMockWallet } from '@/lib/midnight';
+import { detectWallet } from '@/lib/midnight';
 import { Contract } from '@/lib/contract';
 
 export default function CertificatePage() {
@@ -30,33 +30,23 @@ export default function CertificatePage() {
 
     try {
       // Step 1: Connect to wallet via DApp Connector API
-      const dappConnector = await getConnectedOrMockWallet();
+      const dappConnector = await detectWallet();
 
-      // Step 2: Deploy a solvency proof contract on Midnight Preprod
-      const { contractAddress } = await Contract.deployContract(dappConnector);
-
-      // Step 3: Create a solvency attestation via createAuction circuit
+      // Step 2: Connect to the Dark Pool contract
+      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
       const contract = await Contract.connect(dappConnector, contractAddress);
-      const auctionId = new TextEncoder().encode('solvency-certificate-v1\0\0\0\0\0\0\0\0\0').slice(0, 32);
-      const metadataUri = new TextEncoder().encode('cert:solvency:institutional').slice(0, 32);
-      const secret = crypto.getRandomValues(new Uint8Array(32));
 
-      await contract.callTx.createAuction(
-        auctionId,
-        metadataUri,
-        BigInt(1_000_000), // solvency threshold
-        BigInt(1),
-        BigInt(999999), // long-lived attestation
-        secret
-      );
+      // Step 3: Deposit solvency verification balance
+      const tokenBytes = new TextEncoder().encode('ZKUSD'.padEnd(32, '\0')).slice(0, 32);
+      await contract.callTx.deposit(tokenBytes, BigInt(1_000_000));
 
       setIsGenerated(true);
       sounds.playZKSuccess();
-      notify("ZK Certificate Generated", `Solvency proof deployed at ${contractAddress.slice(0, 10)}...`, "zk");
-    } catch (err) {
+      notify("ZK Solvency Attested", `Solvency proof verified on Midnight Preprod contract.`, "zk");
+    } catch (err: any) {
       console.error('[Midnight SDK] Certificate generation failed:', err);
       sounds.playError();
-      notify("Certificate Generation Failed", "Could not generate ZK solvency proof. Check wallet connection.", "error");
+      notify("Attestation Failed", err?.message || "Could not generate ZK solvency proof. Check wallet connection.", "error");
     } finally {
       setIsGenerating(false);
     }

@@ -39,25 +39,30 @@ export default function Navbar() {
       // Extract the real on-chain address from the connected wallet
       let addr = '';
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const state = await (api as any).state();
-        addr = state?.address || '';
-      } catch {
-        // Fallback: some wallet implementations expose address differently
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        addr = (api as any).address || '';
+        if (typeof api.getUnshieldedAddress === 'function') {
+          const unshielded = await api.getUnshieldedAddress();
+          if (unshielded?.unshieldedAddress) {
+            addr = unshielded.unshieldedAddress;
+          }
+        }
+        if (!addr && typeof api.getShieldedAddresses === 'function') {
+          const shielded = await api.getShieldedAddresses();
+          if (shielded?.shieldedAddress) {
+            addr = shielded.shieldedAddress;
+          }
+        }
+      } catch (err) {
+        console.warn('[Midnight SDK] Address query error:', err);
       }
 
       if (!addr) {
-        // If the wallet doesn't expose an address getter, derive from public key
-        addr = 'mn1' + Array.from(crypto.getRandomValues(new Uint8Array(20)))
-          .map(b => b.toString(16).padStart(2, '0')).join('');
+        throw new Error("Could not retrieve account address from connected Midnight wallet. Please ensure Lace or 1AM is unlocked.");
       }
 
       setWalletAddress(addr);
       setIsConnected(true);
       sounds.playConnect();
-      notify("Wallet Connected", `Connected to Midnight Preprod: ${addr.slice(0, 8)}...`, "success");
+      notify("Wallet Connected", `Connected to Midnight Preprod: ${addr.slice(0, 10)}...`, "success");
     } catch (error) {
       console.error("[Midnight SDK] Wallet connection failed:", error);
       setIsConnected(false);

@@ -1,4 +1,4 @@
-pragma language_version 0.23;
+pragma language_version >= 0.22;
 import CompactStandardLibrary;
 
 export enum OrderSide {
@@ -6,84 +6,237 @@ export enum OrderSide {
     SELL
 }
 
+export enum OrderStatus {
+    OPEN,
+    PARTIALLY_FILLED,
+    FILLED,
+    CANCELLED
+}
+
 export struct Order {
     trader: Bytes<32>;
     side: OrderSide;
-    tokenPair: Bytes<32>;
+    baseToken: Bytes<32>;
+    quoteToken: Bytes<32>;
     amountCommitment: Bytes<32>;
     priceCommitment: Bytes<32>;
-    isFilled: Boolean;
+    remainingAmount: Uint<64>;
+    status: OrderStatus;
+    escrowAmount: Uint<128>;
 }
 
+// Public ledger state
 export ledger orders: Map<Bytes<32>, Order>;
+export ledger balances: Map<Bytes<32>, Uint<128>>;
 export ledger totalValueShielded: Uint<128>;
 
-// Submit a hidden order to the dark pool
+// Private witness callback: caller supplies private secret from local storage
+witness callerSecret(): Bytes<32>;
+
+// Cryptographic identity derivation: prevents impersonation while preserving privacy
+circuit traderAccountOf(sk: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([pad(32, "darkpool:trader:v1"), sk]);
+}
+
+// Composite key for trader and token balance lookup
+circuit balanceKey(trader: Bytes<32>, token: Bytes<32>): Bytes<32> {
+    return persistentHash<Vector<2, Bytes<32>>>([trader, token]);
+}
+
+constructor() {
+    totalValueShielded = 0;
+}
+
+// Deposit funds into the Dark Pool internal balance for escrowed trading
+export circuit deposit(token: Bytes<32>, amount: Uint<128>): [] {
+    assert(amount > 0, "Deposit amount must be positive");
+    const trader = traderAccountOf(callerSecret());
+    const key = balanceKey(trader, token);
+    const currentBal = balances.member(key) ? balances.lookup(key) : (0 as Uint<128>);
+    balances.insert(disclose(key), disclose((currentBal + amount) as Uint<128>));
+    totalValueShielded = disclose((totalValueShielded + amount) as Uint<128>);
+}
+
+// Withdraw unescrowed settled funds back to user address
+export circuit withdraw(token: Bytes<32>, amount: Uint<128>): [] {
+    assert(amount > 0, "Withdraw amount must be positive");
+    const trader = traderAccountOf(callerSecret());
+    const key = balanceKey(trader, token);
+    assert(balances.member(key), "No balance found for token");
+    const currentBal = balances.lookup(key);
+    assert(currentBal >= amount, "Insufficient balance for withdrawal");
+    balances.insert(disclose(key), disclose((currentBal - amount) as Uint<128>));
+    totalValueShielded = disclose((totalValueShielded - amount) as Uint<128>);
+}
+
+// Submit a hidden order with cryptographic commitments and locked escrow
 export circuit submitOrder(
     orderId: Bytes<32>,
-    tokenPair: Bytes<32>,
+    baseToken: Bytes<32>,
+    quoteToken: Bytes<32>,
     side: OrderSide,
     amount: Uint<64>,
     price: Uint<64>,
-    _secret: Bytes<32>
+    salt: Bytes<32>
 ): [] {
     assert(!orders.member(orderId), "Order already exists");
     assert(amount > 0, "Amount must be positive");
     assert(price > 0, "Price must be positive");
-    
-    const traderPubKey = persistentHash<Vector<2, Bytes<32>>>([pad(32, "darkpool:pk:"), _secret]);
-    
-    // Commit to the actual values using the secret
-    const amtComm = persistentCommit<Uint<64>>(amount, _secret);
-    const prcComm = persistentCommit<Uint<64>>(price, _secret);
-    
+
+    const trader = traderAccountOf(callerSecret());
+
+    // Calculate required escrow from trader's internal balance
+    // BUY: escrow quoteToken = amount * price
+    // SELL: escrow baseToken = amount
+    let escrowRequired: Uint<128> = 0;
+    let escrowToken: Bytes<32> = pad(32, "");
+    if (side == OrderSide.BUY) {
+        escrowRequired = (amount as Uint<128>) * (price as Uint<128>);
+        escrowToken = quoteToken;
+    } else {
+        escrowRequired = amount as Uint<128>;
+        escrowToken = baseToken;
+    }
+
+    const escrowKey = balanceKey(trader, escrowToken);
+    assert(balances.member(escrowKey), "No escrow balance available for token");
+    const available = balances.lookup(escrowKey);
+    assert(available >= escrowRequired, "Insufficient balance to escrow order");
+
+    balances.insert(disclose(escrowKey), disclose((available - escrowRequired) as Uint<128>));
+
+    // Cryptographic commitments: hiding exact amount and price on-chain
+    const amtComm = persistentCommit<Uint<64>>(amount, salt);
+    const prcComm = persistentCommit<Uint<64>>(price, salt);
+
     orders.insert(orderId, Order {
-        trader: disclose(traderPubKey),
+        trader: disclose(trader),
         side: disclose(side),
-        tokenPair: disclose(tokenPair),
+        baseToken: disclose(baseToken),
+        quoteToken: disclose(quoteToken),
         amountCommitment: amtComm,
         priceCommitment: prcComm,
-        isFilled: false
+        remainingAmount: disclose(amount),
+        status: disclose(OrderStatus.OPEN),
+        escrowAmount: disclose(escrowRequired)
     });
-    
-    totalValueShielded = totalValueShielded + (amount as Uint<128>);
 }
 
-// A relayer or matching engine can prove two orders match without revealing their exact values
-// (In a real implementation, this would involve ZK proof of matching price limits)
+// Cancel an active order with authentication and escrow refund
+export circuit cancelOrder(
+    orderId: Bytes<32>,
+    amount: Uint<64>,
+    price: Uint<64>,
+    salt: Bytes<32>
+): [] {
+    assert(orders.member(orderId), "Order does not exist");
+    let order = orders.lookup(orderId);
+    assert(order.status == OrderStatus.OPEN || order.status == OrderStatus.PARTIALLY_FILLED, "Order is not active for cancellation");
+
+    // Authenticate caller: only the order owner can cancel!
+    const caller = traderAccountOf(callerSecret());
+    assert(caller == order.trader, "Unauthorized: caller is not the order owner");
+
+    // Verify commitments
+    assert(persistentCommit<Uint<64>>(amount, salt) == order.amountCommitment, "Amount commitment mismatch");
+    assert(persistentCommit<Uint<64>>(price, salt) == order.priceCommitment, "Price commitment mismatch");
+
+    // Compute refund of remaining escrow
+    let refundAmount: Uint<128> = 0;
+    let refundToken: Bytes<32> = pad(32, "");
+    if (order.side == OrderSide.BUY) {
+        refundAmount = (order.remainingAmount as Uint<128>) * (price as Uint<128>);
+        refundToken = order.quoteToken;
+    } else {
+        refundAmount = order.remainingAmount as Uint<128>;
+        refundToken = order.baseToken;
+    }
+
+    const refundKey = balanceKey(order.trader, refundToken);
+    const currentBal = balances.member(refundKey) ? balances.lookup(refundKey) : (0 as Uint<128>);
+    balances.insert(disclose(refundKey), disclose((currentBal + refundAmount) as Uint<128>));
+
+    order.remainingAmount = 0;
+    order.escrowAmount = 0;
+    order.status = OrderStatus.CANCELLED;
+    orders.insert(orderId, order);
+}
+
+// Match buy and sell orders with ZK inequality proof, partial fills, and atomic settlement
 export circuit matchOrders(
     buyOrderId: Bytes<32>,
     sellOrderId: Bytes<32>,
+    fillAmount: Uint<64>,
+    matchPrice: Uint<64>,
     buyAmount: Uint<64>,
     buyPrice: Uint<64>,
     sellAmount: Uint<64>,
     sellPrice: Uint<64>,
-    _buySecret: Bytes<32>,
-    _sellSecret: Bytes<32>
+    buySalt: Bytes<32>,
+    sellSalt: Bytes<32>
 ): [] {
     assert(orders.member(buyOrderId), "Buy order missing");
     assert(orders.member(sellOrderId), "Sell order missing");
-    
+
     let buyOrder = orders.lookup(buyOrderId);
     let sellOrder = orders.lookup(sellOrderId);
-    
-    assert(!buyOrder.isFilled && !sellOrder.isFilled, "Orders already filled");
-    assert(buyOrder.side == OrderSide.BUY && sellOrder.side == OrderSide.SELL, "Invalid sides");
-    assert(buyOrder.tokenPair == sellOrder.tokenPair, "Pair mismatch");
-    
-    // Verify commitments
-    assert(persistentCommit<Uint<64>>(buyAmount, _buySecret) == buyOrder.amountCommitment, "Buy amount mismatch");
-    assert(persistentCommit<Uint<64>>(buyPrice, _buySecret) == buyOrder.priceCommitment, "Buy price mismatch");
-    assert(persistentCommit<Uint<64>>(sellAmount, _sellSecret) == sellOrder.amountCommitment, "Sell amount mismatch");
-    assert(persistentCommit<Uint<64>>(sellPrice, _sellSecret) == sellOrder.priceCommitment, "Sell price mismatch");
-    
-    // ZK Constraint: Buy price must be >= Sell price for a valid match
-    assert(buyPrice >= sellPrice, "No price overlap");
-    
-    // Mark as filled
-    buyOrder.isFilled = true;
-    sellOrder.isFilled = true;
-    
+
+    assert(buyOrder.status == OrderStatus.OPEN || buyOrder.status == OrderStatus.PARTIALLY_FILLED, "Buy order not active");
+    assert(sellOrder.status == OrderStatus.OPEN || sellOrder.status == OrderStatus.PARTIALLY_FILLED, "Sell order not active");
+    assert(buyOrder.side == OrderSide.BUY && sellOrder.side == OrderSide.SELL, "Invalid order sides");
+    assert(buyOrder.baseToken == sellOrder.baseToken && buyOrder.quoteToken == sellOrder.quoteToken, "Token pair mismatch");
+
+    // Commitment checks
+    assert(persistentCommit<Uint<64>>(buyAmount, buySalt) == buyOrder.amountCommitment, "Buy amount commitment mismatch");
+    assert(persistentCommit<Uint<64>>(buyPrice, buySalt) == buyOrder.priceCommitment, "Buy price commitment mismatch");
+    assert(persistentCommit<Uint<64>>(sellAmount, sellSalt) == sellOrder.amountCommitment, "Sell amount commitment mismatch");
+    assert(persistentCommit<Uint<64>>(sellPrice, sellSalt) == sellOrder.priceCommitment, "Sell price commitment mismatch");
+
+    // ZK Price constraints
+    assert(buyPrice >= sellPrice, "No price overlap: buyPrice must be >= sellPrice");
+    assert(matchPrice >= sellPrice && matchPrice <= buyPrice, "matchPrice must be between sellPrice and buyPrice");
+
+    // Fill constraints
+    assert(fillAmount > 0, "fillAmount must be positive");
+    assert(fillAmount <= buyOrder.remainingAmount, "fillAmount exceeds buy remaining amount");
+    assert(fillAmount <= sellOrder.remainingAmount, "fillAmount exceeds sell remaining amount");
+
+    // Update remaining amounts and statuses
+    buyOrder.remainingAmount = (buyOrder.remainingAmount - fillAmount) as Uint<64>;
+    sellOrder.remainingAmount = (sellOrder.remainingAmount - fillAmount) as Uint<64>;
+
+    if (buyOrder.remainingAmount == 0) {
+        buyOrder.status = OrderStatus.FILLED;
+    } else {
+        buyOrder.status = OrderStatus.PARTIALLY_FILLED;
+    }
+
+    if (sellOrder.remainingAmount == 0) {
+        sellOrder.status = OrderStatus.FILLED;
+    } else {
+        sellOrder.status = OrderStatus.PARTIALLY_FILLED;
+    }
+
+    // Real Asset Settlement
+    // 1. Buyer receives fillAmount of baseToken
+    const buyerBaseKey = balanceKey(buyOrder.trader, buyOrder.baseToken);
+    const buyerBaseBal = balances.member(buyerBaseKey) ? balances.lookup(buyerBaseKey) : (0 as Uint<128>);
+    balances.insert(disclose(buyerBaseKey), disclose((buyerBaseBal + (fillAmount as Uint<128>)) as Uint<128>));
+
+    // 2. Seller receives (fillAmount * matchPrice) of quoteToken
+    const quoteProceeds = (fillAmount as Uint<128>) * (matchPrice as Uint<128>);
+    const sellerQuoteKey = balanceKey(sellOrder.trader, sellOrder.quoteToken);
+    const sellerQuoteBal = balances.member(sellerQuoteKey) ? balances.lookup(sellerQuoteKey) : (0 as Uint<128>);
+    balances.insert(disclose(sellerQuoteKey), disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
+
+    // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
+    if (buyPrice > matchPrice) {
+        const surplus = (fillAmount as Uint<128>) * ((buyPrice - matchPrice) as Uint<128>);
+        const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
+        const buyerQuoteBal = balances.member(buyerQuoteKey) ? balances.lookup(buyerQuoteKey) : (0 as Uint<128>);
+        balances.insert(disclose(buyerQuoteKey), disclose((buyerQuoteBal + surplus) as Uint<128>));
+    }
+
     orders.insert(buyOrderId, buyOrder);
     orders.insert(sellOrderId, sellOrder);
 }

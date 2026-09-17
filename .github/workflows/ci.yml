@@ -51,10 +51,17 @@ jobs:
       working-directory: ./contracts
       run: npm install --legacy-peer-deps
 
-    - name: Verify Compact Circuit Definitions
-      working-directory: ./contracts
-      run: npm run build
+    - name: Install Midnight Compact Compiler
+      run: |
+        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+        echo "$HOME/.compact/bin" >> $GITHUB_PATH
 
-    - name: Run Contract Integration Tests
+    - name: Actually Compile Compact Contract in CI
+      working-directory: ./contracts
+      run: |
+        export PATH="$HOME/.compact/bin:$PATH"
+        npm run build
+
+    - name: Run Contract Compact Runtime Tests
       working-directory: ./contracts
       run: npm test
