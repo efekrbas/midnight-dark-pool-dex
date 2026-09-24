@@ -15,7 +15,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import LiveTradeFeed from "@/components/LiveTradeFeed";
 import ScrollToTop from "@/components/ScrollToTop";
-import ScrollProgressBar from "@/components/ScrollProgressBar";
+
 import SplashScreen from "@/components/SplashScreen";
 import PrivacyConsent from "@/components/PrivacyConsent";
 import Footer from "@/components/Footer";
@@ -35,7 +35,7 @@ export default function RootLayout({
           <I18nProvider>
             <NotificationProvider>
               <SplashScreen />
-              <ScrollProgressBar />
+
               <Navbar />
               <Marquee />
               <Breadcrumb />
