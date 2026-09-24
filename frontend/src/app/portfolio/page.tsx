@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock, Eye, EyeOff, ShieldCheck, Download, Trash2, ArrowUpRight, ArrowDownRight, RefreshCw, Sparkles, CheckCircle2, Copy } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
@@ -16,6 +16,40 @@ interface OrderItem {
   proofHash: string;
   status: 'PENDING_MATCH' | 'PARTIALLY_MATCHED' | 'SETTLED';
   timestamp: string;
+}
+
+function NumberTicker({ value, prefix = "", suffix = "" }: { value: number, prefix?: string, suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // Artificial delay to simulate "Skeleton Loading" then counting
+    const loadDelay = setTimeout(() => {
+      setIsReady(true);
+      let start = 0;
+      const duration = 1200; // 1.2s smooth count
+      const increment = value / (duration / 16);
+      
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= value) {
+          setCount(value);
+          clearInterval(timer);
+        } else {
+          setCount(start);
+        }
+      }, 16);
+      return () => clearInterval(timer);
+    }, 400); // 400ms skeleton time
+
+    return () => clearTimeout(loadDelay);
+  }, [value]);
+
+  if (!isReady) {
+    return <span className="inline-block w-24 h-7 bg-white/[0.08] animate-pulse rounded-md" />;
+  }
+
+  return <span>{prefix}{count.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}{suffix}</span>;
 }
 
 const HISTORICAL_ORDERS: OrderItem[] = [
@@ -110,26 +144,29 @@ export default function PortfolioPage() {
 
       {/* Account Balances Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl">
-          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider">Shielded tNIGHT Balance</p>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-bold text-white font-mono">148,250.00</h3>
+        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider relative z-10">Shielded tNIGHT Balance</p>
+          <div className="flex items-baseline justify-between mt-2 relative z-10">
+            <h3 className="text-2xl font-bold text-white font-mono"><NumberTicker value={148250.00} /></h3>
             <span className="text-xs text-zinc-400 font-mono">~$210,515 ZKUSD</span>
           </div>
         </div>
 
-        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl">
-          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider">Shielded ZKUSD Settlement</p>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-bold text-white font-mono">82,400.00</h3>
+        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider relative z-10">Shielded ZKUSD Settlement</p>
+          <div className="flex items-baseline justify-between mt-2 relative z-10">
+            <h3 className="text-2xl font-bold text-white font-mono"><NumberTicker value={82400.00} /></h3>
             <span className="text-xs text-zinc-400 font-mono">Instant Finality</span>
           </div>
         </div>
 
-        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl">
-          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider">Shielded DUST Gas Balance</p>
-          <div className="flex items-baseline justify-between mt-2">
-            <h3 className="text-2xl font-bold text-white font-mono">12,180.50</h3>
+        <div className="p-5 text-left border border-zinc-800/80 bg-zinc-950/80 rounded-xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider relative z-10">Shielded DUST Gas Balance</p>
+          <div className="flex items-baseline justify-between mt-2 relative z-10">
+            <h3 className="text-2xl font-bold text-white font-mono"><NumberTicker value={12180.50} /></h3>
             <span className="text-xs text-zinc-400 font-mono">Zero Fee Surges</span>
           </div>
         </div>

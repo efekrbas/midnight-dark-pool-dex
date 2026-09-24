@@ -101,8 +101,8 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-zinc-950/80 backdrop-blur-xl animate-fadeIn">
-      <div className="relative max-w-xl w-full bg-zinc-900 border border-zinc-700/30 rounded-2xl shadow-lg shadow-zinc-700/20 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/60 backdrop-blur-2xl animate-fadeIn">
+      <div className="relative max-w-xl w-full bg-zinc-950 border border-white/[0.08] rounded-2xl shadow-[0_16px_48px_-12px_rgba(0,0,0,0.9)] overflow-hidden">
         
         {/* Input Bar */}
         <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-zinc-950/80">
@@ -136,10 +136,10 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
                     sounds.playClick();
                     act.action();
                   }}
-                  className="w-full p-3 rounded-xl flex items-center justify-between text-left hover:bg-zinc-600/15 border border-transparent hover:border-zinc-700/30 transition-all group"
+                  className="w-full p-3 rounded-xl flex items-center justify-between text-left hover:bg-white/[0.04] border border-transparent hover:border-white/[0.06] transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-zinc-500 group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-lg bg-white/[0.04] flex items-center justify-center text-zinc-400 group-hover:bg-white/[0.08] group-hover:text-white transition-colors">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
