@@ -66,17 +66,17 @@ export default function TokenPairSelector({ currentPair, onSelectPair }: TokenPa
           sounds.playClick();
           setIsOpen(!isOpen);
         }}
-        className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-blue-500/40 transition-all text-left group"
+        className="flex items-center gap-3 px-3 py-1.5 rounded-xl bg-zinc-900/90 border border-white/10 hover:border-zinc-700/40 transition-all text-left group"
       >
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-teal-500 to-teal-700 flex items-center justify-center font-extrabold text-xs text-white shadow-md shadow-teal-500/30 border border-teal-400/20">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-zinc-500 to-zinc-700 flex items-center justify-center font-extrabold text-xs text-white shadow-md shadow-zinc-700/30 border border-zinc-600/20">
           {currentPair.symbol.split(' ')[0]}
         </div>
         <div>
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-black text-white">{currentPair.symbol}</span>
-            <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
-          <p className="text-[10px] text-slate-400 font-mono">{currentPair.type}</p>
+          <p className="text-[10px] text-zinc-400 font-mono">{currentPair.type}</p>
         </div>
       </button>
 
@@ -84,10 +84,10 @@ export default function TokenPairSelector({ currentPair, onSelectPair }: TokenPa
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full left-0 mt-2 w-72 bg-slate-900/95 backdrop-blur-2xl border border-blue-500/30 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.8)] z-50 p-2 space-y-1 animate-fadeIn">
-            <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-slate-400 border-b border-white/10 flex items-center justify-between">
+          <div className="absolute top-full left-0 mt-2 w-72 bg-zinc-900/95 backdrop-blur-2xl border border-zinc-700/30 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.8)] z-50 p-2 space-y-1 animate-fadeIn">
+            <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-zinc-400 border-b border-white/10 flex items-center justify-between">
               <span>Select Dark Pool Pair</span>
-              <Lock className="w-3 h-3 text-teal-400" />
+              <Lock className="w-3 h-3 text-zinc-400" />
             </div>
 
             {availablePairs.map((pair) => {
@@ -98,17 +98,17 @@ export default function TokenPairSelector({ currentPair, onSelectPair }: TokenPa
                   onClick={() => handleSelect(pair)}
                   className={`w-full p-2.5 rounded-xl flex items-center justify-between transition-all text-left ${
                     isSelected
-                      ? 'bg-blue-600/20 border border-blue-500/40 text-white'
-                      : 'hover:bg-white/5 border border-transparent text-slate-300'
+                      ? 'bg-zinc-700/20 border border-zinc-700/40 text-white'
+                      : 'hover:bg-white/5 border border-transparent text-zinc-300'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-md bg-slate-800 flex items-center justify-center text-[10px] font-bold text-blue-400">
+                    <div className="w-7 h-7 rounded-md bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400">
                       {pair.symbol.split(' ')[0]}
                     </div>
                     <div>
                       <p className="text-xs font-bold text-white">{pair.symbol}</p>
-                      <p className="text-[10px] text-slate-400 font-mono">{pair.name}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono">{pair.name}</p>
                     </div>
                   </div>
 
@@ -123,7 +123,7 @@ export default function TokenPairSelector({ currentPair, onSelectPair }: TokenPa
                     </svg>
                     <div>
                       <p className="text-xs font-mono font-bold text-white">{pair.price}</p>
-                      <p className={`text-[10px] font-mono ${pair.isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <p className={`text-[10px] font-mono ${pair.isPositive ? 'text-zinc-400' : 'text-red-400'}`}>
                         {pair.change}
                       </p>
                     </div>

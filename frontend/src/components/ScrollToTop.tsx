@@ -23,10 +23,10 @@ export default function ScrollToTop() {
   return (
     <button
       onClick={scrollUp}
-      className="fixed bottom-6 left-6 z-40 w-10 h-10 rounded-full bg-slate-800/90 backdrop-blur-xl border border-white/10 hover:border-teal-500/50 shadow-lg flex items-center justify-center text-slate-400 hover:text-white transition-all animate-fadeIn hover:scale-110"
+      className="fixed bottom-20 right-6 z-40 w-9 h-9 rounded-md bg-zinc-900/90 backdrop-blur-md border border-zinc-800 hover:border-zinc-700 shadow-xl flex items-center justify-center text-zinc-400 hover:text-white transition-all animate-fadeIn"
       aria-label="Scroll to top"
     >
-      <ArrowUp className="w-4 h-4" />
+      <ArrowUp className="w-3.5 h-3.5 stroke-[1.5]" />
     </button>
   );
 }

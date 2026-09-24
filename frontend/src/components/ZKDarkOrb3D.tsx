@@ -57,7 +57,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
         progress: Math.random(),
         speed: Math.random() * 0.035 + 0.015,
         size: Math.random() * 1.8 + 1.2,
-        hue: Math.random() > 0.4 ? 175 : 210, // Teal or Cyan/Electric Blue
+        hue: 0, // Monochrome (hue unused)
       });
     }
     particlesRef.current = particles;
@@ -95,9 +95,9 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     if (glowIntensity > 0.08) {
       const coronaR = radius * (2.1 + glowIntensity * 0.7);
       const corona = ctx.createRadialGradient(x, y, radius * 0.75, x, y, coronaR);
-      corona.addColorStop(0, `rgba(186, 230, 253, ${glowIntensity * 0.25 * depthScale})`);
-      corona.addColorStop(0.4, `rgba(56, 189, 248, ${glowIntensity * 0.09 * depthScale})`);
-      corona.addColorStop(0.75, `rgba(14, 116, 144, ${glowIntensity * 0.03 * depthScale})`);
+      corona.addColorStop(0, `rgba(228, 228, 231, ${glowIntensity * 0.25 * depthScale})`);
+      corona.addColorStop(0.4, `rgba(161, 161, 170, ${glowIntensity * 0.09 * depthScale})`);
+      corona.addColorStop(0.75, `rgba(82, 82, 91, ${glowIntensity * 0.03 * depthScale})`);
       corona.addColorStop(1, 'transparent');
 
       ctx.fillStyle = corona;
@@ -123,7 +123,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     // 3. Starlight / Earthshine rim on dark side (ensures dark moon is gracefully visible)
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(56, 189, 248, ${0.12 * depthScale})`;
+    ctx.strokeStyle = `rgba(161, 161, 170, ${0.12 * depthScale})`;
     ctx.lineWidth = Math.max(0.6, 0.9 * depthScale);
     ctx.stroke();
 
@@ -203,9 +203,9 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       cx + m.x * 15, cy + m.y * 12, scale * 0.1,
       cx, cy, scale * 0.7
     );
-    nebulaGrad.addColorStop(0, 'rgba(13, 148, 136, 0.08)'); // Teal
-    nebulaGrad.addColorStop(0.35, 'rgba(30, 58, 138, 0.06)'); // Deep Blue
-    nebulaGrad.addColorStop(0.7, 'rgba(88, 28, 135, 0.025)'); // Indigo
+    nebulaGrad.addColorStop(0, 'rgba(63, 63, 70, 0.08)'); // Zinc
+    nebulaGrad.addColorStop(0.35, 'rgba(39, 39, 42, 0.06)'); // Deep Blue
+    nebulaGrad.addColorStop(0.7, 'rgba(63, 63, 70, 0.025)'); // Indigo
     nebulaGrad.addColorStop(1, 'transparent');
     ctx.fillStyle = nebulaGrad;
     ctx.fillRect(0, 0, w, h);
@@ -283,13 +283,13 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
 
       ctx.save();
       // Main dashed line
-      ctx.strokeStyle = `rgba(56, 189, 248, ${0.22 * alphaMult})`;
+      ctx.strokeStyle = `rgba(161, 161, 170, ${0.22 * alphaMult})`;
       ctx.lineWidth = 1.2;
       ctx.setLineDash([5, 6]);
       ctx.stroke();
 
       // Outer glow ribbon
-      ctx.strokeStyle = `rgba(45, 212, 191, ${0.07 * alphaMult})`;
+      ctx.strokeStyle = `rgba(161, 161, 170, ${0.07 * alphaMult})`;
       ctx.lineWidth = 6;
       ctx.setLineDash([]);
       ctx.stroke();
@@ -348,7 +348,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       ctx.beginPath();
       ctx.moveTo(m1.screenX, m1.screenY);
       ctx.lineTo(m2.screenX, m2.screenY);
-      ctx.strokeStyle = `rgba(94, 234, 212, ${chordAlpha})`;
+      ctx.strokeStyle = `rgba(161, 161, 170, ${chordAlpha})`;
       ctx.lineWidth = 0.8;
       ctx.stroke();
     }
@@ -367,9 +367,9 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
 
     // Layer A: Radiant Outer Nebula Aura
     const outerAura = ctx.createRadialGradient(cx, cy, dynamicCoreR * 0.4, cx, cy, dynamicCoreR * 2.8);
-    outerAura.addColorStop(0, 'rgba(45, 212, 191, 0.24)'); // Teal core glow
-    outerAura.addColorStop(0.35, 'rgba(56, 189, 248, 0.12)'); // Electric cyan
-    outerAura.addColorStop(0.7, 'rgba(99, 102, 241, 0.04)'); // Indigo
+    outerAura.addColorStop(0, 'rgba(161, 161, 170, 0.24)'); // Zinc core glow
+    outerAura.addColorStop(0.35, 'rgba(161, 161, 170, 0.12)'); // Soft zinc
+    outerAura.addColorStop(0.7, 'rgba(63, 63, 70, 0.04)'); // Dark zinc
     outerAura.addColorStop(1, 'transparent');
 
     ctx.save();
@@ -392,30 +392,30 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
     ctx.fillStyle = discGrad;
     ctx.fill();
 
-    // Subtle neon cyan rim ring
+    // Subtle rim ring
     ctx.beginPath();
     ctx.arc(cx, cy, dynamicCoreR * 1.05, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(45, 212, 191, 0.35)';
+    ctx.strokeStyle = 'rgba(161, 161, 170, 0.35)';
     ctx.lineWidth = 1.4;
     ctx.stroke();
 
     // Layer C: Elegant smooth halo rings (pure minimalist elegance, zero visual noise)
     ctx.beginPath();
     ctx.arc(cx, cy, dynamicCoreR * 1.16, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(45, 212, 191, 0.15)';
+    ctx.strokeStyle = 'rgba(161, 161, 170, 0.15)';
     ctx.lineWidth = 1;
     ctx.stroke();
 
     ctx.beginPath();
     ctx.arc(cx, cy, dynamicCoreR * 1.28, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
+    ctx.strokeStyle = 'rgba(161, 161, 170, 0.06)';
     ctx.lineWidth = 0.8;
     ctx.stroke();
 
     // Layer D: Midnight Emblem with self-illumination bloom
     ctx.save();
     if (logoImgRef.current && logoImgRef.current.complete) {
-      ctx.shadowColor = 'rgba(56, 189, 248, 0.55)';
+      ctx.shadowColor = 'rgba(161, 161, 170, 0.55)';
       ctx.shadowBlur = 16;
 
       ctx.beginPath();
@@ -432,7 +432,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       );
     } else {
       // Vector fallback
-      ctx.shadowColor = 'rgba(94, 234, 212, 0.65)';
+      ctx.shadowColor = 'rgba(161, 161, 170, 0.65)';
       ctx.shadowBlur = 14;
 
       const ringR = dynamicCoreR * 0.7;
@@ -474,7 +474,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       const particleAlpha = pt.z < 0 ? 0.3 : 0.85;
       const grad = ctx.createLinearGradient(prevPt.screenX, prevPt.screenY, pt.screenX, pt.screenY);
       grad.addColorStop(0, 'transparent');
-      grad.addColorStop(1, `hsla(${p.hue}, 90%, 65%, ${particleAlpha})`);
+      grad.addColorStop(1, `rgba(212, 212, 216, ${particleAlpha})`);
 
       ctx.beginPath();
       ctx.moveTo(prevPt.screenX, prevPt.screenY);
@@ -486,7 +486,7 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       // Head Sparkle
       ctx.beginPath();
       ctx.arc(pt.screenX, pt.screenY, p.size * 0.7 * pt.scale, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${p.hue}, 100%, 80%, ${particleAlpha})`;
+      ctx.fillStyle = `rgba(228, 228, 231, ${particleAlpha})`;
       ctx.fill();
     }
 
@@ -548,11 +548,11 @@ export default function ZKDarkOrb3D({ className = "w-full h-[400px]" }: { classN
       <canvas ref={canvasRef} className="w-full h-full block" />
       
       {/* Sleek single-line bottom pill - safely placed with whitespace-nowrap and no overlap */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono tracking-[0.14em] uppercase pointer-events-none flex items-center gap-2 bg-slate-950/75 px-3.5 py-1 rounded-full border border-teal-500/25 backdrop-blur-md whitespace-nowrap shadow-lg shadow-black/50">
-        <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse shadow-[0_0_6px_#2dd4bf]" />
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] font-mono tracking-[0.14em] uppercase pointer-events-none flex items-center gap-2 bg-zinc-950/75 px-3.5 py-1 rounded-full border border-zinc-700/25 backdrop-blur-md whitespace-nowrap shadow-lg shadow-black/50">
+        <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse shadow-[0_0_6px_#a1a1aa]" />
         <span className="text-white/80 font-bold">MIDNIGHT</span>
-        <span className="text-teal-400/30">/</span>
-        <span className="text-slate-300">MOON PHASE CYCLE</span>
+        <span className="text-zinc-400/30">/</span>
+        <span className="text-zinc-300">MOON PHASE CYCLE</span>
       </div>
     </div>
   );

@@ -40,15 +40,15 @@ export default function RecentTradesWidget() {
   }, []);
 
   return (
-    <div className="glass-panel rounded-2xl border border-white/10 bg-slate-900/70 overflow-hidden">
+    <div className="glass-panel rounded-2xl border border-white/10 bg-zinc-900/70 overflow-hidden">
       {/* Header */}
       <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs font-mono text-slate-300 font-bold">
-          <ArrowRightLeft className="w-3.5 h-3.5 text-teal-400" />
+        <div className="flex items-center gap-2 text-xs font-mono text-zinc-300 font-bold">
+          <ArrowRightLeft className="w-3.5 h-3.5 text-zinc-400" />
           <span>Recent Dark Pool Fills</span>
         </div>
-        <div className="flex items-center gap-1 text-[10px] text-emerald-400 font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="flex items-center gap-1 text-[10px] text-zinc-400 font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
           <span>Live</span>
         </div>
       </div>
@@ -58,19 +58,19 @@ export default function RecentTradesWidget() {
         {trades.map((trade) => (
           <div key={trade.id} className="px-4 py-2.5 flex items-center justify-between text-[11px] font-mono hover:bg-white/[0.02] transition-colors animate-fadeIn">
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${trade.side === 'BUY' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+              <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${trade.side === 'BUY' ? 'bg-zinc-500/20 text-zinc-400' : 'bg-red-500/20 text-red-400'}`}>
                 {trade.side === 'BUY' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               </div>
               <div>
                 <span className="text-white font-bold">{trade.pair}</span>
-                <span className={`ml-2 ${trade.side === 'BUY' ? 'text-emerald-400' : 'text-red-400'}`}>{trade.side}</span>
+                <span className={`ml-2 ${trade.side === 'BUY' ? 'text-zinc-400' : 'text-red-400'}`}>{trade.side}</span>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-slate-400">
+            <div className="flex items-center gap-4 text-zinc-400">
               <span>{trade.price}</span>
-              <span className="text-slate-500 w-20 text-right">{trade.amount}</span>
-              <span className="text-slate-600 w-16 text-right flex items-center gap-1">
-                <Shield className="w-2.5 h-2.5 text-teal-400/50" />
+              <span className="text-zinc-500 w-20 text-right">{trade.amount}</span>
+              <span className="text-zinc-600 w-16 text-right flex items-center gap-1">
+                <Shield className="w-2.5 h-2.5 text-zinc-400/50" />
                 {trade.time}
               </span>
             </div>

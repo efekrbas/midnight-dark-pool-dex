@@ -70,7 +70,7 @@ export default function ParticleCanvas() {
         // Draw particle dot
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(147, 51, 234, 0.4)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.fill();
 
         // Connect lines to mouse
@@ -82,8 +82,8 @@ export default function ParticleCanvas() {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(mouseX, mouseY);
-          ctx.strokeStyle = `rgba(59, 130, 246, ${0.35 * (1 - distMouse / 140)})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = `rgba(255, 255, 255, ${0.12 * (1 - distMouse / 140)})`;
+          ctx.lineWidth = 0.6;
           ctx.stroke();
         }
 
@@ -98,8 +98,8 @@ export default function ParticleCanvas() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(147, 51, 234, ${0.15 * (1 - dist / 110)})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 * (1 - dist / 110)})`;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }

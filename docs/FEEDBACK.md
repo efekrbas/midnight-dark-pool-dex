@@ -2,6 +2,8 @@
 
 This document compiles the user research, survey responses, and feedback implementation log collected from **75+ verified Preprod/Preview traders** for the **Midnight Dark Pool DEX**.
 
+> **Live Google Sheet Maintenance:** All user feedback is maintained and processed in real-time in **Google Sheets** ([Google Sheets Live Data](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing)) rather than stored in static `.md` files, ensuring cloud persistence and transparent evaluation.
+
 ## 📊 Quantitative Survey Metrics
 
 - **Total Survey Respondents:** 75 Active Preprod Users

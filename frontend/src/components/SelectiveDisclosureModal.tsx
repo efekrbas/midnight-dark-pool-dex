@@ -60,8 +60,8 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-2xl animate-fadeIn">
-      <div className="relative max-w-xl w-full bg-slate-900 border border-slate-700 rounded-xl p-6 sm:p-8 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-2xl animate-fadeIn">
+      <div className="relative max-w-xl w-full bg-zinc-900 border border-zinc-700 rounded-xl p-6 sm:p-8 shadow-2xl overflow-hidden">
 
         {/* Close Button */}
         <button
@@ -69,21 +69,21 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
             sounds.playClick();
             onClose();
           }}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 transition-all border border-white/10"
+          className="absolute top-5 right-5 p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-800 transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-600 shadow-lg">
-            <Key className="w-6 h-6 text-teal-400" />
+          <div className="w-12 h-12 rounded-lg bg-zinc-800 flex items-center justify-center border border-zinc-600 shadow-lg">
+            <Key className="w-6 h-6 text-zinc-400" />
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
               Auditor Selective Disclosure Exporter
             </h2>
-            <p className="text-xs text-slate-400 font-mono">
+            <p className="text-xs text-zinc-400 font-mono">
               Generate zero-knowledge audit viewing keys for regulatory & tax compliance.
             </p>
           </div>
@@ -93,9 +93,9 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
         <div className="space-y-4 my-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs text-slate-400 mb-1.5 font-mono block">Start Date</label>
-              <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white">
-                <Calendar className="w-4 h-4 text-teal-400" />
+              <label className="text-xs text-zinc-400 mb-1.5 font-mono block">Start Date</label>
+              <div className="flex items-center gap-2 bg-zinc-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white">
+                <Calendar className="w-4 h-4 text-zinc-400" />
                 <input
                   type="date"
                   value={startDate}
@@ -105,9 +105,9 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
               </div>
             </div>
             <div>
-              <label className="text-xs text-slate-400 mb-1.5 font-mono block">End Date</label>
-              <div className="flex items-center gap-2 bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white">
-                <Calendar className="w-4 h-4 text-teal-400" />
+              <label className="text-xs text-zinc-400 mb-1.5 font-mono block">End Date</label>
+              <div className="flex items-center gap-2 bg-zinc-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white">
+                <Calendar className="w-4 h-4 text-zinc-400" />
                 <input
                   type="date"
                   value={endDate}
@@ -121,22 +121,22 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
           {!isGenerated ? (
             <button
               onClick={handleGenerateKey}
-              className="w-full py-3.5 rounded-xl bg-slate-800 border border-slate-600 hover:border-teal-500 hover:text-teal-300 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-zinc-800 border border-zinc-600 hover:border-zinc-700 hover:text-zinc-300 text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2"
             >
-              <Sparkles className="w-4 h-4 text-teal-400" />
+              <Sparkles className="w-4 h-4 text-zinc-400" />
               <span>Generate Selective Disclosure Key</span>
             </button>
           ) : (
-            <div className="space-y-4 p-4 rounded-xl bg-slate-950/80 border border-slate-700">
+            <div className="space-y-4 p-4 rounded-xl bg-zinc-950/80 border border-zinc-700">
               <div>
-                <span className="text-xs font-mono text-teal-300 block mb-1">Generated Viewing Key:</span>
-                <div className="flex items-center gap-2 bg-slate-900 border border-white/10 p-2.5 rounded-xl text-xs font-mono text-emerald-400">
+                <span className="text-xs font-mono text-zinc-300 block mb-1">Generated Viewing Key:</span>
+                <div className="flex items-center gap-2 bg-zinc-900 border border-white/10 p-2.5 rounded-xl text-xs font-mono text-zinc-400">
                   <span className="truncate flex-1">{viewKey}</span>
                   <button
                     onClick={handleCopy}
-                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-all"
+                    className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-all"
                   >
-                    {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    {copied ? <Check className="w-4 h-4 text-zinc-400" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
@@ -144,7 +144,7 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
               <div className="flex gap-3">
                 <button
                   onClick={handleExportJSON}
-                  className="flex-1 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
+                  className="flex-1 py-2.5 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download ZK JSON Report</span>
@@ -155,8 +155,8 @@ export default function SelectiveDisclosureModal({ isOpen, onClose }: SelectiveD
         </div>
 
         {/* Regulatory Badge Footer */}
-        <div className="p-3 rounded-xl bg-teal-950/20 border border-teal-500/20 flex items-center gap-3 text-[11px] font-mono text-teal-300">
-          <ShieldCheck className="w-5 h-5 text-teal-400 shrink-0" />
+        <div className="p-3 rounded-xl bg-zinc-950/20 border border-zinc-700/20 flex items-center gap-3 text-[11px] font-mono text-zinc-300">
+          <ShieldCheck className="w-5 h-5 text-zinc-400 shrink-0" />
           <span>Selective disclosure guarantees public trade privacy while enabling verified 1-click auditor compliance.</span>
         </div>
       </div>

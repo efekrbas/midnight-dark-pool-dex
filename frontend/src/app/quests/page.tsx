@@ -40,16 +40,16 @@ export default function QuestsPage() {
     <div className="w-full max-w-[1200px] mx-auto py-8 px-4 sm:px-6 space-y-8 animate-fadeIn">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-slate-900/80 backdrop-blur-2xl gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-zinc-900/80 backdrop-blur-2xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-teal-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(236,72,153,0.3)] border border-white/20">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-zinc-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(236,72,153,0.3)] border border-white/20">
             <Trophy className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               Midnight Quests & Achievements
             </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
+            <p className="text-xs text-zinc-400 font-mono mt-1">
               Complete Web3 privacy quests to earn XP, badges, and unlock exclusive features.
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function QuestsPage() {
 
         <div className="flex items-center gap-6 font-mono text-xs">
           <div className="text-right">
-            <span className="text-slate-400 block">Total Earned XP</span>
+            <span className="text-zinc-400 block">Total Earned XP</span>
             <span className="text-xl font-black text-pink-400 flex items-center gap-1">
               <Star className="w-4 h-4 fill-current" /> {totalXP} XP
             </span>
@@ -71,14 +71,14 @@ export default function QuestsPage() {
           <div
             key={quest.id}
             className={`glass-panel p-6 rounded-3xl border ${
-              quest.completed ? 'border-pink-500/40 bg-slate-900/80' : 'border-white/10 bg-slate-900/50'
+              quest.completed ? 'border-pink-500/40 bg-zinc-900/80' : 'border-white/10 bg-zinc-900/50'
             } space-y-4 transition-all hover:-translate-y-1`}
           >
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-2xl mb-1 block">{quest.badge.split(' ')[0]}</span>
                 <h3 className="font-black text-lg text-white">{quest.title}</h3>
-                <p className="text-xs text-slate-400 font-mono mt-1">{quest.description}</p>
+                <p className="text-xs text-zinc-400 font-mono mt-1">{quest.description}</p>
               </div>
               <span className="px-3 py-1 rounded-xl bg-pink-500/20 text-pink-300 text-xs font-mono font-bold border border-pink-500/30">
                 +{quest.xp} XP
@@ -87,13 +87,13 @@ export default function QuestsPage() {
 
             {/* Progress Bar */}
             <div className="space-y-1 font-mono text-[11px]">
-              <div className="flex justify-between text-slate-400">
+              <div className="flex justify-between text-zinc-400">
                 <span>Progress</span>
                 <span>{quest.progress} / {quest.total}</span>
               </div>
-              <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
+              <div className="w-full h-2 bg-zinc-950 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-pink-500 to-teal-500 rounded-full transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-pink-500 to-zinc-500 rounded-full transition-all duration-300"
                   style={{ width: `${(quest.progress / quest.total) * 100}%` }}
                 />
               </div>
@@ -101,13 +101,13 @@ export default function QuestsPage() {
 
             {/* Action */}
             {quest.completed ? (
-              <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold pt-1">
+              <div className="flex items-center gap-2 text-xs font-mono text-zinc-400 font-bold pt-1">
                 <CheckCircle2 className="w-4 h-4" /> <span>Completed & Claimed</span>
               </div>
             ) : (
               <button
                 onClick={() => handleClaim(quest.id)}
-                className="w-full py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs font-mono transition-all shadow-md"
+                className="w-full py-2.5 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white font-bold text-xs font-mono transition-all shadow-md"
               >
                 Complete Quest
               </button>

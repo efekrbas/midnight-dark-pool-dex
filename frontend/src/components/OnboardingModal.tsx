@@ -45,16 +45,16 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-slate-900/90 backdrop-blur-2xl border border-blue-500/20 rounded-2xl max-w-md w-full relative overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_40px_rgba(59,130,246,0.15)]"
+          className="bg-zinc-900/90 backdrop-blur-2xl border border-zinc-700/20 rounded-2xl max-w-md w-full relative overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.7),0_0_40px_rgba(113,113,122,0.15)]"
         >
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-8">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 text-blue-400 mb-6 mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-zinc-500/20 text-zinc-400 mb-6 mx-auto">
                 <ShieldCheck size={32} />
               </div>
               <h2 className="text-2xl font-bold text-center mb-4">Welcome to Midnight Dark Pool</h2>
-              <p className="text-gray-400 text-center leading-relaxed">
+              <p className="text-zinc-400 text-center leading-relaxed">
                 Experience institutional-grade privacy. Your limit orders are kept entirely private using Zero-Knowledge proofs until matched.
               </p>
               <button onClick={nextStep} className="glass-button w-full py-3 rounded-lg flex items-center justify-center font-medium">
@@ -65,18 +65,18 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
 
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-8">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-teal-500/20 text-teal-400 mb-6 mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-zinc-500/20 text-zinc-400 mb-6 mx-auto">
                 <KeySquare size={32} />
               </div>
               <h2 className="text-2xl font-bold text-center mb-4">Acquire Testnet Tokens</h2>
-              <p className="text-gray-300 text-center mb-6">
+              <p className="text-zinc-300 text-center mb-6">
                 You will need Preprod tNIGHT and ZKUSD tokens to submit zero-knowledge limit orders and swap in the dark pool. Visit the Midnight Testnet Faucet to fund your wallet.
               </p>
               <a 
                 href="https://faucet.preprod.midnight.network/" 
                 target="_blank" 
                 rel="noreferrer"
-                className="block text-center text-teal-400 hover:text-teal-300 mb-8 underline underline-offset-4"
+                className="block text-center text-zinc-400 hover:text-zinc-300 mb-8 underline underline-offset-4"
               >
                 Open Faucet in new tab
               </a>
@@ -88,11 +88,11 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
 
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-8">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mb-6 mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-zinc-500/20 text-zinc-400 mb-6 mx-auto">
                 <Wallet size={32} />
               </div>
               <h2 className="text-2xl font-bold text-center mb-4">Connect Wallet</h2>
-              <p className="text-gray-400 text-center text-sm">
+              <p className="text-zinc-400 text-center text-sm">
                 Connect your Lace or 1AM wallet on the Midnight Preprod network to interact with the matching engine.
               </p>
               
@@ -105,7 +105,7 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
               <button 
                 onClick={handleConnectWallet} 
                 disabled={walletStatus === "connecting" || walletStatus === "connected"}
-                className={`glass-button w-full py-3 rounded-lg flex items-center justify-center font-medium ${walletStatus === 'connected' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : ''}`}
+                className={`glass-button w-full py-3 rounded-lg flex items-center justify-center font-medium ${walletStatus === 'connected' ? 'bg-zinc-500/20 text-zinc-400 border-zinc-700/50' : ''}`}
               >
                 {walletStatus === "idle" && "Connect Wallet"}
                 {walletStatus === "connecting" && "Connecting..."}
@@ -117,7 +117,7 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
                 <div className="mt-4 text-center">
                   <button 
                     onClick={() => { setWalletStatus("connected"); setTimeout(() => setStep(4), 500); }} 
-                    className="text-slate-400 hover:text-white underline text-xs transition-colors"
+                    className="text-zinc-400 hover:text-white underline text-xs transition-colors"
                   >
                     Continue in Simulation Mode (Demo)
                   </button>
@@ -132,7 +132,7 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
                 <CheckCircle2 size={32} />
               </div>
               <h2 className="text-2xl font-bold text-center mb-4">You&apos;re All Set!</h2>
-              <p className="text-gray-400 text-center text-sm">
+              <p className="text-zinc-400 text-center text-sm">
                 Your wallet is connected. You can now browse blurred liquidity, submit private ZK orders, and view your terminal.
               </p>
               <button onClick={() => { onClose(); router.push('/trade'); }} className="glass-button w-full py-3 rounded-lg flex items-center justify-center font-medium text-white">

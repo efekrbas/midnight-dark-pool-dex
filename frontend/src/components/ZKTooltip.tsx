@@ -32,17 +32,17 @@ export function ZKTooltip({ term, explanation, children }: ZKTooltipProps) {
       onMouseLeave={() => setShow(false)}
     >
       {children || (
-        <span className="text-teal-400 underline decoration-dotted underline-offset-2 decoration-teal-400/50 font-semibold">
+        <span className="text-zinc-400 underline decoration-dotted underline-offset-2 decoration-zinc-400/50 font-semibold">
           {term}
         </span>
       )}
-      <HelpCircle className="w-3 h-3 text-teal-400/60 inline" />
+      <HelpCircle className="w-3 h-3 text-zinc-400/60 inline" />
 
       {show && (
-        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-slate-900/95 backdrop-blur-xl border border-teal-500/30 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] text-[11px] text-slate-300 leading-relaxed z-50 animate-fadeIn pointer-events-none">
-          <span className="font-bold text-teal-300 block mb-1">{term}</span>
+        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700/30 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.6)] text-[11px] text-zinc-300 leading-relaxed z-50 animate-fadeIn pointer-events-none">
+          <span className="font-bold text-zinc-300 block mb-1">{term}</span>
           {explanation}
-          <span className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900/95 border-r border-b border-teal-500/30 rotate-45 -mt-1" />
+          <span className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-900/95 border-r border-b border-zinc-700/30 rotate-45 -mt-1" />
         </span>
       )}
     </span>

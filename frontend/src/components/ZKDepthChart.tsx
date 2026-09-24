@@ -14,22 +14,22 @@ export default function ZKDepthChart() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950/70 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backdrop-blur-xl relative font-sans">
+    <div className="flex flex-col h-full bg-zinc-950/70 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backdrop-blur-xl relative font-sans">
       
       {/* Top Controls */}
-      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-slate-950/90">
+      <div className="p-4 border-b border-white/10 flex justify-between items-center bg-zinc-950/90">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400">
+          <div className="w-8 h-8 rounded-lg bg-zinc-500/10 flex items-center justify-center border border-zinc-700/20 text-zinc-400">
             <Layers className="w-4 h-4" />
           </div>
           <div>
             <h3 className="font-bold text-sm text-white tracking-wide flex items-center gap-2">
               Market Depth & ZK Fog of War
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-teal-500/10 text-teal-300 border border-teal-500/30">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-500/10 text-zinc-300 border border-zinc-700/30">
                 ZK SHIELDED WALLS
               </span>
             </h3>
-            <p className="text-[11px] text-slate-400 font-mono">Bids (Green) vs Asks (Red)</p>
+            <p className="text-[11px] text-zinc-400 font-mono">Bids (Green) vs Asks (Red)</p>
           </div>
         </div>
 
@@ -37,11 +37,11 @@ export default function ZKDepthChart() {
           onClick={toggleFog}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all border ${
             showFog
-              ? 'bg-teal-500/10 text-teal-300 border-teal-500/40 shadow-[0_0_15px_rgba(20,184,166,0.15)]'
-              : 'bg-slate-900 text-slate-400 border-white/10 hover:text-white'
+              ? 'bg-zinc-500/10 text-zinc-300 border-zinc-700/40 shadow-[0_0_15px_rgba(161,161,170,0.15)]'
+              : 'bg-zinc-900 text-zinc-400 border-white/10 hover:text-white'
           }`}
         >
-          {showFog ? <Eye className="w-3.5 h-3.5 text-teal-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+          {showFog ? <Eye className="w-3.5 h-3.5 text-zinc-400" /> : <EyeOff className="w-3.5 h-3.5" />}
           <span>Fog of War: {showFog ? 'ON' : 'OFF'}</span>
         </button>
       </div>
@@ -53,22 +53,22 @@ export default function ZKDepthChart() {
         {showFog && (
           <div className="absolute inset-0 pointer-events-none z-10">
             {/* Left Outer Fog (Deep Bids) */}
-            <div className="absolute top-0 bottom-0 left-0 w-[30%] bg-teal-900/20 blur-xl border-r border-teal-500/30 animate-pulse-glow" />
-            <div className="absolute top-8 left-4 text-[10px] font-mono text-teal-300 bg-teal-950/80 px-2 py-1 rounded border border-teal-500/30 z-20">
+            <div className="absolute top-0 bottom-0 left-0 w-[30%] bg-zinc-900/20 blur-xl border-r border-zinc-700/30 animate-pulse-glow" />
+            <div className="absolute top-8 left-4 text-[10px] font-mono text-zinc-300 bg-zinc-950/80 px-2 py-1 rounded border border-zinc-700/30 z-20">
               🔒 ZK Fog: Deep Bids Masked (&lt; $1.380)
             </div>
 
             {/* Right Outer Fog (Deep Asks) */}
-            <div className="absolute top-0 bottom-0 right-0 w-[30%] bg-blue-900/20 blur-xl border-l border-blue-500/30 animate-pulse-glow" />
-            <div className="absolute top-8 right-4 text-[10px] font-mono text-blue-300 bg-blue-950/80 px-2 py-1 rounded border border-blue-500/30 z-20">
+            <div className="absolute top-0 bottom-0 right-0 w-[30%] bg-zinc-900/20 blur-xl border-l border-zinc-700/30 animate-pulse-glow" />
+            <div className="absolute top-8 right-4 text-[10px] font-mono text-zinc-300 bg-zinc-950/80 px-2 py-1 rounded border border-zinc-700/30 z-20">
               🔒 ZK Fog: Institutional Asks Masked (&gt; $1.460)
             </div>
           </div>
         )}
 
         {/* Mid Oracle Reference Marker */}
-        <div className="absolute left-1/2 top-4 bottom-10 -translate-x-1/2 w-0 border-l border-dashed border-emerald-400/50 z-10 pointer-events-none flex flex-col justify-between items-center">
-          <span className="bg-slate-900 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono font-bold px-2 py-0.5 rounded shadow">
+        <div className="absolute left-1/2 top-4 bottom-10 -translate-x-1/2 w-0 border-l border-dashed border-zinc-600/50 z-10 pointer-events-none flex flex-col justify-between items-center">
+          <span className="bg-zinc-900 border border-zinc-700/40 text-zinc-400 text-[10px] font-mono font-bold px-2 py-0.5 rounded shadow">
             Oracle $1.420
           </span>
         </div>
@@ -114,10 +114,10 @@ export default function ZKDepthChart() {
         </div>
 
         {/* Bottom Price Scale */}
-        <div className="flex justify-between text-[11px] font-mono text-slate-500 border-t border-white/5 pt-3 relative z-20">
+        <div className="flex justify-between text-[11px] font-mono text-zinc-500 border-t border-white/5 pt-3 relative z-20">
           <span>$1.340</span>
           <span>$1.380</span>
-          <span className="text-emerald-400 font-bold">$1.420</span>
+          <span className="text-zinc-400 font-bold">$1.420</span>
           <span>$1.460</span>
           <span>$1.500</span>
         </div>

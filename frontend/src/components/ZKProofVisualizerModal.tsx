@@ -35,28 +35,28 @@ export default function ZKProofVisualizerModal({
       desc: "Deriving trader secret and local nullifier key from encrypted client storage.",
       detail: "Witness: callerSecret() | Identity: persistentHash('darkpool:trader:v1', sk)",
       icon: Lock,
-      color: "from-blue-500 to-cyan-500",
+      color: "from-zinc-500 to-zinc-500",
     },
     {
       title: "2. Cryptographic Commitments",
       desc: "Computing persistentCommit for hidden trade volume and limit price.",
       detail: `persistentCommit(${amount} tNIGHT, salt) | persistentCommit(${price} ZKUSD, salt)`,
       icon: Database,
-      color: "from-cyan-500 to-teal-500",
+      color: "from-zinc-500 to-zinc-500",
     },
     {
       title: "3. Compact ZK-SNARK Prover Execution",
       desc: "Evaluating Compact submitOrder circuit constraints via Midnight proving provider.",
       detail: "Prover: Wallet Proving Provider / ProofServer | Constraints Verified Locally",
       icon: Cpu,
-      color: "from-teal-500 to-emerald-500",
+      color: "from-zinc-500 to-zinc-500",
     },
     {
       title: "4. Midnight Preprod Submission & Escrow Lock",
       desc: "Balancing, signing, and broadcasting transaction to Midnight Preprod.",
       detail: `Endpoint: ${INDEXER_URL} | Escrow Locked in Contract`,
       icon: Shield,
-      color: "from-emerald-500 to-teal-600",
+      color: "from-zinc-500 to-zinc-600",
     },
   ];
 
@@ -167,16 +167,16 @@ export default function ZKProofVisualizerModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-2xl animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-zinc-950/80 backdrop-blur-2xl animate-fadeIn"
       role="dialog"
       aria-modal="true"
       aria-labelledby="zk-modal-title"
     >
-      <div className="relative max-w-2xl w-full max-h-[95vh] flex flex-col bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden">
+      <div className="relative max-w-2xl w-full max-h-[95vh] flex flex-col bg-zinc-900/90 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-2xl overflow-hidden">
         
         {/* Subtle Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-500/10 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-zinc-500/10 rounded-full blur-[80px] pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -185,7 +185,7 @@ export default function ZKProofVisualizerModal({
             onClose();
           }}
           aria-label="Close ZK Proof Dialog"
-          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-700 transition-all border border-white/10 z-10"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-700 transition-all border border-white/10 z-10"
         >
           <X className="w-5 h-5" />
         </button>
@@ -194,8 +194,8 @@ export default function ZKProofVisualizerModal({
         <div className="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1">
           {/* Header */}
           <div className="flex items-start sm:items-center gap-4 mb-6 sm:mb-8 pr-12 sm:pr-16">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-slate-800/80 flex items-center justify-center border border-slate-600/50 shadow-lg backdrop-blur-md">
-              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-teal-400 animate-spin" style={{ animationDuration: '8s' }} />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-zinc-800/80 flex items-center justify-center border border-zinc-600/50 shadow-lg backdrop-blur-md">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400 animate-spin" style={{ animationDuration: '8s' }} />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -203,16 +203,16 @@ export default function ZKProofVisualizerModal({
                   Midnight Compact ZK Execution
                 </h2>
                 {isDemoMode ? (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-500/20 text-zinc-300 border border-zinc-600/40">
                     ⚠ DEMO SIMULATION (NOT ON-CHAIN)
                   </span>
                 ) : (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-300 border border-teal-500/30">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-zinc-500/15 text-zinc-300 border border-zinc-700/30">
                     ⚡ Live Preprod Mode
                   </span>
                 )}
               </div>
-              <p className="text-[10px] sm:text-xs font-mono text-slate-400 leading-relaxed">
+              <p className="text-[10px] sm:text-xs font-mono text-zinc-400 leading-relaxed">
                 Submitting {orderSide} order ({amount} tNIGHT @ ${price} ZKUSD) to Midnight Dark Pool DEX
               </p>
             </div>
@@ -235,7 +235,7 @@ export default function ZKProofVisualizerModal({
                 </button>
                 <button
                   onClick={runDemoSimulation}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-bold text-xs flex items-center gap-1.5 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-white/10 font-bold text-xs flex items-center gap-1.5 transition-all"
                 >
                   Run Interactive Demo Simulator
                 </button>
@@ -255,24 +255,24 @@ export default function ZKProofVisualizerModal({
                   key={idx}
                   className={`p-3 sm:p-5 rounded-xl sm:rounded-2xl border transition-all duration-500 relative overflow-hidden backdrop-blur-sm ${
                     isActive
-                      ? 'bg-slate-800/80 border-teal-500/40 shadow-[0_4px_20px_rgba(20,184,166,0.15)] scale-[1.01]'
+                      ? 'bg-zinc-800/80 border-zinc-700/40 shadow-[0_4px_20px_rgba(161,161,170,0.15)] scale-[1.01]'
                       : isDone
-                      ? 'bg-slate-900/40 border-emerald-500/30 opacity-90'
+                      ? 'bg-zinc-900/40 border-zinc-700/30 opacity-90'
                       : errorMsg && idx === currentStep
                       ? 'bg-red-950/20 border-red-500/30'
-                      : 'bg-slate-950/40 border-white/5 opacity-40'
+                      : 'bg-zinc-950/40 border-white/5 opacity-40'
                   }`}
                 >
                   <div className="flex items-start gap-3 sm:gap-4 relative z-10">
                     <div
                       className={`w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl flex items-center justify-center border transition-all duration-300 ${
                         isDone
-                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                          ? 'bg-zinc-500/10 border-zinc-700/30 text-zinc-400'
                           : isActive
-                          ? 'bg-teal-500/10 border-teal-500/40 text-teal-400 animate-pulse'
+                          ? 'bg-zinc-500/10 border-zinc-700/40 text-zinc-400 animate-pulse'
                           : errorMsg && idx === currentStep
                           ? 'bg-red-500/10 border-red-500/40 text-red-400'
-                          : 'bg-slate-800/40 border-white/5 text-slate-500'
+                          : 'bg-zinc-800/40 border-white/5 text-zinc-500'
                       }`}
                     >
                       {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
@@ -284,19 +284,19 @@ export default function ZKProofVisualizerModal({
                         <span
                           className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${
                             isDone
-                              ? 'text-emerald-400 bg-emerald-500/10'
+                              ? 'text-zinc-400 bg-zinc-500/10'
                               : isActive
-                              ? 'text-teal-400 bg-teal-500/10 animate-pulse'
+                              ? 'text-zinc-400 bg-zinc-500/10 animate-pulse'
                               : errorMsg && idx === currentStep
                               ? 'text-red-400 bg-red-500/10'
-                              : 'text-slate-500'
+                              : 'text-zinc-500'
                           }`}
                         >
                           {isDone ? 'COMPLETED' : isActive ? 'EXECUTING' : errorMsg && idx === currentStep ? 'FAILED' : 'PENDING'}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-300 mb-2 leading-relaxed">{step.desc}</p>
-                      <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 text-[10px] font-mono text-slate-400 truncate">
+                      <p className="text-[11px] text-zinc-300 mb-2 leading-relaxed">{step.desc}</p>
+                      <div className="p-2 rounded-lg bg-zinc-950/60 border border-white/5 text-[10px] font-mono text-zinc-400 truncate">
                         {step.detail}
                       </div>
                     </div>
@@ -308,13 +308,13 @@ export default function ZKProofVisualizerModal({
 
           {/* Success Banner */}
           {isCompleted && (
-            <div className="mt-6 p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 space-y-2 animate-fadeIn">
-              <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
+            <div className="mt-6 p-4 rounded-xl bg-zinc-950/30 border border-zinc-700/40 space-y-2 animate-fadeIn">
+              <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Zero-Knowledge Order Committed</span>
               </div>
-              <p className="text-[11px] font-mono text-slate-300 truncate">
-                Tx Identifier: <span className="text-teal-300">{txIdentifier}</span>
+              <p className="text-[11px] font-mono text-zinc-300 truncate">
+                Tx Identifier: <span className="text-zinc-300">{txIdentifier}</span>
               </p>
             </div>
           )}

@@ -25,30 +25,32 @@ export default function SplashScreen() {
   if (phase === 'done') return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center animate-fadeIn transition-opacity duration-500" style={{ opacity: progress >= 100 ? 0 : 1 }}>
-      {/* Logo */}
-      <div className="relative mb-8">
-        <div className="w-20 h-20 rounded-xl bg-slate-900 flex items-center justify-center shadow-[0_0_60px_rgba(15,23,42,0.6)] border border-slate-700 animate-pulse">
-          <Hexagon className="w-10 h-10 text-teal-400" />
+    <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center animate-fadeIn transition-opacity duration-500" style={{ opacity: progress >= 100 ? 0 : 1 }}>
+      {/* Institutional Monogram */}
+      <div className="relative mb-6">
+        <div className="w-14 h-14 rounded-xl bg-zinc-950 flex items-center justify-center border border-zinc-800 shadow-2xl">
+          <Hexagon className="w-7 h-7 text-white stroke-[1.5]" />
         </div>
-        <div className="absolute -inset-4 rounded-xl bg-slate-800/30 blur-2xl" />
       </div>
 
-      <h1 className="text-2xl font-black text-white mb-1 tracking-tight">Midnight Dark Pool</h1>
-      <p className="text-[10px] font-mono text-slate-400 mb-8 flex items-center gap-1.5">
-        <Lock className="w-3 h-3 text-teal-400" />
+      <div className="flex items-center gap-2 mb-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
+        <h1 className="text-sm font-semibold tracking-tight text-white">Midnight Dark Pool</h1>
+      </div>
+      <p className="text-[11px] font-mono text-zinc-400 mb-6 flex items-center gap-1.5">
+        <Lock className="w-3 h-3 text-zinc-400" />
         <span>Initializing Zero-Knowledge circuits...</span>
       </p>
 
       {/* Progress Bar */}
-      <div className="w-64 h-1 bg-slate-800 rounded-none overflow-hidden">
+      <div className="w-56 h-[2px] bg-zinc-900 rounded-none overflow-hidden">
         <div
-          className="h-full bg-teal-500 transition-all duration-200 shadow-[0_0_10px_rgba(20,184,166,0.5)]"
+          className="h-full bg-white transition-all duration-200"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>
-      <p className="text-[10px] font-mono text-slate-500 mt-3">
-        {progress < 30 ? 'Loading ZK circuits...' : progress < 60 ? 'Connecting to Midnight Preprod...' : progress < 90 ? 'Verifying state commitments...' : 'Ready'}
+      <p className="text-[10px] font-mono text-zinc-400 mt-3 uppercase tracking-wider">
+        {progress < 30 ? 'Loading Compact Circuits...' : progress < 60 ? 'Connecting Preprod Gateway...' : progress < 90 ? 'Verifying State Commitments...' : 'Ready'}
       </p>
     </div>
   );

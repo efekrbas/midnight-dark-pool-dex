@@ -76,11 +76,11 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-2xl animate-fadeIn">
-      <div className="relative max-w-xl w-full bg-slate-900 border border-blue-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_80px_rgba(59,130,246,0.35)] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-2xl animate-fadeIn">
+      <div className="relative max-w-xl w-full bg-zinc-900 border border-zinc-700/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_80px_rgba(113,113,122,0.35)] overflow-hidden">
         
         {/* Ambient Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-zinc-700/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close Button */}
         <button
@@ -88,21 +88,21 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
             sounds.playClick();
             onClose();
           }}
-          className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 transition-all border border-white/10"
+          className="absolute top-5 right-5 p-2 rounded-xl text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-800 transition-all border border-white/10"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-700 flex items-center justify-center text-white border border-teal-400/20 shadow-lg shadow-teal-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-zinc-500 to-zinc-700 flex items-center justify-center text-white border border-zinc-600/20 shadow-lg shadow-zinc-700/30">
             <Icon className="w-6 h-6 animate-pulse" />
           </div>
           <div>
             <h2 className="text-lg sm:text-xl font-black text-white tracking-tight">
               {step.title}
             </h2>
-            <span className="text-xs font-mono text-blue-400">
+            <span className="text-xs font-mono text-zinc-400">
               Step {currentStep + 1} of {tourSteps.length}
             </span>
           </div>
@@ -110,12 +110,12 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
 
         {/* Step Description */}
         <div className="space-y-4 my-6">
-          <p className="text-sm text-slate-300 leading-relaxed font-light">
+          <p className="text-sm text-zinc-300 leading-relaxed font-light">
             {step.desc}
           </p>
 
-          <div className="p-3.5 rounded-2xl bg-slate-950/80 border border-blue-500/30 text-xs font-mono text-blue-300 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-teal-400 shrink-0" />
+          <div className="p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-700/30 text-xs font-mono text-zinc-300 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-zinc-400 shrink-0" />
             <span>{step.highlight}</span>
           </div>
         </div>
@@ -127,8 +127,8 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
             disabled={currentStep === 0}
             className={`px-4 py-2 rounded-xl font-mono text-xs font-bold flex items-center gap-1.5 transition-all ${
               currentStep === 0
-                ? 'opacity-30 cursor-not-allowed text-slate-500'
-                : 'text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700'
+                ? 'opacity-30 cursor-not-allowed text-zinc-500'
+                : 'text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700'
             }`}
           >
             <ArrowLeft className="w-4 h-4" />
@@ -140,7 +140,7 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
               <span
                 key={i}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  i === currentStep ? 'w-6 bg-teal-500' : 'bg-slate-700'
+                  i === currentStep ? 'w-6 bg-zinc-500' : 'bg-zinc-700'
                 }`}
               />
             ))}
@@ -148,7 +148,7 @@ export default function GuidedTourModal({ isOpen, onClose }: GuidedTourModalProp
 
           <button
             onClick={handleNext}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-teal-500 to-teal-700 hover:from-teal-400 hover:to-teal-600 text-white font-bold font-mono text-xs transition-all shadow-lg hover:shadow-teal-500/40 border border-teal-400/20 flex items-center gap-1.5"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-zinc-500 to-zinc-700 hover:from-zinc-400 hover:to-zinc-600 text-white font-bold font-mono text-xs transition-all shadow-lg hover:shadow-zinc-700/40 border border-zinc-600/20 flex items-center gap-1.5"
           >
             <span>{currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next Step'}</span>
             <ArrowRight className="w-4 h-4" />

@@ -105,16 +105,16 @@ export default function CertificatePage() {
     <div className="w-full max-w-[1200px] mx-auto py-8 px-4 sm:px-6 space-y-8 animate-fadeIn">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-slate-900/80 backdrop-blur-2xl gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-zinc-900/80 backdrop-blur-2xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-600 flex items-center justify-center text-slate-950 shadow-[0_0_30px_rgba(245,158,11,0.3)] border border-white/20">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-zinc-400 to-zinc-500 flex items-center justify-center text-zinc-950 shadow-[0_0_30px_rgba(161,161,170,0.3)] border border-white/20">
             <Award className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               ZK Solvency Certificate
             </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
+            <p className="text-xs text-zinc-400 font-mono mt-1">
               Generate & share your institutional Zero-Knowledge trader verification badge.
             </p>
           </div>
@@ -123,7 +123,7 @@ export default function CertificatePage() {
         <button
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-slate-950 font-extrabold text-sm flex items-center gap-3 transition-all shadow-xl"
+          className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-zinc-400 to-zinc-500 hover:from-zinc-300 hover:to-zinc-500 text-zinc-950 font-extrabold text-sm flex items-center gap-3 transition-all shadow-xl"
         >
           {isGenerating ? <RefreshCw className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
           <span>{isGenerating ? 'Generating ZK Proof...' : 'Generate Certificate'}</span>
@@ -134,47 +134,47 @@ export default function CertificatePage() {
       {isGenerated && (
         <div className="relative animate-fadeIn">
           {/* Hologram Glow */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-teal-500/10 to-amber-500/10 rounded-3xl blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-r from-zinc-500/10 via-zinc-500/10 to-zinc-500/10 rounded-3xl blur-xl" />
           
-          <div className="relative glass-panel rounded-3xl border-2 border-teal-500/40 bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950 p-8 sm:p-12 shadow-[0_0_60px_rgba(147,51,234,0.2)] overflow-hidden">
+          <div className="relative glass-panel rounded-3xl border-2 border-zinc-700/40 bg-gradient-to-br from-zinc-900 via-zinc-950 to-indigo-950 p-8 sm:p-12 shadow-[0_0_60px_rgba(113,113,122,0.2)] overflow-hidden">
             {/* Corner Decorations */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-teal-600/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-zinc-600/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-zinc-700/10 rounded-full blur-3xl" />
 
             <div className="text-center space-y-6 relative z-10">
-              <p className="text-xs font-mono text-teal-400 font-bold tracking-[0.3em] uppercase">Midnight Dark Pool DEX</p>
+              <p className="text-xs font-mono text-zinc-400 font-bold tracking-[0.3em] uppercase">Midnight Dark Pool DEX</p>
               
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-yellow-500 flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(245,158,11,0.4)] border-2 border-white/20">
-                <Award className="w-10 h-10 text-slate-950" />
+              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-zinc-400 to-zinc-500 flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(161,161,170,0.4)] border-2 border-white/20">
+                <Award className="w-10 h-10 text-zinc-950" />
               </div>
 
               <h2 className="text-3xl sm:text-4xl font-black text-white">ZK Solvency Certificate</h2>
-              <p className="text-sm text-amber-400 font-mono font-bold tracking-wider">{certData.tier}</p>
+              <p className="text-sm text-zinc-400 font-mono font-bold tracking-wider">{certData.tier}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 text-xs font-mono">
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-1">Wallet</span>
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-white/10">
+                  <span className="text-zinc-400 block mb-1">Wallet</span>
                   <span className="text-white font-bold">{certData.wallet}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-1">Solvency</span>
-                  <span className="text-emerald-400 font-bold">{certData.solvencyScore}</span>
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-white/10">
+                  <span className="text-zinc-400 block mb-1">Solvency</span>
+                  <span className="text-zinc-400 font-bold">{certData.solvencyScore}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-1">Trades</span>
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-white/10">
+                  <span className="text-zinc-400 block mb-1">Trades</span>
                   <span className="text-white font-bold">{certData.totalTrades}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-1">Volume</span>
+                <div className="p-3 rounded-xl bg-zinc-950/80 border border-white/10">
+                  <span className="text-zinc-400 block mb-1">Volume</span>
                   <span className="text-white font-bold">{certData.volumeUSD}</span>
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-teal-500/30 text-xs font-mono text-teal-300 mt-4">
+              <div className="p-3 rounded-xl bg-zinc-950/80 border border-zinc-700/30 text-xs font-mono text-zinc-300 mt-4">
                 ZK Proof: {certData.proofHash}
               </div>
 
-              <p className="text-[10px] text-slate-400 font-mono">
+              <p className="text-[10px] text-zinc-400 font-mono">
                 Issued: {certData.issuedAt} | Network: {certData.network}
               </p>
             </div>
@@ -184,14 +184,14 @@ export default function CertificatePage() {
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <button
               onClick={handleDownload}
-              className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all"
+              className="flex-1 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all"
             >
-              <Download className="w-4 h-4 text-blue-400" />
+              <Download className="w-4 h-4 text-zinc-400" />
               <span>Download SVG Certificate</span>
             </button>
             <button
               onClick={handleShare}
-              className="flex-1 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
+              className="flex-1 py-3 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg"
             >
               <Share2 className="w-4 h-4" />
               <span>Copy & Share on Social Media</span>

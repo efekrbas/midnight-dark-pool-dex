@@ -48,19 +48,19 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, x: 50, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.9 }}
-              className="pointer-events-auto bg-slate-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-start"
+              className="pointer-events-auto bg-zinc-900/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-start"
             >
               <div className="flex-shrink-0 mr-3 mt-0.5">
-                {n.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-400" />}
+                {n.type === 'success' && <CheckCircle className="w-5 h-5 text-zinc-400" />}
                 {n.type === 'error' && <XCircle className="w-5 h-5 text-red-400" />}
-                {n.type === 'info' && <Info className="w-5 h-5 text-blue-400" />}
-                {n.type === 'zk' && <ShieldCheck className="w-5 h-5 text-teal-400" />}
+                {n.type === 'info' && <Info className="w-5 h-5 text-zinc-400" />}
+                {n.type === 'zk' && <ShieldCheck className="w-5 h-5 text-zinc-400" />}
               </div>
               <div className="flex-1">
                 <h4 className="text-sm font-semibold text-white">{n.title}</h4>
-                <p className="text-xs text-gray-300 mt-1">{n.message}</p>
+                <p className="text-xs text-zinc-300 mt-1">{n.message}</p>
               </div>
-              <button onClick={() => removeNotification(n.id)} className="ml-3 text-gray-500 hover:text-white">
+              <button onClick={() => removeNotification(n.id)} className="ml-3 text-zinc-500 hover:text-white">
                 <X className="w-4 h-4" />
               </button>
             </motion.div>

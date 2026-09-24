@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type ThemeId = 'obsidian' | 'emerald' | 'crimson' | 'amber';
+export type ThemeId = 'obsidian' | 'obsidian' | 'crimson' | 'amber';
 
 interface ThemeContextType {
   theme: ThemeId;
@@ -15,20 +15,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>('obsidian');
 
   useEffect(() => {
-    const saved = localStorage.getItem('midnight_theme') as ThemeId;
-    if (saved && ['obsidian', 'emerald', 'crimson', 'amber'].includes(saved)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setThemeState(saved);
-      document.documentElement.setAttribute('data-theme', saved);
-    } else {
-      document.documentElement.setAttribute('data-theme', 'obsidian');
+    // Clear any legacy theme from localStorage to enforce pure pitch-black institutional theme
+    try {
+      localStorage.removeItem('midnight_theme');
+      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.classList.add('dark');
+    } catch {
+      // ignore
     }
   }, []);
 
   const setTheme = (newTheme: ThemeId) => {
     setThemeState(newTheme);
-    localStorage.setItem('midnight_theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   return (

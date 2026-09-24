@@ -101,21 +101,21 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-slate-950/80 backdrop-blur-xl animate-fadeIn">
-      <div className="relative max-w-xl w-full bg-slate-900 border border-teal-500/30 rounded-2xl shadow-lg shadow-teal-500/20 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-zinc-950/80 backdrop-blur-xl animate-fadeIn">
+      <div className="relative max-w-xl w-full bg-zinc-900 border border-zinc-700/30 rounded-2xl shadow-lg shadow-zinc-700/20 overflow-hidden">
         
         {/* Input Bar */}
-        <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-slate-950/80">
-          <Search className="w-5 h-5 text-teal-400" />
+        <div className="p-4 border-b border-white/10 flex items-center gap-3 bg-zinc-950/80">
+          <Search className="w-5 h-5 text-zinc-400" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Type a command or search (e.g. trade, portfolio, contract)..."
-            className="flex-1 bg-transparent text-white text-sm font-sans placeholder-slate-500 focus:outline-none"
+            className="flex-1 bg-transparent text-white text-sm font-sans placeholder-zinc-500 focus:outline-none"
             autoFocus
           />
-          <kbd className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-white/10">
+          <kbd className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-white/10">
             ESC
           </kbd>
         </div>
@@ -123,7 +123,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
         {/* Command Options List */}
         <div className="max-h-80 overflow-y-auto p-2 space-y-1">
           {filteredActions.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-xs font-mono">
+            <div className="p-8 text-center text-zinc-500 text-xs font-mono">
               No matching commands found for &quot;{query}&quot;
             </div>
           ) : (
@@ -136,20 +136,20 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
                     sounds.playClick();
                     act.action();
                   }}
-                  className="w-full p-3 rounded-xl flex items-center justify-between text-left hover:bg-teal-600/15 border border-transparent hover:border-teal-500/30 transition-all group"
+                  className="w-full p-3 rounded-xl flex items-center justify-between text-left hover:bg-zinc-600/15 border border-transparent hover:border-zinc-700/30 transition-all group"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-teal-400 group-hover:bg-teal-500 group-hover:text-white transition-colors">
+                    <div className="w-9 h-9 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-zinc-500 group-hover:text-white transition-colors">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
+                      <p className="text-sm font-bold text-white group-hover:text-zinc-300 transition-colors">
                         {act.label}
                       </p>
-                      <p className="text-xs text-slate-400 font-mono">{act.sub}</p>
+                      <p className="text-xs text-zinc-400 font-mono">{act.sub}</p>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
+                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-zinc-400 group-hover:translate-x-1 transition-all" />
                 </button>
               );
             })
@@ -157,11 +157,11 @@ export default function CommandPalette({ isOpen, onClose, onOpenSelectiveDisclos
         </div>
 
         {/* Footer Hint */}
-        <div className="p-3 border-t border-white/10 bg-slate-950/60 flex items-center justify-between text-[11px] font-mono text-slate-500">
+        <div className="p-3 border-t border-white/10 bg-zinc-950/60 flex items-center justify-between text-[11px] font-mono text-zinc-500">
           <span className="flex items-center gap-1">
             <Command className="w-3 h-3" /> Navigation Shortcut
           </span>
-          <span className="text-teal-400">Midnight Dark Pool Terminal</span>
+          <span className="text-zinc-400">Midnight Dark Pool Terminal</span>
         </div>
       </div>
     </div>

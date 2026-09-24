@@ -48,22 +48,22 @@ export default function ZKCandlestickChart() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-950/70 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backdrop-blur-xl relative font-sans">
+    <div className="flex flex-col h-full bg-zinc-950/70 rounded-2xl border border-white/10 overflow-hidden shadow-2xl backdrop-blur-xl relative font-sans">
       
       {/* Top Header Controls */}
-      <div className="p-4 border-b border-white/10 flex flex-wrap justify-between items-center bg-slate-950/90 gap-3 z-10">
+      <div className="p-4 border-b border-white/10 flex flex-wrap justify-between items-center bg-zinc-950/90 gap-3 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 text-blue-400">
+          <div className="w-8 h-8 rounded-lg bg-zinc-500/10 flex items-center justify-center border border-zinc-700/20 text-zinc-400">
             <Activity className="w-4 h-4" />
           </div>
           <div>
             <h3 className="font-bold text-sm text-white tracking-wide flex items-center gap-2">
               ZK Oracle Candlestick & Liquidity Heatmap
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800/80 text-slate-300 border border-slate-700">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800/80 text-zinc-300 border border-zinc-700">
                 BLURRED DEPTH
               </span>
             </h3>
-            <p className="text-[11px] text-slate-400 font-mono">Reference Price: $1.420 ZKUSD (+2.4%)</p>
+            <p className="text-[11px] text-zinc-400 font-mono">Reference Price: $1.420 ZKUSD (+2.4%)</p>
           </div>
         </div>
 
@@ -73,24 +73,24 @@ export default function ZKCandlestickChart() {
             onClick={handleHeatmapToggle}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all border ${
               showHeatmap
-                ? 'bg-slate-800 text-blue-300 border-slate-600 shadow-md'
-                : 'bg-slate-900 text-slate-400 border-white/10 hover:text-white'
+                ? 'bg-zinc-800 text-zinc-300 border-zinc-600 shadow-md'
+                : 'bg-zinc-900 text-zinc-400 border-white/10 hover:text-white'
             }`}
           >
-            {showHeatmap ? <Eye className="w-3.5 h-3.5 text-blue-400" /> : <EyeOff className="w-3.5 h-3.5" />}
+            {showHeatmap ? <Eye className="w-3.5 h-3.5 text-zinc-400" /> : <EyeOff className="w-3.5 h-3.5" />}
             <span>ZK Heatmap: {showHeatmap ? 'ON' : 'OFF'}</span>
           </button>
 
           {/* Timeframe Switcher */}
-          <div className="flex gap-1 bg-slate-900/90 p-1 rounded-lg border border-white/10 text-xs font-mono">
+          <div className="flex gap-1 bg-zinc-900/90 p-1 rounded-lg border border-white/10 text-xs font-mono">
             {(['1H', '4H', '1D', '1W'] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => handleTimeframeChange(tf)}
                 className={`px-2.5 py-1 rounded transition-all font-semibold ${
                   timeframe === tf
-                    ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'bg-zinc-700 text-white shadow-[0_0_12px_rgba(82,82,91,0.4)]'
+                    : 'text-zinc-400 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {tf}
@@ -107,14 +107,14 @@ export default function ZKCandlestickChart() {
         {showHeatmap && (
           <div className="absolute inset-0 pointer-events-none z-0">
             {/* Top Blurred Order Accumulation Zone */}
-            <div className="absolute top-[15%] left-0 right-0 h-[22%] bg-gradient-to-r from-blue-600/10 via-slate-600/10 to-blue-600/10 blur-xl border-y border-slate-700 animate-pulse-glow" />
-            <div className="absolute top-[18%] left-4 text-[10px] font-mono text-slate-300 bg-slate-900 px-2 py-0.5 rounded border border-slate-700 w-max">
+            <div className="absolute top-[15%] left-0 right-0 h-[22%] bg-gradient-to-r from-zinc-600/10 via-zinc-600/10 to-zinc-600/10 blur-xl border-y border-zinc-700 animate-pulse-glow" />
+            <div className="absolute top-[18%] left-4 text-[10px] font-mono text-zinc-300 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700 w-max">
               🔒 High Institutional Dark Liquidity Zone (~1.450 - 1.480)
             </div>
 
             {/* Bottom Blurred Liquidity Support Zone */}
-            <div className="absolute bottom-[20%] left-0 right-0 h-[18%] bg-gradient-to-r from-emerald-600/15 via-blue-600/20 to-emerald-600/15 blur-xl border-y border-emerald-500/20" />
-            <div className="absolute bottom-[23%] left-4 text-[10px] font-mono text-emerald-300/70 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/20 w-max">
+            <div className="absolute bottom-[20%] left-0 right-0 h-[18%] bg-gradient-to-r from-zinc-600/15 via-zinc-600/20 to-zinc-600/15 blur-xl border-y border-zinc-700/20" />
+            <div className="absolute bottom-[23%] left-4 text-[10px] font-mono text-zinc-300/70 bg-zinc-950/60 px-2 py-0.5 rounded border border-zinc-700/20 w-max">
               🔒 Shielded Support Accumulation (~1.340 - 1.360)
             </div>
           </div>
@@ -122,26 +122,26 @@ export default function ZKCandlestickChart() {
 
         {/* Horizontal Grid lines */}
         <div className="absolute inset-0 flex flex-col justify-between p-6 pointer-events-none opacity-15 z-0">
-          <div className="w-full border-b border-dashed border-slate-400 h-0" />
-          <div className="w-full border-b border-dashed border-slate-400 h-0" />
-          <div className="w-full border-b border-dashed border-slate-400 h-0" />
-          <div className="w-full border-b border-dashed border-slate-400 h-0" />
+          <div className="w-full border-b border-dashed border-zinc-400 h-0" />
+          <div className="w-full border-b border-dashed border-zinc-400 h-0" />
+          <div className="w-full border-b border-dashed border-zinc-400 h-0" />
+          <div className="w-full border-b border-dashed border-zinc-400 h-0" />
         </div>
 
         {/* Right Price Scale */}
-        <div className="absolute right-4 top-6 bottom-12 flex flex-col justify-between text-[11px] font-mono text-slate-500 pointer-events-none z-10">
+        <div className="absolute right-4 top-6 bottom-12 flex flex-col justify-between text-[11px] font-mono text-zinc-500 pointer-events-none z-10">
           <span>$1.500</span>
           <span>$1.450</span>
-          <span className="text-emerald-400 font-bold">$1.420 ◄</span>
+          <span className="text-zinc-400 font-bold">$1.420 ◄</span>
           <span>$1.380</span>
           <span>$1.300</span>
         </div>
 
         {/* Live SNARK Circuit Status Tag */}
-        <div className="relative z-10 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl w-max shadow-lg">
-          <Cpu className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-          <span className="text-[11px] font-mono text-slate-300">
-            ZK Oracle Feed: <span className="text-emerald-400 font-semibold">Verified</span>
+        <div className="relative z-10 flex items-center gap-2 bg-zinc-900/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-xl w-max shadow-lg">
+          <Cpu className="w-3.5 h-3.5 text-zinc-400 animate-pulse" />
+          <span className="text-[11px] font-mono text-zinc-300">
+            ZK Oracle Feed: <span className="text-zinc-400 font-semibold">Verified</span>
           </span>
         </div>
 
@@ -172,7 +172,7 @@ export default function ZKCandlestickChart() {
                 {/* Thin Wick line */}
                 <div
                   className={`absolute w-[1.5px] transition-colors ${
-                    isGreen ? 'bg-emerald-400/80 group-hover:bg-emerald-300' : 'bg-red-400/80 group-hover:bg-red-300'
+                    isGreen ? 'bg-zinc-400/80 group-hover:bg-zinc-300' : 'bg-red-400/80 group-hover:bg-red-300'
                   }`}
                   style={{
                     top: `${highPct}%`,
@@ -184,7 +184,7 @@ export default function ZKCandlestickChart() {
                 <div
                   className={`w-4 sm:w-5 rounded-[1px] transition-all duration-200 shadow-sm ${
                     isGreen
-                      ? 'bg-emerald-500 border border-emerald-400 group-hover:shadow-[0_0_12px_rgba(16,185,129,0.8)] group-hover:bg-emerald-400'
+                      ? 'bg-zinc-500 border border-zinc-600 group-hover:shadow-[0_0_12px_rgba(161,161,170,0.8)] group-hover:bg-zinc-400'
                       : 'bg-red-500 border border-red-400 group-hover:shadow-[0_0_12px_rgba(239,68,68,0.8)] group-hover:bg-red-400'
                   }`}
                   style={{
@@ -200,27 +200,27 @@ export default function ZKCandlestickChart() {
 
         {/* Hovered Candle Tooltip Overlay */}
         {hoveredCandle && (
-          <div className="absolute left-1/2 top-4 -translate-x-1/2 bg-slate-900/95 backdrop-blur-xl border border-slate-700 p-3 rounded-xl shadow-2xl z-30 flex items-center gap-6 animate-fadeIn">
+          <div className="absolute left-1/2 top-4 -translate-x-1/2 bg-zinc-900/95 backdrop-blur-xl border border-zinc-700 p-3 rounded-xl shadow-2xl z-30 flex items-center gap-6 animate-fadeIn">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-400" />
+              <Sparkles className="w-4 h-4 text-zinc-400" />
               <span className="text-xs font-mono font-bold text-white">{hoveredCandle.time} UTC</span>
             </div>
             <div className="text-xs font-mono flex gap-4">
-              <div><span className="text-slate-400">O:</span> <span className="text-slate-200">${hoveredCandle.open}</span></div>
-              <div><span className="text-slate-400">H:</span> <span className="text-emerald-400">${hoveredCandle.high}</span></div>
-              <div><span className="text-slate-400">L:</span> <span className="text-red-400">${hoveredCandle.low}</span></div>
-              <div><span className="text-slate-400">C:</span> <span className="text-slate-200">${hoveredCandle.close}</span></div>
+              <div><span className="text-zinc-400">O:</span> <span className="text-slate-200">${hoveredCandle.open}</span></div>
+              <div><span className="text-zinc-400">H:</span> <span className="text-zinc-400">${hoveredCandle.high}</span></div>
+              <div><span className="text-zinc-400">L:</span> <span className="text-red-400">${hoveredCandle.low}</span></div>
+              <div><span className="text-zinc-400">C:</span> <span className="text-slate-200">${hoveredCandle.close}</span></div>
             </div>
-            <div className="text-xs font-mono bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700">
+            <div className="text-xs font-mono bg-zinc-800 text-zinc-300 px-2 py-1 rounded border border-zinc-700">
               ZK Band: {hoveredCandle.zkBand}
             </div>
           </div>
         )}
 
         {/* Bottom Time Labels */}
-        <div className="flex justify-between text-[11px] font-mono text-slate-500 pt-3 border-t border-white/5 relative z-10 px-4">
+        <div className="flex justify-between text-[11px] font-mono text-zinc-500 pt-3 border-t border-white/5 relative z-10 px-4">
           {CANDLESTICK_FEED.map((c, i) => (
-            <span key={i} className="text-slate-400">{c.time}</span>
+            <span key={i} className="text-zinc-400">{c.time}</span>
           ))}
         </div>
       </div>

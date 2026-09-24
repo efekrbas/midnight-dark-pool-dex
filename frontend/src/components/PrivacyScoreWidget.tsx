@@ -29,37 +29,37 @@ export default function PrivacyScoreWidget({ amount, onApplySalt }: PrivacyScore
   return (
     <div className={`p-3.5 rounded-2xl border transition-all animate-fadeIn ${
       isHighRisk
-        ? 'bg-teal-950/30 border-teal-500/40 shadow-[0_0_20px_rgba(147,51,234,0.15)]'
-        : 'bg-emerald-950/30 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+        ? 'bg-zinc-950/30 border-zinc-700/40 shadow-[0_0_20px_rgba(113,113,122,0.15)]'
+        : 'bg-zinc-950/30 border-zinc-700/40 shadow-[0_0_20px_rgba(161,161,170,0.15)]'
     }`}>
       <div className="flex items-center justify-between font-mono text-xs mb-2">
         <div className="flex items-center gap-2">
           {isHighRisk ? (
-            <ShieldAlert className="w-4 h-4 text-teal-400 animate-pulse" />
+            <ShieldAlert className="w-4 h-4 text-zinc-400 animate-pulse" />
           ) : (
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <ShieldCheck className="w-4 h-4 text-zinc-400" />
           )}
           <span className="font-bold text-white">Anonymity Set Strength:</span>
         </div>
-        <span className={`font-black ${isHighRisk ? 'text-teal-300' : 'text-emerald-400'}`}>
+        <span className={`font-black ${isHighRisk ? 'text-zinc-300' : 'text-zinc-400'}`}>
           {privacyScore}% ({isHighRisk ? 'ROUND NUMBER RISK' : 'OPTIMAL'})
         </span>
       </div>
 
       {isHighRisk ? (
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 pt-1 border-t border-teal-500/20">
+        <div className="flex items-center justify-between text-[11px] font-mono text-zinc-300 pt-1 border-t border-zinc-700/20">
           <span>Tip: Add a random salt offset to prevent statistical pattern matching.</span>
           <button
             type="button"
             onClick={handleSalt}
-            className="px-2.5 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-[10px] transition-all flex items-center gap-1 shrink-0 ml-2"
+            className="px-2.5 py-1 rounded-lg bg-zinc-600 hover:bg-zinc-500 text-white font-bold text-[10px] transition-all flex items-center gap-1 shrink-0 ml-2"
           >
             <Sparkles className="w-3 h-3" />
             <span>Apply Salt</span>
           </button>
         </div>
       ) : (
-        <p className="text-[11px] font-mono text-emerald-300/80">
+        <p className="text-[11px] font-mono text-zinc-300/80">
           Optimal randomized commitment. Maximum resistance against statistical correlation.
         </p>
       )}

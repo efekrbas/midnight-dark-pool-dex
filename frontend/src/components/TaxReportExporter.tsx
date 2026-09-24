@@ -53,29 +53,29 @@ export default function TaxReportExporter() {
   };
 
   return (
-    <div className="p-5 rounded-3xl bg-slate-900/80 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div className="p-5 rounded-3xl bg-zinc-900/80 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <ShieldCheck className="w-6 h-6 text-teal-400 shrink-0" />
+        <ShieldCheck className="w-6 h-6 text-zinc-400 shrink-0" />
         <div>
           <h4 className="font-bold text-sm text-white">Regulatory Tax & Trade History Exporter</h4>
-          <p className="text-xs font-mono text-slate-400">Export timestamped receipts with cryptographic proof hashes.</p>
+          <p className="text-xs font-mono text-zinc-400">Export timestamped receipts with cryptographic proof hashes.</p>
         </div>
       </div>
 
       <div className="flex gap-2 w-full sm:w-auto">
         <button
           onClick={handleExportCSV}
-          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/10 transition-all"
+          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-mono text-xs font-bold flex items-center justify-center gap-2 border border-white/10 transition-all"
         >
-          <FileSpreadsheet className="w-4 h-4 text-teal-400" />
+          <FileSpreadsheet className="w-4 h-4 text-zinc-400" />
           <span>Export CSV</span>
         </button>
 
         <button
           onClick={handleExportJSON}
-          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg"
+          className="flex-1 sm:flex-initial px-4 py-2 rounded-xl bg-zinc-600 hover:bg-zinc-500 text-white font-mono text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-lg"
         >
-          <FileCode className="w-4 h-4 text-teal-200" />
+          <FileCode className="w-4 h-4 text-zinc-300" />
           <span>Export ZK JSON</span>
         </button>
       </div>

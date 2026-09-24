@@ -14,7 +14,6 @@ import Marquee from "@/components/Marquee";
 import Breadcrumb from "@/components/Breadcrumb";
 import FeedbackWidget from "@/components/FeedbackWidget";
 import LiveTradeFeed from "@/components/LiveTradeFeed";
-import CyberpunkRadio from "@/components/CyberpunkRadio";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
 import SplashScreen from "@/components/SplashScreen";
@@ -31,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased text-slate-100 bg-slate-950`} suppressHydrationWarning>
+      <body className={`${inter.className} antialiased text-zinc-100 bg-black selection:bg-zinc-800 selection:text-white min-h-screen`} suppressHydrationWarning>
         <ThemeProvider>
           <I18nProvider>
             <NotificationProvider>
@@ -43,7 +42,6 @@ export default function RootLayout({
               {children}
               <Footer />
               <LiveTradeFeed />
-              <CyberpunkRadio />
               <ScrollToTop />
               <PrivacyConsent />
               <FeedbackWidget />

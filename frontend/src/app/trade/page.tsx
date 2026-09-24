@@ -32,39 +32,39 @@ export default function TradePage() {
     <div className="w-full max-w-[1700px] mx-auto py-8 px-4 sm:px-6 space-y-6 animate-fadeIn">
       
       {/* Institutional Telemetry Header */}
-      <div className="flex flex-col lg:flex-row items-center justify-between glass-panel p-5 rounded-2xl border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.6)] bg-slate-900/80 backdrop-blur-2xl gap-4">
+      <div className="flex flex-col lg:flex-row items-center justify-between p-4 rounded-xl border border-zinc-800 bg-zinc-950 gap-4">
         <div className="flex flex-wrap items-center gap-6 sm:gap-8">
           
           {/* Token Pair Switcher */}
           <TokenPairSelector currentPair={selectedPair} onSelectPair={(p) => setSelectedPair(p)} />
 
-          <div className="h-10 w-px bg-white/10 hidden sm:block" />
+          <div className="h-8 w-px bg-zinc-800 hidden sm:block" />
 
           <div>
-            <p className="text-xs text-gray-400 font-mono uppercase tracking-wider">Oracle Reference Price</p>
+            <p className="text-[11px] text-zinc-500 font-mono uppercase tracking-wider">Oracle Price</p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-emerald-400 font-mono font-bold text-lg">{selectedPair.price}</span>
-              <span className={`text-[11px] px-1.5 py-0.2 rounded flex items-center font-mono ${
-                selectedPair.isPositive ? 'text-emerald-400/80 bg-emerald-500/10' : 'text-red-400/80 bg-red-500/10'
+              <span className="text-white font-mono font-bold text-base">{selectedPair.price}</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
+                selectedPair.isPositive ? 'text-zinc-400 bg-zinc-950/40 border border-zinc-800/40' : 'text-rose-400 bg-rose-950/40 border border-rose-900/40'
               }`}>
-                <TrendingUp className="w-3 h-3 mr-1 inline" /> {selectedPair.change}
+                <TrendingUp className="w-2.5 h-2.5 mr-0.5 inline" /> {selectedPair.change}
               </span>
             </div>
           </div>
 
-          <div className="h-10 w-px bg-white/10 hidden sm:block" />
+          <div className="h-8 w-px bg-zinc-800 hidden sm:block" />
 
           <div>
-            <p className="text-xs text-gray-400 font-mono uppercase tracking-wider">24h Blurred Volume</p>
-            <p className="text-slate-200 font-mono font-bold text-lg mt-0.5">~1,250,000 - 1,500,000 ZKUSD</p>
+            <p className="text-[11px] text-zinc-500 font-mono uppercase tracking-wider">24h Shielded Depth</p>
+            <p className="text-zinc-300 font-mono font-medium text-sm mt-0.5">~1,420,000 ZKUSD</p>
           </div>
         </div>
         
         {/* Right Header Status Badges & Chart View Toggle */}
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-end">
+        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-end">
           
           {/* Terminal Grid Layout Switcher */}
-          <div className="flex bg-slate-950 p-1 rounded-xl border border-white/10 text-xs font-mono">
+          <div className="flex bg-black p-1 rounded-lg border border-zinc-850 text-xs font-mono">
             {(['STANDARD', 'CHART_FOCUS', 'ORDERBOOK_FOCUS'] as const).map((mode) => (
               <button
                 key={mode}
@@ -72,31 +72,31 @@ export default function TradePage() {
                   sounds.playClick();
                   setLayoutMode(mode);
                 }}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                   layoutMode === mode
-                    ? 'bg-teal-600 text-white shadow-[0_0_12px_rgba(147,51,234,0.4)]'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-zinc-800 text-white font-semibold shadow-sm'
+                    : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
-                {mode === 'STANDARD' ? 'Standard' : mode === 'CHART_FOCUS' ? 'Chart Focus' : 'Book Focus'}
+                {mode === 'STANDARD' ? 'Standard' : mode === 'CHART_FOCUS' ? 'Chart' : 'Book'}
               </button>
             ))}
           </div>
 
           {/* Chart Mode Switcher */}
-          <div className="flex bg-slate-950 p-1 rounded-xl border border-white/10 text-xs font-mono">
+          <div className="flex bg-black p-1 rounded-lg border border-zinc-850 text-xs font-mono">
             <button
               onClick={() => {
                 sounds.playClick();
                 setActiveChartView('CANDLES');
               }}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 font-bold transition-all ${
+              className={`px-3 py-1 rounded-md flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer ${
                 activeChartView === 'CANDLES'
-                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <BarChart2 className="w-3.5 h-3.5" />
+              <BarChart2 className="w-3 h-3" />
               <span>Candles</span>
             </button>
             <button
@@ -104,13 +104,13 @@ export default function TradePage() {
                 sounds.playClick();
                 setActiveChartView('DEPTH');
               }}
-              className={`px-3 py-1 rounded-lg flex items-center gap-1.5 font-bold transition-all ${
+              className={`px-3 py-1 rounded-md flex items-center gap-1.5 text-[11px] font-medium transition-all cursor-pointer ${
                 activeChartView === 'DEPTH'
-                  ? 'bg-teal-600 text-white shadow-[0_0_12px_rgba(147,51,234,0.4)]'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3 h-3" />
               <span>Depth</span>
             </button>
           </div>
@@ -126,11 +126,11 @@ export default function TradePage() {
         </div>
 
         {/* Middle Column - Dark Order Book */}
-        <div className={`${cols.orderbook} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-teal-500/30 transition-all duration-500 shadow-2xl bg-slate-900/70 backdrop-blur-xl rounded-2xl`}>
-          <div className="p-4 border-b border-white/10 bg-slate-950/40 flex justify-between items-center">
+        <div className={`${cols.orderbook} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-zinc-700/30 transition-all duration-500 shadow-2xl bg-zinc-900/70 backdrop-blur-xl rounded-2xl`}>
+          <div className="p-4 border-b border-white/10 bg-zinc-950/40 flex justify-between items-center">
             <div>
               <h3 className="font-bold text-sm text-white tracking-wide">Dark Order Book</h3>
-              <p className="text-[10px] text-teal-300 mt-0.5 font-mono flex items-center">
+              <p className="text-[10px] text-zinc-300 mt-0.5 font-mono flex items-center">
                 <Lock className="w-2.5 h-2.5 mr-1 inline" /> Volumes cryptographically blurred
               </p>
             </div>
@@ -141,7 +141,7 @@ export default function TradePage() {
         </div>
 
         {/* Right Column - Order Entry Form */}
-        <div className={`${cols.form} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-blue-500/30 transition-all duration-500 shadow-2xl bg-slate-900/70 backdrop-blur-xl rounded-2xl`}>
+        <div className={`${cols.form} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-zinc-700/30 transition-all duration-500 shadow-2xl bg-zinc-900/70 backdrop-blur-xl rounded-2xl`}>
           <OrderEntry />
         </div>
       </div>

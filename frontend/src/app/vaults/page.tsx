@@ -10,31 +10,23 @@ import { Contract } from '@/lib/contract';
 interface Vault {
   id: string;
   token: string;
-  symbol: string;
   apy: number;
   tvl: string;
   userDeposit: number;
-  color: string;
-  borderColor: string;
-  gradientFrom: string;
-  gradientTo: string;
 }
 
 const vaults: Vault[] = [
   {
-    id: 'v1', token: 'tNIGHT', symbol: '🌙', apy: 12.4, tvl: '4,250,000',
-    userDeposit: 25000, color: 'text-blue-400', borderColor: 'border-blue-500/30',
-    gradientFrom: 'from-blue-600', gradientTo: 'to-indigo-600'
+    id: 'v1', token: 'tNIGHT', apy: 12.4, tvl: '4,250,000',
+    userDeposit: 25000,
   },
   {
-    id: 'v2', token: 'DUST', symbol: '✨', apy: 8.7, tvl: '1,800,000',
-    userDeposit: 50000, color: 'text-teal-400', borderColor: 'border-teal-500/30',
-    gradientFrom: 'from-teal-600', gradientTo: 'to-pink-600'
+    id: 'v2', token: 'DUST', apy: 8.7, tvl: '1,800,000',
+    userDeposit: 50000,
   },
   {
-    id: 'v3', token: 'ZKUSD', symbol: '💎', apy: 5.2, tvl: '9,120,000',
-    userDeposit: 82000, color: 'text-emerald-400', borderColor: 'border-emerald-500/30',
-    gradientFrom: 'from-emerald-600', gradientTo: 'to-teal-600'
+    id: 'v3', token: 'ZKUSD', apy: 5.2, tvl: '9,120,000',
+    userDeposit: 82000,
   },
 ];
 
@@ -115,33 +107,33 @@ export default function VaultsPage() {
   };
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto py-8 px-4 sm:px-6 space-y-8 animate-fadeIn">
+    <div className="w-full max-w-[1400px] mx-auto py-8 px-4 sm:px-6 space-y-6 animate-fadeIn">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-slate-900/80 backdrop-blur-2xl gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between p-6 rounded-xl border border-zinc-800 shadow-2xl bg-zinc-950/80 backdrop-blur-xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-teal-500/30 border border-teal-400/20">
-            <Coins className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-lg bg-zinc-900 flex items-center justify-center text-white border border-zinc-800">
+            <Coins className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Shielded Dark Liquidity Vaults
             </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
-              Earn yield on shielded deposits. All balances remain ZK-masked on-chain.
+            <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              Institutional yield on shielded deposits. All pool balances remain ZK-masked on-chain.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-6 font-mono text-xs">
           <div className="text-right">
-            <span className="text-slate-400 block">Total Value Locked</span>
-            <span className="text-lg font-black text-white">$15,170,000</span>
+            <span className="text-zinc-400 block text-[11px] uppercase tracking-wider">Total Value Locked</span>
+            <span className="text-lg font-bold text-white font-mono">$15,170,000</span>
           </div>
-          <div className="h-8 w-px bg-white/10" />
+          <div className="h-8 w-px bg-zinc-800" />
           <div className="text-right">
-            <span className="text-slate-400 block">Avg. Blended APY</span>
-            <span className="text-lg font-black text-emerald-400 flex items-center gap-1">
+            <span className="text-zinc-400 block text-[11px] uppercase tracking-wider">Avg. Blended APY</span>
+            <span className="text-lg font-bold text-zinc-400 font-mono flex items-center gap-1">
               <TrendingUp className="w-4 h-4" /> 8.77%
             </span>
           </div>
@@ -149,82 +141,84 @@ export default function VaultsPage() {
       </div>
 
       {/* Vault Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {vaults.map((vault) => (
           <div
             key={vault.id}
-            className={`glass-panel rounded-3xl border ${vault.borderColor} bg-slate-900/70 overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-1`}
+            className="rounded-xl border border-zinc-800 bg-zinc-950/80 overflow-hidden shadow-2xl transition-all"
           >
             {/* Vault Header */}
-            <div className={`p-6 bg-gradient-to-r ${vault.gradientFrom} ${vault.gradientTo} bg-opacity-20`}>
+            <div className="p-5 border-b border-zinc-800 bg-zinc-900/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl">{vault.symbol}</span>
+                  <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono font-bold text-white text-xs">
+                    {vault.token.slice(0, 3)}
+                  </div>
                   <div>
-                    <h3 className="font-black text-lg text-white">{vault.token} Vault</h3>
-                    <p className="text-xs text-white/60 font-mono">Shielded LP Pool</p>
+                    <h3 className="font-semibold text-sm text-white">{vault.token} Vault</h3>
+                    <p className="text-[11px] text-zinc-400 font-mono">Shielded LP Pool</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-2xl font-black text-white">{vault.apy}%</span>
-                  <span className="text-[10px] text-white/60 block font-mono">APY</span>
+                  <span className="text-xl font-bold text-zinc-400 font-mono">{vault.apy}%</span>
+                  <span className="text-[10px] text-zinc-400 block font-mono uppercase">APY</span>
                 </div>
               </div>
             </div>
 
             {/* Vault Stats */}
-            <div className="p-6 space-y-4">
+            <div className="p-5 space-y-4">
               <div className="grid grid-cols-2 gap-3 text-xs font-mono">
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-0.5">TVL</span>
-                  <span className="text-white font-bold">${vault.tvl}</span>
+                <div className="p-3 rounded-lg bg-black border border-zinc-800">
+                  <span className="text-zinc-500 block mb-0.5 text-[11px]">TVL</span>
+                  <span className="text-white font-semibold">${vault.tvl}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10">
-                  <span className="text-slate-400 block mb-0.5">Your Deposit</span>
-                  <span className={`${vault.color} font-bold`}>{vault.userDeposit.toLocaleString()}</span>
+                <div className="p-3 rounded-lg bg-black border border-zinc-800">
+                  <span className="text-zinc-500 block mb-0.5 text-[11px]">Your Deposit</span>
+                  <span className="text-zinc-200 font-semibold">{vault.userDeposit.toLocaleString()}</span>
                 </div>
               </div>
 
               {/* Deposit Input */}
               <div>
-                <label className="text-[10px] text-slate-400 font-mono uppercase block mb-1.5">Deposit Amount</label>
+                <label className="text-[10px] text-zinc-400 font-mono uppercase block mb-1.5">Deposit Amount</label>
                 <input
                   type="number"
                   placeholder={`Enter ${vault.token} amount...`}
                   value={depositAmounts[vault.id] || ''}
                   onChange={(e) => setDepositAmounts(prev => ({ ...prev, [vault.id]: e.target.value }))}
-                  className="w-full bg-slate-950/90 border border-white/10 rounded-xl px-4 py-3 text-xs font-mono text-white focus:outline-none focus:border-blue-500 transition-all"
+                  className="w-full bg-black border border-zinc-800 rounded-lg px-3.5 py-2.5 text-xs font-mono text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors"
                 />
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-2.5">
                 <button
                   onClick={() => handleDeposit(vault)}
                   disabled={loadingVault === vault.id}
-                  className={`flex-1 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all bg-gradient-to-r ${vault.gradientFrom} ${vault.gradientTo} text-white shadow-lg hover:opacity-90`}
+                  className="flex-1 py-2.5 rounded-lg font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors bg-white hover:bg-zinc-200 text-black disabled:opacity-50"
                 >
                   {loadingVault === vault.id ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <ArrowDownToLine className="w-4 h-4" />
+                    <ArrowDownToLine className="w-3.5 h-3.5" />
                   )}
                   <span>Deposit</span>
                 </button>
                 <button
                   onClick={() => handleWithdraw(vault)}
                   disabled={loadingVault === vault.id}
-                  className="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs flex items-center justify-center gap-2 transition-all border border-white/10"
+                  className="flex-1 py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors border border-zinc-800 hover:border-zinc-700"
                 >
-                  <ArrowUpFromLine className="w-4 h-4" />
+                  <ArrowUpFromLine className="w-3.5 h-3.5" />
                   <span>Withdraw</span>
                 </button>
               </div>
 
               {/* ZK Shield Badge */}
-              <div className="flex items-center gap-2 text-[10px] font-mono text-slate-400 pt-1">
-                <Shield className="w-3 h-3 text-teal-400" />
-                <span>All deposits are shielded via ZK-SNARK commitments</span>
+              <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-500 pt-1">
+                <Shield className="w-3 h-3 text-zinc-400" />
+                <span>Shielded via ZK-SNARK commitments</span>
               </div>
             </div>
           </div>

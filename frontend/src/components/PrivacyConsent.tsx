@@ -31,34 +31,34 @@ export default function PrivacyConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-lg animate-fadeIn">
-      <div className="bg-slate-900/95 backdrop-blur-2xl border border-teal-500/30 rounded-2xl shadow-[0_15px_40px_rgba(0,0,0,0.7)] p-5">
+    <div className="fixed bottom-4 left-4 sm:left-6 z-50 max-w-md w-[calc(100%-2rem)] animate-fadeIn">
+      <div className="bg-zinc-950 border border-zinc-800 rounded-lg shadow-2xl p-4">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center flex-shrink-0 border border-teal-500/30">
-            <Shield className="w-5 h-5 text-teal-400" />
+          <div className="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center flex-shrink-0 border border-zinc-800">
+            <Shield className="w-4 h-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-white mb-1">Privacy-First by Design</h3>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
-              Midnight Dark Pool uses zero-knowledge proofs to protect your trading privacy. We use minimal local storage for your preferences only. No tracking, no analytics, no cookies.
+            <h3 className="text-xs font-semibold text-white mb-0.5 tracking-tight">Zero-Knowledge Architecture</h3>
+            <p className="text-[11px] text-zinc-400 leading-relaxed font-mono">
+              Midnight Dark Pool operates with zero persistent tracking or cookies. Balances and order commitments are computed client-side with Compact ZK circuits.
             </p>
             <div className="flex items-center gap-2 mt-3">
               <button
                 onClick={handleAccept}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-600 to-blue-600 text-white font-bold text-xs hover:opacity-90 transition-all shadow-md"
+                className="px-3 py-1.5 rounded-md bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] transition-colors"
               >
-                I Understand
+                Acknowledge
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs font-bold transition-all border border-white/10"
+                className="px-3 py-1.5 rounded-md bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-[11px] transition-colors border border-zinc-800"
               >
                 Dismiss
               </button>
             </div>
           </div>
-          <button onClick={handleDismiss} className="text-slate-500 hover:text-white p-0.5 flex-shrink-0">
-            <X className="w-4 h-4" />
+          <button onClick={handleDismiss} className="text-zinc-500 hover:text-white p-0.5 flex-shrink-0 transition-colors">
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

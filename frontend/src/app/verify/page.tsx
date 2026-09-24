@@ -157,28 +157,28 @@ function VerifyContent() {
   }, [searchParams]);
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto py-8 px-4 sm:px-6 space-y-8 animate-fadeIn">
+    <div className="w-full max-w-[1200px] mx-auto py-8 px-4 sm:px-6 space-y-6 animate-fadeIn">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-slate-900/80 backdrop-blur-2xl gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between p-6 rounded-xl border border-zinc-800 shadow-2xl bg-zinc-950/80 backdrop-blur-xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-teal-500/30 border border-teal-400/20">
-            <ShieldCheck className="w-7 h-7" />
+          <div className="w-12 h-12 rounded-lg bg-zinc-900 flex items-center justify-center text-white border border-zinc-800">
+            <ShieldCheck className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-              Independent Preprod ZK Verifier Portal
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-2.5">
+              Independent Preprod ZK Verifier
             </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
-              Direct verification against live Midnight Preprod Indexer ({INDEXER_URL}). No simulated fallbacks.
+            <p className="text-xs text-zinc-400 font-mono mt-0.5">
+              Cryptographic verification against live Midnight Preprod Indexer ({INDEXER_URL}).
             </p>
           </div>
         </div>
       </div>
 
       {/* Input Card */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 bg-slate-900/80 space-y-6">
+      <div className="p-6 sm:p-8 rounded-xl border border-zinc-800 bg-zinc-950/80 space-y-6 shadow-2xl">
         <div>
-          <label className="text-xs font-mono text-slate-300 uppercase tracking-wider block mb-2">
+          <label className="text-xs font-mono text-zinc-400 uppercase tracking-wider block mb-2">
             Paste Transaction Hash or Hex Contract Address:
           </label>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -187,15 +187,15 @@ function VerifyContent() {
               value={proofInput}
               onChange={(e) => setProofInput(e.target.value)}
               placeholder="e.g. 64-character hex hash or address..."
-              className="flex-1 bg-slate-950/90 border border-white/10 rounded-2xl px-4 py-3.5 text-xs font-mono text-teal-400 focus:outline-none focus:border-teal-500 transition-all shadow-inner"
+              className="flex-1 bg-black border border-zinc-800 rounded-lg px-4 py-3 text-xs font-mono text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors shadow-inner"
             />
             <button
               onClick={() => handleVerify()}
               disabled={isVerifying}
-              className="px-8 py-3.5 rounded-2xl bg-teal-500 hover:bg-teal-400 text-white font-bold text-xs transition-all shadow-lg shadow-teal-500/30 flex items-center justify-center gap-2 disabled:opacity-50"
+              className="px-6 py-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-semibold text-xs transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              {isVerifying ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Radio className="w-4 h-4" />}
-              <span>{isVerifying ? 'Querying Indexer...' : 'Verify on Midnight Preprod'}</span>
+              {isVerifying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Radio className="w-3.5 h-3.5" />}
+              <span>{isVerifying ? 'Querying Indexer...' : 'Verify on Preprod'}</span>
             </button>
           </div>
         </div>
@@ -204,44 +204,44 @@ function VerifyContent() {
         {result && (
           <div className="animate-fadeIn">
             {result.found ? (
-              <div className="p-6 rounded-2xl bg-emerald-950/30 border border-emerald-500/40 space-y-4">
-                <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3">
-                  <div className="flex items-center gap-3 text-emerald-400 font-bold text-base">
-                    <CheckCircle2 className="w-6 h-6" />
+              <div className="p-5 rounded-lg bg-zinc-950/20 border border-zinc-700/30 space-y-3">
+                <div className="flex items-center justify-between border-b border-zinc-700/20 pb-2.5">
+                  <div className="flex items-center gap-2.5 text-zinc-400 font-semibold text-sm">
+                    <CheckCircle2 className="w-4 h-4" />
                     <span>On-Chain Record Verified on Midnight Preprod</span>
                   </div>
-                  <span className="text-[11px] font-mono text-emerald-300/80 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-500/30">
+                  <span className="text-[10px] font-mono text-zinc-400 bg-zinc-500/10 px-2 py-0.5 rounded border border-zinc-700/20">
                     Live Verified
                   </span>
                 </div>
 
-                <div className="text-xs font-mono space-y-2 text-slate-300">
+                <div className="text-xs font-mono space-y-2 text-zinc-300">
                   <p>{result.message}</p>
                   {result.blockHeight && (
-                    <p className="text-teal-300">Confirmed Block Height: #{result.blockHeight}</p>
+                    <p className="text-zinc-400">Confirmed Block Height: #{result.blockHeight}</p>
                   )}
                   {result.details && (
-                    <pre className="p-3 bg-slate-950 rounded-xl border border-white/5 text-[10px] text-slate-400 overflow-x-auto">
+                    <pre className="p-3 bg-black rounded-lg border border-zinc-800 text-[10px] text-zinc-400 overflow-x-auto">
                       {JSON.stringify(result.details, null, 2)}
                     </pre>
                   )}
                 </div>
               </div>
             ) : (
-              <div className="p-6 rounded-2xl bg-red-950/30 border border-red-500/40 space-y-4">
-                <div className="flex items-center justify-between border-b border-red-500/20 pb-3">
-                  <div className="flex items-center gap-3 text-red-400 font-bold text-base">
-                    <XCircle className="w-6 h-6" />
+              <div className="p-5 rounded-lg bg-zinc-900/60 border border-zinc-800 space-y-3">
+                <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+                  <div className="flex items-center gap-2.5 text-zinc-300 font-semibold text-sm">
+                    <XCircle className="w-4 h-4 text-zinc-500" />
                     <span>Not Found on Midnight Preprod Indexer</span>
                   </div>
-                  <span className="text-[11px] font-mono text-red-300/80 bg-red-500/20 px-3 py-1 rounded-full border border-red-500/30">
+                  <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded border border-zinc-700">
                     Unconfirmed
                   </span>
                 </div>
 
-                <div className="text-xs font-mono space-y-2 text-red-300">
+                <div className="text-xs font-mono space-y-2 text-zinc-400">
                   <p>{result.message}</p>
-                  <p className="text-slate-400 text-[11px]">
+                  <p className="text-zinc-500 text-[11px]">
                     To confirm transactions on Preprod, submit a real transaction via your connected 1AM or Lace wallet.
                   </p>
                 </div>
@@ -256,7 +256,7 @@ function VerifyContent() {
 
 export default function VerifyPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-slate-400 font-mono text-sm">Loading ZK Verifier...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-zinc-400 font-mono text-sm">Loading ZK Verifier...</div>}>
       <VerifyContent />
     </Suspense>
   );

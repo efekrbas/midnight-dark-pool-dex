@@ -149,16 +149,16 @@ export default function NetworkPage() {
     <div className="w-full max-w-[1400px] mx-auto py-8 px-4 sm:px-6 space-y-8 animate-fadeIn">
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-slate-900/80 backdrop-blur-2xl gap-6">
+      <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-zinc-900/80 backdrop-blur-2xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-teal-500/30 border border-teal-400/20">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-zinc-500 to-zinc-700 flex items-center justify-center text-white shadow-lg shadow-zinc-700/30 border border-zinc-600/20">
             <Globe className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
               Network Topology Map
             </h1>
-            <p className="text-xs text-slate-400 font-mono mt-1">
+            <p className="text-xs text-zinc-400 font-mono mt-1">
               Live visualization of Midnight Preprod validators, relayers, and cross-chain bridges.
             </p>
           </div>
@@ -166,50 +166,50 @@ export default function NetworkPage() {
 
         <div className="flex items-center gap-6 font-mono text-xs">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-blue-500" /> <span className="text-slate-300">Validators (3)</span>
+            <span className="w-3 h-3 rounded-full bg-zinc-500" /> <span className="text-zinc-300">Validators (3)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-teal-500" /> <span className="text-slate-300">ZK Relayers (2)</span>
+            <span className="w-3 h-3 rounded-full bg-zinc-500" /> <span className="text-zinc-300">ZK Relayers (2)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-amber-500" /> <span className="text-slate-300">Bridges (2)</span>
+            <span className="w-3 h-3 rounded-full bg-zinc-500" /> <span className="text-zinc-300">Bridges (2)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-500" /> <span className="text-slate-300">Client (1)</span>
+            <span className="w-3 h-3 rounded-full bg-zinc-500" /> <span className="text-zinc-300">Client (1)</span>
           </div>
         </div>
       </div>
 
       {/* Canvas Map */}
-      <div className="glass-panel rounded-3xl border border-white/10 bg-slate-900/80 overflow-hidden p-2">
+      <div className="glass-panel rounded-3xl border border-white/10 bg-zinc-900/80 overflow-hidden p-2">
         <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ height: 600 }} />
       </div>
 
       {/* Status Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-slate-900/70">
-          <div className="flex items-center gap-2 text-blue-400 text-xs font-mono mb-2">
+        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-zinc-900/70">
+          <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono mb-2">
             <ShieldCheck className="w-4 h-4" /> <span>Consensus</span>
           </div>
           <p className="text-lg font-black text-white">3/3 Validators Online</p>
         </div>
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-slate-900/70">
-          <div className="flex items-center gap-2 text-teal-400 text-xs font-mono mb-2">
+        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-zinc-900/70">
+          <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono mb-2">
             <Wifi className="w-4 h-4" /> <span>ZK Relay Latency</span>
           </div>
           <p className="text-lg font-black text-white">42ms avg</p>
         </div>
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-slate-900/70">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-mono mb-2">
+        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-zinc-900/70">
+          <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono mb-2">
             <Activity className="w-4 h-4" /> <span>Bridge Throughput</span>
           </div>
           <p className="text-lg font-black text-white">1,200 tx/min</p>
         </div>
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-slate-900/70">
-          <div className="flex items-center gap-2 text-emerald-400 text-xs font-mono mb-2">
+        <div className="glass-panel p-5 rounded-2xl border border-white/10 bg-zinc-900/70">
+          <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono mb-2">
             <Sparkles className="w-4 h-4" /> <span>Network Uptime</span>
           </div>
-          <p className="text-lg font-black text-emerald-400">99.97%</p>
+          <p className="text-lg font-black text-zinc-400">99.97%</p>
         </div>
       </div>
     </div>
