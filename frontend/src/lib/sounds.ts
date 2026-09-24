@@ -2,7 +2,7 @@
 
 class SoundSystem {
   private ctx: AudioContext | null = null;
-  private isMuted: boolean = false;
+  private isMuted: boolean = true;
   private muteListeners: ((muted: boolean) => void)[] = [];
 
   constructor() {
