@@ -98,7 +98,7 @@ export circuit submitOrder(
     // BUY: escrow quoteToken = amount * price
     // SELL: escrow baseToken = amount
     const escrowRequired: Uint<128> = (side == OrderSide.BUY)
-        ? ((amount as Uint<128>) * (price as Uint<128>))
+        ? (((amount as Field) * (price as Field)) as Uint<128>)
         : (amount as Uint<128>);
     const escrowToken: Bytes<32> = (side == OrderSide.BUY) ? quoteToken : baseToken;
 
@@ -149,7 +149,7 @@ export circuit cancelOrder(
 
     // Compute refund of remaining escrow
     const refundAmount: Uint<128> = (order.side == OrderSide.BUY)
-        ? ((order.remainingAmount as Uint<128>) * (price as Uint<128>))
+        ? (((order.remainingAmount as Field) * (price as Field)) as Uint<128>)
         : (order.remainingAmount as Uint<128>);
     const refundToken: Bytes<32> = (order.side == OrderSide.BUY) ? order.quoteToken : order.baseToken;
 
@@ -227,7 +227,7 @@ export circuit matchOrders(
     balances.insert(disBuyerBaseKey, disclose((buyerBaseBal + (fillAmount as Uint<128>)) as Uint<128>));
 
     // 2. Seller receives (fillAmount * matchPrice) of quoteToken
-    const quoteProceeds = (fillAmount as Uint<128>) * (matchPrice as Uint<128>);
+    const quoteProceeds: Uint<128> = ((fillAmount as Field) * (matchPrice as Field)) as Uint<128>;
     const sellerQuoteKey = balanceKey(sellOrder.trader, sellOrder.quoteToken);
     const disSellerQuoteKey = disclose(sellerQuoteKey);
     const sellerQuoteBal = balances.member(disSellerQuoteKey) ? balances.lookup(disSellerQuoteKey) : (0 as Uint<128>);
@@ -235,14 +235,14 @@ export circuit matchOrders(
 
     // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
     if (buyPrice > matchPrice) {
-        const surplus = (fillAmount as Uint<128>) * ((buyPrice - matchPrice) as Uint<128>);
+        const surplus: Uint<128> = ((fillAmount as Field) * ((buyPrice - matchPrice) as Field)) as Uint<128>;
         const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
         const disBuyerQuoteKey = disclose(buyerQuoteKey);
         const buyerQuoteBal = balances.member(disBuyerQuoteKey) ? balances.lookup(disBuyerQuoteKey) : (0 as Uint<128>);
         balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + surplus) as Uint<128>));
     }
 
-    const buyEscrowUsed = (fillAmount as Uint<128>) * (buyPrice as Uint<128>);
+    const buyEscrowUsed: Uint<128> = ((fillAmount as Field) * (buyPrice as Field)) as Uint<128>;
     const sellEscrowUsed = fillAmount as Uint<128>;
 
     orders.insert(disBuyOrderId, Order {
