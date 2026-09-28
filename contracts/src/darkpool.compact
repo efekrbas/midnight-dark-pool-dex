@@ -50,6 +50,7 @@ constructor() {
 // Deposit funds into the Dark Pool internal balance for escrowed trading
 export circuit deposit(token: Bytes<32>, amount: Uint<128>): [] {
     assert(amount > 0, "Deposit amount must be positive");
+    receiveUnshielded(disclose(token), disclose(amount));
     const trader = traderAccountOf(callerSecret());
     const key = balanceKey(trader, token);
     const disKey = disclose(key);
@@ -59,7 +60,7 @@ export circuit deposit(token: Bytes<32>, amount: Uint<128>): [] {
 }
 
 // Withdraw unescrowed settled funds back to user address
-export circuit withdraw(token: Bytes<32>, amount: Uint<128>): [] {
+export circuit withdraw(token: Bytes<32>, amount: Uint<128>, recipient: UserAddress): [] {
     assert(amount > 0, "Withdraw amount must be positive");
     const trader = traderAccountOf(callerSecret());
     const key = balanceKey(trader, token);
@@ -67,6 +68,11 @@ export circuit withdraw(token: Bytes<32>, amount: Uint<128>): [] {
     assert(balances.member(disKey), "No balance found for token");
     const currentBal = balances.lookup(disKey);
     assert(currentBal >= amount, "Insufficient balance for withdrawal");
+    sendUnshielded(
+        disclose(token),
+        disclose(amount),
+        right<ContractAddress, UserAddress>(disclose(recipient))
+    );
     balances.insert(disKey, disclose((currentBal - amount) as Uint<128>));
     totalValueShielded = disclose((totalValueShielded - amount) as Uint<128>);
 }
@@ -236,6 +242,9 @@ export circuit matchOrders(
         balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + surplus) as Uint<128>));
     }
 
+    const buyEscrowUsed = (fillAmount as Uint<128>) * (buyPrice as Uint<128>);
+    const sellEscrowUsed = fillAmount as Uint<128>;
+
     orders.insert(disBuyOrderId, Order {
         trader: buyOrder.trader,
         side: buyOrder.side,
@@ -245,7 +254,7 @@ export circuit matchOrders(
         priceCommitment: buyOrder.priceCommitment,
         remainingAmount: buyRemaining,
         status: buyStatus,
-        escrowAmount: buyOrder.escrowAmount
+        escrowAmount: (buyOrder.escrowAmount - buyEscrowUsed) as Uint<128>
     });
 
     orders.insert(disSellOrderId, Order {
@@ -257,6 +266,6 @@ export circuit matchOrders(
         priceCommitment: sellOrder.priceCommitment,
         remainingAmount: sellRemaining,
         status: sellStatus,
-        escrowAmount: sellOrder.escrowAmount
+        escrowAmount: (sellOrder.escrowAmount - sellEscrowUsed) as Uint<128>
     });
 }

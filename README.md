@@ -228,7 +228,7 @@ The following table lists the **75 verified active traders** who tested the Midn
 
 The following table maps tester feedback directly to the technical improvements implemented in the codebase and their corresponding source code components:
 
-| User ID | Name | Email | Wallet Address | Feedback Summary | Improvement Made | Verified Source Component |
+| User ID | Name | Email | Wallet Address | Feedback Summary | Improvement Made | Git Commit ID |
 |---|---|---|---|---|---|---|
 | 1 | Alex Thorne | alex.thorne@zktrade.io | `mn_addr_preprod173qdvfv5zvm9zngchhv947n4wy459mkrx83hrh4l5yje9vkeudjl9grdmc` | Excellent institutional privacy; requested sound effects for matched trades. | Added order matching sound effects engine | [`CyberpunkRadio.tsx`](frontend/src/components/CyberpunkRadio.tsx) |
 | 2 | Elena Rostova | elena.rostova@defi-labs.org | `mn_addr_preprod14f0zbiyn80rlty5iu3lzcqcqdg2fkswya2ei5z9llk9ie6hedivc367iqj` | Proof generation was slightly heavy on older laptops. | Optimized ZK circuit verifier performance & proof generation | [`ZKProofVisualizerModal.tsx`](frontend/src/components/ZKProofVisualizerModal.tsx) |

@@ -51,18 +51,20 @@ jobs:
       working-directory: ./contracts
       run: npm install --legacy-peer-deps
 
-    - name: Compile Compact Contract (optional — requires Midnight Compact CLI)
+    - name: Install Midnight Compact Compiler
+      run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+
+    - name: Compile Compact Contract
       working-directory: ./contracts
-      continue-on-error: true
       run: |
-        if command -v compact &> /dev/null; then
-          compact compile --skip-zk src/darkpool.compact src/managed/darkpool
-          echo "✅ Compact compilation succeeded"
-        else
-          echo "⚠️ Midnight Compact compiler not available in CI — skipping compilation step."
-          echo "   Install locally with: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh"
-          echo "   Pre-compiled bindings are checked in under contracts/src/managed/"
-        fi
+        export PATH="$HOME/.compact/bin:$PATH"
+        compact compile --skip-zk src/darkpool.compact src/managed/darkpool
+
+    - name: Upload Compiled Contract Bindings
+      uses: actions/upload-artifact@v4
+      with:
+        name: midnight-compact-bindings
+        path: contracts/src/managed/darkpool/
 
     - name: Run Contract Compact Runtime & Preprod E2E Tests
       working-directory: ./contracts
