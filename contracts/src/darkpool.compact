@@ -234,18 +234,19 @@ export circuit matchOrders(
     balances.insert(disSellerQuoteKey, disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
 
     // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
-    if (buyPrice > matchPrice) {
-        const surplus: Uint<128> = ((fillAmount as Field) * ((buyPrice - matchPrice) as Field)) as Uint<128>;
-        const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
-        const disBuyerQuoteKey = disclose(buyerQuoteKey);
-        const buyerQuoteBal = balances.member(disBuyerQuoteKey) ? balances.lookup(disBuyerQuoteKey) : (0 as Uint<128>);
-        balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + surplus) as Uint<128>));
-    }
+    const isSurplus: boolean = buyPrice > matchPrice;
+    const surplus: Uint<128> = isSurplus
+        ? (((fillAmount as Field) * ((buyPrice - matchPrice) as Field)) as Uint<128>)
+        : (0 as Uint<128>);
+    const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
+    const disBuyerQuoteKey = disclose(buyerQuoteKey);
+    const buyerQuoteBal = balances.member(disBuyerQuoteKey) ? balances.lookup(disBuyerQuoteKey) : (0 as Uint<128>);
+    balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + surplus) as Uint<128>));
 
     const buyEscrowUsed: Uint<128> = ((fillAmount as Field) * (buyPrice as Field)) as Uint<128>;
     const sellEscrowUsed = fillAmount as Uint<128>;
 
-    orders.insert(disBuyOrderId, Order {
+    orders.insert(disBuyOrderId, disclose(Order {
         trader: buyOrder.trader,
         side: buyOrder.side,
         baseToken: buyOrder.baseToken,
@@ -255,9 +256,9 @@ export circuit matchOrders(
         remainingAmount: buyRemaining,
         status: buyStatus,
         escrowAmount: (buyOrder.escrowAmount - buyEscrowUsed) as Uint<128>
-    });
+    }));
 
-    orders.insert(disSellOrderId, Order {
+    orders.insert(disSellOrderId, disclose(Order {
         trader: sellOrder.trader,
         side: sellOrder.side,
         baseToken: sellOrder.baseToken,
@@ -267,5 +268,5 @@ export circuit matchOrders(
         remainingAmount: sellRemaining,
         status: sellStatus,
         escrowAmount: (sellOrder.escrowAmount - sellEscrowUsed) as Uint<128>
-    });
+    }));
 }

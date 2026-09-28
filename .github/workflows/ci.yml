@@ -59,6 +59,7 @@ jobs:
       run: |
         export PATH="$HOME/.compact/bin:$PATH"
         compact update
+        mkdir -p src/managed/darkpool
         compact compile --skip-zk src/darkpool.compact src/managed/darkpool
 
     - name: Upload Compiled Contract Bindings
