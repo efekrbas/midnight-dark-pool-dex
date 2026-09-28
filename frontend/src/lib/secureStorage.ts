@@ -10,6 +10,8 @@
 const STORAGE_PREFIX = 'midnight_darkpool_priv_';
 const KEY_STORAGE_NAME = 'midnight_darkpool_key';
 
+let memoryKey: CryptoKey | null = null;
+
 // Derive or retrieve persistent AES-GCM 256-bit encryption key
 async function getOrCreateEncryptionKey(): Promise<CryptoKey> {
   if (typeof window === 'undefined') {
@@ -17,28 +19,15 @@ async function getOrCreateEncryptionKey(): Promise<CryptoKey> {
     throw new Error('SecureStorage requires browser Web Crypto API');
   }
 
-  const rawKeyHex = localStorage.getItem(KEY_STORAGE_NAME);
-  if (rawKeyHex) {
-    const rawKey = Uint8Array.from(rawKeyHex.match(/.{1,2}/g)!.map((b) => parseInt(b, 16)));
-    return await window.crypto.subtle.importKey(
-      'raw',
-      rawKey,
-      { name: 'AES-GCM', length: 256 },
-      true,
-      ['encrypt', 'decrypt']
-    );
-  }
+  if (memoryKey) return memoryKey;
 
   const freshKey = await window.crypto.subtle.generateKey(
     { name: 'AES-GCM', length: 256 },
     true,
     ['encrypt', 'decrypt']
   );
-  const exported = await window.crypto.subtle.exportKey('raw', freshKey);
-  const hex = Array.from(new Uint8Array(exported))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  localStorage.setItem(KEY_STORAGE_NAME, hex);
+  
+  memoryKey = freshKey;
   return freshKey;
 }
 
