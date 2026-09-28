@@ -234,8 +234,7 @@ export circuit matchOrders(
     balances.insert(disSellerQuoteKey, disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
 
     // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
-    const isSurplus: boolean = buyPrice > matchPrice;
-    const surplus: Uint<128> = isSurplus
+    const surplus: Uint<128> = (buyPrice > matchPrice)
         ? (((fillAmount as Field) * ((buyPrice - matchPrice) as Field)) as Uint<128>)
         : (0 as Uint<128>);
     const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
