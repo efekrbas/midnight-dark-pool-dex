@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
 import { detectWallet } from '@/lib/midnight';
-import { Contract, OrderSide } from '@/lib/contract';
+import { Contract, OrderSide, DARK_POOL_CONTRACT_ADDRESS } from '@/lib/contract';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -40,8 +40,7 @@ export default function OtcPage() {
       const dappConnector = await detectWallet();
 
       // Step 2: Connect to the Dark Pool contract
-      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
-      const contract = await Contract.connect(dappConnector, contractAddress);
+      const contract = await Contract.connect(dappConnector, DARK_POOL_CONTRACT_ADDRESS);
 
       const orderId = crypto.getRandomValues(new Uint8Array(32));
       const baseToken = new TextEncoder().encode(asset.padEnd(32, '\0')).slice(0, 32);

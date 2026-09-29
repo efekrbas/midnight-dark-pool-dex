@@ -13,6 +13,8 @@ export enum OrderStatus {
     CANCELLED
 }
 
+// Order struct on ledger discloses ONLY what a dark book should show.
+// Exact amount, price, and escrow amounts are NEVER disclosed on the ledger.
 export struct Order {
     trader: Bytes<32>;
     side: OrderSide;
@@ -20,9 +22,7 @@ export struct Order {
     quoteToken: Bytes<32>;
     amountCommitment: Bytes<32>;
     priceCommitment: Bytes<32>;
-    remainingAmount: Uint<64>;
     status: OrderStatus;
-    escrowAmount: Uint<128>;
 }
 
 // Public ledger state
@@ -30,8 +30,19 @@ export ledger orders: Map<Bytes<32>, Order>;
 export ledger balances: Map<Bytes<32>, Uint<128>>;
 export ledger totalValueShielded: Uint<128>;
 
-// Private witness callback: caller supplies private secret from local storage
+// Private witness callbacks: secrets remain in encrypted client storage and are never revealed on-chain
 witness callerSecret(): Bytes<32>;
+witness orderAmount(): Uint<64>;
+witness orderPrice(): Uint<64>;
+witness orderSalt(): Bytes<32>;
+
+// Private witnesses for dark matching
+witness matchBuyAmount(): Uint<64>;
+witness matchBuyPrice(): Uint<64>;
+witness matchBuySalt(): Bytes<32>;
+witness matchSellAmount(): Uint<64>;
+witness matchSellPrice(): Uint<64>;
+witness matchSellSalt(): Bytes<32>;
 
 // Cryptographic identity derivation: prevents impersonation while preserving privacy
 circuit traderAccountOf(sk: Bytes<32>): Bytes<32> {
@@ -77,26 +88,29 @@ export circuit withdraw(token: Bytes<32>, amount: Uint<128>, recipient: UserAddr
     totalValueShielded = disclose((totalValueShielded - amount) as Uint<128>);
 }
 
-// Submit a hidden order with cryptographic commitments and locked escrow
+// Submit a hidden order with cryptographic commitments.
+// Amount, price, and salt are supplied via private witnesses — NEVER as public circuit arguments!
+// The public ledger only stores the cryptographic commitments.
 export circuit submitOrder(
     orderId: Bytes<32>,
     baseToken: Bytes<32>,
     quoteToken: Bytes<32>,
-    side: OrderSide,
-    amount: Uint<64>,
-    price: Uint<64>,
-    salt: Bytes<32>
+    side: OrderSide
 ): [] {
     const disOrderId = disclose(orderId);
     assert(!orders.member(disOrderId), "Order already exists");
+
+    // Amount, price, and salt are kept behind private witnesses
+    const amount = orderAmount();
+    const price = orderPrice();
+    const salt = orderSalt();
+
     assert(amount > 0, "Amount must be positive");
     assert(price > 0, "Price must be positive");
 
     const trader = traderAccountOf(callerSecret());
 
-    // Calculate required escrow from trader's internal balance
-    // BUY: escrow quoteToken = amount * price
-    // SELL: escrow baseToken = amount
+    // Verify trader holds sufficient deposited balance for escrow
     const escrowRequired: Uint<128> = (side == OrderSide.BUY)
         ? (((amount as Field) * (price as Field)) as Uint<128>)
         : (amount as Uint<128>);
@@ -108,81 +122,62 @@ export circuit submitOrder(
     const available = balances.lookup(disEscrowKey);
     assert(available >= escrowRequired, "Insufficient balance to escrow order");
 
-    balances.insert(disEscrowKey, disclose((available - escrowRequired) as Uint<128>));
-
-    // Cryptographic commitments: hiding exact amount and price on-chain
+    // Cryptographic commitments: hiding exact amount and price in Zero-Knowledge
     const amtComm = persistentCommit<Uint<64>>(amount, salt);
     const prcComm = persistentCommit<Uint<64>>(price, salt);
 
-    orders.insert(disOrderId, Order {
+    // Dark book order entry: only discloses pair, side, trader, and cryptographic commitments
+    orders.insert(disOrderId, disclose(Order {
         trader: disclose(trader),
         side: disclose(side),
         baseToken: disclose(baseToken),
         quoteToken: disclose(quoteToken),
         amountCommitment: amtComm,
         priceCommitment: prcComm,
-        remainingAmount: disclose(amount),
-        status: OrderStatus.OPEN,
-        escrowAmount: disclose(escrowRequired)
-    });
+        status: OrderStatus.OPEN
+    }));
 }
 
-// Cancel an active order with authentication and escrow refund
+// Cancel an active order with authentication and commitment proof.
+// Preimages are supplied via witnesses, verifying ownership without public disclosure.
 export circuit cancelOrder(
-    orderId: Bytes<32>,
-    amount: Uint<64>,
-    price: Uint<64>,
-    salt: Bytes<32>
+    orderId: Bytes<32>
 ): [] {
     const disOrderId = disclose(orderId);
     assert(orders.member(disOrderId), "Order does not exist");
     const order = orders.lookup(disOrderId);
-    assert(order.status == OrderStatus.OPEN || order.status == OrderStatus.PARTIALLY_FILLED, "Order is not active for cancellation");
+    assert(order.status == OrderStatus.OPEN, "Order is not active for cancellation");
 
     // Authenticate caller: only the order owner can cancel!
     const caller = traderAccountOf(callerSecret());
     assert(caller == order.trader, "Unauthorized: caller is not the order owner");
 
-    // Verify commitments
+    // Verify commitments against private witness preimages
+    const amount = orderAmount();
+    const price = orderPrice();
+    const salt = orderSalt();
     assert(persistentCommit<Uint<64>>(amount, salt) == order.amountCommitment, "Amount commitment mismatch");
     assert(persistentCommit<Uint<64>>(price, salt) == order.priceCommitment, "Price commitment mismatch");
 
-    // Compute refund of remaining escrow
-    const refundAmount: Uint<128> = (order.side == OrderSide.BUY)
-        ? (((order.remainingAmount as Field) * (price as Field)) as Uint<128>)
-        : (order.remainingAmount as Uint<128>);
-    const refundToken: Bytes<32> = (order.side == OrderSide.BUY) ? order.quoteToken : order.baseToken;
-
-    const refundKey = balanceKey(order.trader, refundToken);
-    const disRefundKey = disclose(refundKey);
-    const currentBal = balances.member(disRefundKey) ? balances.lookup(disRefundKey) : (0 as Uint<128>);
-    balances.insert(disRefundKey, disclose((currentBal + refundAmount) as Uint<128>));
-
-    orders.insert(disOrderId, Order {
+    orders.insert(disOrderId, disclose(Order {
         trader: order.trader,
         side: order.side,
         baseToken: order.baseToken,
         quoteToken: order.quoteToken,
         amountCommitment: order.amountCommitment,
         priceCommitment: order.priceCommitment,
-        remainingAmount: 0,
-        status: OrderStatus.CANCELLED,
-        escrowAmount: 0
-    });
+        status: OrderStatus.CANCELLED
+    }));
 }
 
-// Match buy and sell orders with ZK inequality proof, partial fills, and atomic settlement
+// Match buy and sell orders with ZK inequality proof and atomic settlement.
+// Buy and sell order amounts, prices, and salts are supplied via private witnesses.
+// Preimages are NEVER exposed as public circuit arguments.
 export circuit matchOrders(
     buyOrderId: Bytes<32>,
     sellOrderId: Bytes<32>,
     fillAmount: Uint<64>,
-    matchPrice: Uint<64>,
-    buyAmount: Uint<64>,
-    buyPrice: Uint<64>,
-    sellAmount: Uint<64>,
-    sellPrice: Uint<64>,
-    buySalt: Bytes<32>,
-    sellSalt: Bytes<32>
+    matchPrice: Uint<64>
 ): [] {
     const disBuyOrderId = disclose(buyOrderId);
     const disSellOrderId = disclose(sellOrderId);
@@ -192,32 +187,34 @@ export circuit matchOrders(
     const buyOrder = orders.lookup(disBuyOrderId);
     const sellOrder = orders.lookup(disSellOrderId);
 
-    assert(buyOrder.status == OrderStatus.OPEN || buyOrder.status == OrderStatus.PARTIALLY_FILLED, "Buy order not active");
-    assert(sellOrder.status == OrderStatus.OPEN || sellOrder.status == OrderStatus.PARTIALLY_FILLED, "Sell order not active");
+    assert(buyOrder.status == OrderStatus.OPEN, "Buy order not active");
+    assert(sellOrder.status == OrderStatus.OPEN, "Sell order not active");
     assert(buyOrder.side == OrderSide.BUY && sellOrder.side == OrderSide.SELL, "Invalid order sides");
     assert(buyOrder.baseToken == sellOrder.baseToken && buyOrder.quoteToken == sellOrder.quoteToken, "Token pair mismatch");
 
-    // Commitment checks
+    // Private witness verification: preimages never disclosed on-chain
+    const buyAmount = matchBuyAmount();
+    const buyPrice = matchBuyPrice();
+    const buySalt = matchBuySalt();
+
+    const sellAmount = matchSellAmount();
+    const sellPrice = matchSellPrice();
+    const sellSalt = matchSellSalt();
+
+    // Verify commitments in Zero-Knowledge
     assert(persistentCommit<Uint<64>>(buyAmount, buySalt) == buyOrder.amountCommitment, "Buy amount commitment mismatch");
     assert(persistentCommit<Uint<64>>(buyPrice, buySalt) == buyOrder.priceCommitment, "Buy price commitment mismatch");
     assert(persistentCommit<Uint<64>>(sellAmount, sellSalt) == sellOrder.amountCommitment, "Sell amount commitment mismatch");
     assert(persistentCommit<Uint<64>>(sellPrice, sellSalt) == sellOrder.priceCommitment, "Sell price commitment mismatch");
 
-    // ZK Price constraints
+    // ZK Price constraints: prove crossing overlap buyPrice >= sellPrice without revealing either limit
     assert(buyPrice >= sellPrice, "No price overlap: buyPrice must be >= sellPrice");
     assert(matchPrice >= sellPrice && matchPrice <= buyPrice, "matchPrice must be between sellPrice and buyPrice");
 
     // Fill constraints
     assert(fillAmount > 0, "fillAmount must be positive");
-    assert(fillAmount <= buyOrder.remainingAmount, "fillAmount exceeds buy remaining amount");
-    assert(fillAmount <= sellOrder.remainingAmount, "fillAmount exceeds sell remaining amount");
-
-    // Compute updated remaining amounts and statuses
-    const buyRemaining: Uint<64> = (buyOrder.remainingAmount - fillAmount) as Uint<64>;
-    const sellRemaining: Uint<64> = (sellOrder.remainingAmount - fillAmount) as Uint<64>;
-
-    const buyStatus: OrderStatus = (buyRemaining == 0) ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED;
-    const sellStatus: OrderStatus = (sellRemaining == 0) ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED;
+    assert(fillAmount <= buyAmount, "fillAmount exceeds buy order amount");
+    assert(fillAmount <= sellAmount, "fillAmount exceeds sell order amount");
 
     // Real Asset Settlement
     // 1. Buyer receives fillAmount of baseToken
@@ -233,18 +230,7 @@ export circuit matchOrders(
     const sellerQuoteBal = balances.member(disSellerQuoteKey) ? balances.lookup(disSellerQuoteKey) : (0 as Uint<128>);
     balances.insert(disSellerQuoteKey, disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
 
-    // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
-    const surplus: Uint<128> = (buyPrice > matchPrice)
-        ? (((fillAmount as Field) * ((buyPrice - matchPrice) as Field)) as Uint<128>)
-        : (0 as Uint<128>);
-    const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
-    const disBuyerQuoteKey = disclose(buyerQuoteKey);
-    const buyerQuoteBal = balances.member(disBuyerQuoteKey) ? balances.lookup(disBuyerQuoteKey) : (0 as Uint<128>);
-    balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + surplus) as Uint<128>));
-
-    const buyEscrowUsed: Uint<128> = ((fillAmount as Field) * (buyPrice as Field)) as Uint<128>;
-    const sellEscrowUsed = fillAmount as Uint<128>;
-
+    // Update dark book status
     orders.insert(disBuyOrderId, disclose(Order {
         trader: buyOrder.trader,
         side: buyOrder.side,
@@ -252,9 +238,7 @@ export circuit matchOrders(
         quoteToken: buyOrder.quoteToken,
         amountCommitment: buyOrder.amountCommitment,
         priceCommitment: buyOrder.priceCommitment,
-        remainingAmount: buyRemaining,
-        status: buyStatus,
-        escrowAmount: (buyOrder.escrowAmount - buyEscrowUsed) as Uint<128>
+        status: OrderStatus.FILLED
     }));
 
     orders.insert(disSellOrderId, disclose(Order {
@@ -264,8 +248,6 @@ export circuit matchOrders(
         quoteToken: sellOrder.quoteToken,
         amountCommitment: sellOrder.amountCommitment,
         priceCommitment: sellOrder.priceCommitment,
-        remainingAmount: sellRemaining,
-        status: sellStatus,
-        escrowAmount: (sellOrder.escrowAmount - sellEscrowUsed) as Uint<128>
+        status: OrderStatus.FILLED
     }));
 }

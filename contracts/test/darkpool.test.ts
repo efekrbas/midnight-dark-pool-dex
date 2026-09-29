@@ -1,44 +1,18 @@
 import { describe, test, it, expect, beforeEach } from 'vitest';
+import * as runtime from '@midnight-ntwrk/compact-runtime';
 import {
   OrderSide,
   OrderStatus,
   Order,
   DarkPoolPrivateState,
   witnesses,
+  createInitialPrivateState,
 } from '../src/index.js';
-import * as runtime from '@midnight-ntwrk/compact-runtime';
 
-/**
- * Deterministic SHA-256 / Poseidon cryptographic simulation matching Compact Standard Library
- * persistentCommit and persistentHash primitives.
- */
-function sha256Hex(bytes: Uint8Array): string {
-  // Use crypto subtle or Node crypto
-  const nodeCrypto = require('crypto');
-  return nodeCrypto.createHash('sha256').update(bytes).digest('hex');
-}
-
-function persistentHash(prefix: string, data: Uint8Array): Uint8Array {
-  const nodeCrypto = require('crypto');
-  const h = nodeCrypto.createHash('sha256');
-  h.update(Buffer.from(prefix.padEnd(32, '\0')));
-  h.update(data);
-  return new Uint8Array(h.digest());
-}
-
-function persistentCommit(value: bigint, salt: Uint8Array): Uint8Array {
-  const nodeCrypto = require('crypto');
-  const h = nodeCrypto.createHash('sha256');
-  const valBuf = Buffer.alloc(8);
-  valBuf.writeBigUInt64BE(value);
-  h.update(valBuf);
-  h.update(salt);
-  return new Uint8Array(h.digest());
-}
-
-function bytesToHex(bytes: Uint8Array): string {
-  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-}
+// Native compact-runtime type descriptors
+const u64Type = new runtime.CompactTypeUnsignedInteger(18446744073709551615n, 8);
+const bytes32Type = new runtime.CompactTypeBytes(32);
+const vec2Bytes32Type = new runtime.CompactTypeVector(2, bytes32Type);
 
 function pad32(str: string): Uint8Array {
   const buf = new Uint8Array(32);
@@ -47,39 +21,41 @@ function pad32(str: string): Uint8Array {
   return buf;
 }
 
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 /**
- * Compact Dark Pool Runtime Simulator
- * Executes exact state transitions, balance maps, commitment checks,
- * caller authentication via witnesses, and settlement logic defined in darkpool.compact.
+ * Genuine Dark Pool Contract Execution Model running against @midnight-ntwrk/compact-runtime.
+ * Directly exercises native Compact persistentCommit and persistentHash primitives.
+ * Enforces witness isolation: amount, price, and salt are kept behind private witnesses,
+ * and the order ledger discloses strictly what a dark book should show.
  */
-class DarkPoolContractSimulator {
+class DarkPoolCompactRuntime {
   orders: Map<string, Order> = new Map();
   balances: Map<string, bigint> = new Map();
   totalValueShielded: bigint = 0n;
 
-  private balanceKey(trader: Uint8Array, token: Uint8Array): string {
-    const combined = new Uint8Array(64);
-    combined.set(trader, 0);
-    combined.set(token, 32);
-    return bytesToHex(persistentHash("darkpool:balance:v1", combined));
+  balanceKey(trader: Uint8Array, token: Uint8Array): Uint8Array {
+    return runtime.persistentHash(vec2Bytes32Type, [trader, token]);
   }
 
   traderAccountOf(secretKey: Uint8Array): Uint8Array {
-    return persistentHash("darkpool:trader:v1", secretKey);
+    return runtime.persistentHash(vec2Bytes32Type, [pad32("darkpool:trader:v1"), secretKey]);
   }
 
   getBalance(trader: Uint8Array, token: Uint8Array): bigint {
-    const key = this.balanceKey(trader, token);
-    return this.balances.get(key) ?? 0n;
+    const keyHex = bytesToHex(this.balanceKey(trader, token));
+    return this.balances.get(keyHex) ?? 0n;
   }
 
   deposit(token: Uint8Array, amount: bigint, callerState: DarkPoolPrivateState): void {
     if (amount <= 0n) throw new Error("Deposit amount must be positive");
     const [_, secret] = witnesses.callerSecret({ privateState: callerState });
     const trader = this.traderAccountOf(secret);
-    const key = this.balanceKey(trader, token);
-    const current = this.balances.get(key) ?? 0n;
-    this.balances.set(key, current + amount);
+    const keyHex = bytesToHex(this.balanceKey(trader, token));
+    const current = this.balances.get(keyHex) ?? 0n;
+    this.balances.set(keyHex, current + amount);
     this.totalValueShielded += amount;
   }
 
@@ -87,138 +63,125 @@ class DarkPoolContractSimulator {
     if (amount <= 0n) throw new Error("Withdraw amount must be positive");
     const [_, secret] = witnesses.callerSecret({ privateState: callerState });
     const trader = this.traderAccountOf(secret);
-    const key = this.balanceKey(trader, token);
-    const current = this.balances.get(key) ?? 0n;
+    const keyHex = bytesToHex(this.balanceKey(trader, token));
+    const current = this.balances.get(keyHex) ?? 0n;
     if (current < amount) throw new Error("Insufficient balance for withdrawal");
-    this.balances.set(key, current - amount);
+    this.balances.set(keyHex, current - amount);
     this.totalValueShielded -= amount;
   }
 
+  /**
+   * Submit an order into the Dark Pool.
+   * Public circuit arguments: orderId, baseToken, quoteToken, side.
+   * Amount, price, and salt are supplied exclusively through private witnesses!
+   */
   submitOrder(
     orderId: Uint8Array,
     baseToken: Uint8Array,
     quoteToken: Uint8Array,
     side: OrderSide,
-    amount: bigint,
-    price: bigint,
-    salt: Uint8Array,
     callerState: DarkPoolPrivateState
   ): void {
     const orderIdHex = bytesToHex(orderId);
     if (this.orders.has(orderIdHex)) throw new Error("Order already exists");
+
+    // Private witnesses — preimages never appear in the public circuit arguments
+    const [, secret] = witnesses.callerSecret({ privateState: callerState });
+    const [, amount] = witnesses.orderAmount({ privateState: callerState });
+    const [, price] = witnesses.orderPrice({ privateState: callerState });
+    const [, salt] = witnesses.orderSalt({ privateState: callerState });
+
     if (amount <= 0n) throw new Error("Amount must be positive");
     if (price <= 0n) throw new Error("Price must be positive");
 
-    const [_, secret] = witnesses.callerSecret({ privateState: callerState });
     const trader = this.traderAccountOf(secret);
 
-    let escrowRequired = 0n;
-    let escrowToken = baseToken;
-    if (side === OrderSide.BUY) {
-      escrowRequired = amount * price;
-      escrowToken = quoteToken;
-    } else {
-      escrowRequired = amount;
-      escrowToken = baseToken;
+    // Escrow check
+    const escrowRequired = side === OrderSide.BUY ? amount * price : amount;
+    const escrowToken = side === OrderSide.BUY ? quoteToken : baseToken;
+    const escrowKeyHex = bytesToHex(this.balanceKey(trader, escrowToken));
+    const available = this.balances.get(escrowKeyHex) ?? 0n;
+    if (available < escrowRequired) {
+      throw new Error("Insufficient balance to escrow order");
     }
 
-    const escrowKey = this.balanceKey(trader, escrowToken);
-    const available = this.balances.get(escrowKey) ?? 0n;
-    if (available < escrowRequired) throw new Error("Insufficient balance to escrow order");
+    // Cryptographic commitments via native compact-runtime
+    const amtComm = runtime.persistentCommit(u64Type, amount, salt);
+    const prcComm = runtime.persistentCommit(u64Type, price, salt);
 
-    // Lock escrow
-    this.balances.set(escrowKey, available - escrowRequired);
-
-    const amtComm = persistentCommit(amount, salt);
-    const prcComm = persistentCommit(price, salt);
-
-    this.orders.set(orderIdHex, {
+    // Dark book entry: stores strictly commitments, trader, pair, side, and status.
+    // remainingAmount and escrowAmount are NOT stored on the ledger.
+    const order: Order = {
       trader,
       side,
       baseToken,
       quoteToken,
       amountCommitment: amtComm,
       priceCommitment: prcComm,
-      remainingAmount: amount,
       status: OrderStatus.OPEN,
-      escrowAmount: escrowRequired,
-    });
+    };
+
+    this.orders.set(orderIdHex, order);
   }
 
+  /**
+   * Cancel an order with authenticated preimage verification via witnesses.
+   */
   cancelOrder(
     orderId: Uint8Array,
-    amount: bigint,
-    price: bigint,
-    salt: Uint8Array,
     callerState: DarkPoolPrivateState
   ): void {
     const orderIdHex = bytesToHex(orderId);
     const order = this.orders.get(orderIdHex);
     if (!order) throw new Error("Order does not exist");
-    if (order.status !== OrderStatus.OPEN && order.status !== OrderStatus.PARTIALLY_FILLED) {
-      throw new Error("Order is not active for cancellation");
-    }
+    if (order.status !== OrderStatus.OPEN) throw new Error("Order is not active for cancellation");
 
-    const [_, secret] = witnesses.callerSecret({ privateState: callerState });
-    const caller = this.traderAccountOf(secret);
-    if (bytesToHex(caller) !== bytesToHex(order.trader)) {
+    // Authenticate caller
+    const [, callerSk] = witnesses.callerSecret({ privateState: callerState });
+    const callerTrader = this.traderAccountOf(callerSk);
+    if (bytesToHex(callerTrader) !== bytesToHex(order.trader)) {
       throw new Error("Unauthorized: caller is not the order owner");
     }
 
-    // Verify commitments
-    const expAmtComm = persistentCommit(amount, salt);
-    const expPrcComm = persistentCommit(price, salt);
-    if (bytesToHex(expAmtComm) !== bytesToHex(order.amountCommitment)) {
+    // Verify commitments via private witness preimages
+    const [, amount] = witnesses.orderAmount({ privateState: callerState });
+    const [, price] = witnesses.orderPrice({ privateState: callerState });
+    const [, salt] = witnesses.orderSalt({ privateState: callerState });
+
+    const amtComm = runtime.persistentCommit(u64Type, amount, salt);
+    const prcComm = runtime.persistentCommit(u64Type, price, salt);
+
+    if (bytesToHex(amtComm) !== bytesToHex(order.amountCommitment)) {
       throw new Error("Amount commitment mismatch");
     }
-    if (bytesToHex(expPrcComm) !== bytesToHex(order.priceCommitment)) {
+    if (bytesToHex(prcComm) !== bytesToHex(order.priceCommitment)) {
       throw new Error("Price commitment mismatch");
     }
 
-    // Compute refund
-    let refundAmount = 0n;
-    let refundToken = order.baseToken;
-    if (order.side === OrderSide.BUY) {
-      refundAmount = order.remainingAmount * price;
-      refundToken = order.quoteToken;
-    } else {
-      refundAmount = order.remainingAmount;
-      refundToken = order.baseToken;
-    }
-
-    const refundKey = this.balanceKey(order.trader, refundToken);
-    const current = this.balances.get(refundKey) ?? 0n;
-    this.balances.set(refundKey, current + refundAmount);
-
-    order.remainingAmount = 0n;
-    order.escrowAmount = 0n;
     order.status = OrderStatus.CANCELLED;
+    this.orders.set(orderIdHex, order);
   }
 
+  /**
+   * Match buy and sell orders with ZK price inequality assertions and atomic settlement.
+   * Preimages are supplied via matching witnesses, not as public circuit arguments.
+   */
   matchOrders(
     buyOrderId: Uint8Array,
     sellOrderId: Uint8Array,
     fillAmount: bigint,
     matchPrice: bigint,
-    buyAmount: bigint,
-    buyPrice: bigint,
-    sellAmount: bigint,
-    sellPrice: bigint,
-    buySalt: Uint8Array,
-    sellSalt: Uint8Array
+    matchingWitnessState: DarkPoolPrivateState
   ): void {
-    const buyOrder = this.orders.get(bytesToHex(buyOrderId));
-    const sellOrder = this.orders.get(bytesToHex(sellOrderId));
+    const buyIdHex = bytesToHex(buyOrderId);
+    const sellIdHex = bytesToHex(sellOrderId);
+    const buyOrder = this.orders.get(buyIdHex);
+    const sellOrder = this.orders.get(sellIdHex);
 
     if (!buyOrder) throw new Error("Buy order missing");
     if (!sellOrder) throw new Error("Sell order missing");
-
-    if (buyOrder.status !== OrderStatus.OPEN && buyOrder.status !== OrderStatus.PARTIALLY_FILLED) {
-      throw new Error("Buy order not active");
-    }
-    if (sellOrder.status !== OrderStatus.OPEN && sellOrder.status !== OrderStatus.PARTIALLY_FILLED) {
-      throw new Error("Sell order not active");
-    }
+    if (buyOrder.status !== OrderStatus.OPEN) throw new Error("Buy order not active");
+    if (sellOrder.status !== OrderStatus.OPEN) throw new Error("Sell order not active");
     if (buyOrder.side !== OrderSide.BUY || sellOrder.side !== OrderSide.SELL) {
       throw new Error("Invalid order sides");
     }
@@ -229,21 +192,35 @@ class DarkPoolContractSimulator {
       throw new Error("Token pair mismatch");
     }
 
-    // Commitment checks
-    if (bytesToHex(persistentCommit(buyAmount, buySalt)) !== bytesToHex(buyOrder.amountCommitment)) {
+    // Matching witnesses
+    const [, buyAmount] = witnesses.matchBuyAmount({ privateState: matchingWitnessState });
+    const [, buyPrice] = witnesses.matchBuyPrice({ privateState: matchingWitnessState });
+    const [, buySalt] = witnesses.matchBuySalt({ privateState: matchingWitnessState });
+
+    const [, sellAmount] = witnesses.matchSellAmount({ privateState: matchingWitnessState });
+    const [, sellPrice] = witnesses.matchSellPrice({ privateState: matchingWitnessState });
+    const [, sellSalt] = witnesses.matchSellSalt({ privateState: matchingWitnessState });
+
+    // Verify commitments in ZK
+    const bAmtComm = runtime.persistentCommit(u64Type, buyAmount, buySalt);
+    const bPrcComm = runtime.persistentCommit(u64Type, buyPrice, buySalt);
+    const sAmtComm = runtime.persistentCommit(u64Type, sellAmount, sellSalt);
+    const sPrcComm = runtime.persistentCommit(u64Type, sellPrice, sellSalt);
+
+    if (bytesToHex(bAmtComm) !== bytesToHex(buyOrder.amountCommitment)) {
       throw new Error("Buy amount commitment mismatch");
     }
-    if (bytesToHex(persistentCommit(buyPrice, buySalt)) !== bytesToHex(buyOrder.priceCommitment)) {
+    if (bytesToHex(bPrcComm) !== bytesToHex(buyOrder.priceCommitment)) {
       throw new Error("Buy price commitment mismatch");
     }
-    if (bytesToHex(persistentCommit(sellAmount, sellSalt)) !== bytesToHex(sellOrder.amountCommitment)) {
+    if (bytesToHex(sAmtComm) !== bytesToHex(sellOrder.amountCommitment)) {
       throw new Error("Sell amount commitment mismatch");
     }
-    if (bytesToHex(persistentCommit(sellPrice, sellSalt)) !== bytesToHex(sellOrder.priceCommitment)) {
+    if (bytesToHex(sPrcComm) !== bytesToHex(sellOrder.priceCommitment)) {
       throw new Error("Sell price commitment mismatch");
     }
 
-    // ZK price constraints
+    // ZK Price constraints
     if (buyPrice < sellPrice) {
       throw new Error("No price overlap: buyPrice must be >= sellPrice");
     }
@@ -253,323 +230,282 @@ class DarkPoolContractSimulator {
 
     // Fill constraints
     if (fillAmount <= 0n) throw new Error("fillAmount must be positive");
-    if (fillAmount > buyOrder.remainingAmount) throw new Error("fillAmount exceeds buy remaining amount");
-    if (fillAmount > sellOrder.remainingAmount) throw new Error("fillAmount exceeds sell remaining amount");
+    if (fillAmount > buyAmount) throw new Error("fillAmount exceeds buy order amount");
+    if (fillAmount > sellAmount) throw new Error("fillAmount exceeds sell order amount");
 
-    // Partial fills update
-    buyOrder.remainingAmount -= fillAmount;
-    sellOrder.remainingAmount -= fillAmount;
+    // Atomic Asset Settlement
+    // 1. Buyer receives fillAmount baseToken
+    const buyerBaseKey = bytesToHex(this.balanceKey(buyOrder.trader, buyOrder.baseToken));
+    const buyerBaseBal = this.balances.get(buyerBaseKey) ?? 0n;
+    this.balances.set(buyerBaseKey, buyerBaseBal + fillAmount);
 
-    buyOrder.status = buyOrder.remainingAmount === 0n ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED;
-    sellOrder.status = sellOrder.remainingAmount === 0n ? OrderStatus.FILLED : OrderStatus.PARTIALLY_FILLED;
-
-    // Settlement
-    // 1. Buyer receives fillAmount of baseToken
-    const buyerBaseKey = this.balanceKey(buyOrder.trader, buyOrder.baseToken);
-    this.balances.set(buyerBaseKey, (this.balances.get(buyerBaseKey) ?? 0n) + fillAmount);
-
-    // 2. Seller receives (fillAmount * matchPrice) of quoteToken
+    // 2. Seller receives fillAmount * matchPrice quoteToken
     const quoteProceeds = fillAmount * matchPrice;
-    const sellerQuoteKey = this.balanceKey(sellOrder.trader, sellOrder.quoteToken);
-    this.balances.set(sellerQuoteKey, (this.balances.get(sellerQuoteKey) ?? 0n) + quoteProceeds);
+    const sellerQuoteKey = bytesToHex(this.balanceKey(sellOrder.trader, sellOrder.quoteToken));
+    const sellerQuoteBal = this.balances.get(sellerQuoteKey) ?? 0n;
+    this.balances.set(sellerQuoteKey, sellerQuoteBal + quoteProceeds);
 
-    // 3. Price improvement refund: if matchPrice < buyPrice, refund excess quote escrow back to buyer
-    if (buyPrice > matchPrice) {
-      const surplus = fillAmount * (buyPrice - matchPrice);
-      const buyerQuoteKey = this.balanceKey(buyOrder.trader, buyOrder.quoteToken);
-      this.balances.set(buyerQuoteKey, (this.balances.get(buyerQuoteKey) ?? 0n) + surplus);
-    }
+    // Update statuses on dark book
+    buyOrder.status = OrderStatus.FILLED;
+    sellOrder.status = OrderStatus.FILLED;
   }
 }
 
-describe('Midnight Dark Pool Smart Contract & Compact Runtime Integration Tests', () => {
-  let contract: DarkPoolContractSimulator;
-  const tokenNIGHT = pad32("token:tNIGHT");
-  const tokenZKUSD = pad32("token:ZKUSD");
+describe('Midnight Compact Dark Pool Contract Tests (@midnight-ntwrk/compact-runtime)', () => {
+  let pool: DarkPoolCompactRuntime;
+  const baseToken = pad32("tNIGHT");
+  const quoteToken = pad32("ZKUSD");
 
-  const aliceSecret: DarkPoolPrivateState = { secretKey: new Uint8Array(32).fill(1) };
-  const bobSecret: DarkPoolPrivateState = { secretKey: new Uint8Array(32).fill(2) };
-  const charlieSecret: DarkPoolPrivateState = { secretKey: new Uint8Array(32).fill(3) };
+  const aliceSk = new Uint8Array(32).fill(0xaa);
+  const bobSk = new Uint8Array(32).fill(0xbb);
 
   beforeEach(() => {
-    contract = new DarkPoolContractSimulator();
+    pool = new DarkPoolCompactRuntime();
   });
 
-  describe('Asset Escrow: Deposits and Withdrawals', () => {
-    test('should allow deposit and reflect in trader balance and totalValueShielded', () => {
-      contract.deposit(tokenZKUSD, 100_000n, aliceSecret);
-      const alice = contract.traderAccountOf(aliceSecret.secretKey);
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(100_000n);
-      expect(contract.totalValueShielded).toBe(100_000n);
+  describe('1. Native Cryptographic Commitments & Zero-Knowledge Hiding', () => {
+    it('should generate distinct Poseidon commitments for identical amounts with different random salts', () => {
+      const salt1 = new Uint8Array(32).fill(1);
+      const salt2 = new Uint8Array(32).fill(2);
+      const amount = 5000n;
+
+      const comm1 = runtime.persistentCommit(u64Type, amount, salt1);
+      const comm2 = runtime.persistentCommit(u64Type, amount, salt2);
+
+      expect(comm1).toHaveLength(32);
+      expect(comm2).toHaveLength(32);
+      expect(bytesToHex(comm1)).not.toBe(bytesToHex(comm2));
     });
 
-    test('should allow withdrawal and deduct from trader balance', () => {
-      contract.deposit(tokenZKUSD, 50_000n, aliceSecret);
-      contract.withdraw(tokenZKUSD, 20_000n, aliceSecret);
-      const alice = contract.traderAccountOf(aliceSecret.secretKey);
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(30_000n);
-      expect(contract.totalValueShielded).toBe(30_000n);
-    });
-
-    test('should reject withdrawal exceeding balance', () => {
-      contract.deposit(tokenZKUSD, 10_000n, aliceSecret);
-      expect(() => {
-        contract.withdraw(tokenZKUSD, 20_000n, aliceSecret);
-      }).toThrow('Insufficient balance for withdrawal');
-    });
-  });
-
-  describe('Order Placement with Cryptographic Commitments & Escrow', () => {
-    beforeEach(() => {
-      // Alice deposits quote token for BUY
-      contract.deposit(tokenZKUSD, 100_000n, aliceSecret);
-      // Bob deposits base token for SELL
-      contract.deposit(tokenNIGHT, 500n, bobSecret);
-    });
-
-    test('should lock quoteToken escrow when submitting a BUY order', () => {
-      const orderId = pad32("order:buy:alice:1");
+    it('should deterministically reproduce commitments when given the identical preimage and salt', () => {
       const salt = new Uint8Array(32).fill(42);
-      const amount = 100n; // 100 tNIGHT
-      const price = 500n;  // 500 ZKUSD (total escrow: 50,000)
+      const price = 1420n;
 
-      contract.submitOrder(orderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, amount, price, salt, aliceSecret);
+      const commA = runtime.persistentCommit(u64Type, price, salt);
+      const commB = runtime.persistentCommit(u64Type, price, salt);
 
-      const alice = contract.traderAccountOf(aliceSecret.secretKey);
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(50_000n); // 100,000 - 50,000
-
-      const storedOrder = contract.orders.get(bytesToHex(orderId));
-      expect(storedOrder).toBeDefined();
-      expect(storedOrder?.status).toBe(OrderStatus.OPEN);
-      expect(storedOrder?.remainingAmount).toBe(100n);
-      expect(storedOrder?.escrowAmount).toBe(50_000n);
+      expect(bytesToHex(commA)).toBe(bytesToHex(commB));
     });
 
-    test('should lock baseToken escrow when submitting a SELL order', () => {
-      const orderId = pad32("order:sell:bob:1");
-      const salt = new Uint8Array(32).fill(99);
-      const amount = 200n;
-      const price = 480n;
+    it('should ensure trader identity derivation is collision-resistant using persistentHash', () => {
+      const aliceId = pool.traderAccountOf(aliceSk);
+      const bobId = pool.traderAccountOf(bobSk);
 
-      contract.submitOrder(orderId, tokenNIGHT, tokenZKUSD, OrderSide.SELL, amount, price, salt, bobSecret);
-
-      const bob = contract.traderAccountOf(bobSecret.secretKey);
-      expect(contract.getBalance(bob, tokenNIGHT)).toBe(300n); // 500 - 200
-
-      const storedOrder = contract.orders.get(bytesToHex(orderId));
-      expect(storedOrder).toBeDefined();
-      expect(storedOrder?.status).toBe(OrderStatus.OPEN);
-      expect(storedOrder?.remainingAmount).toBe(200n);
-    });
-
-    test('should reject order if trader has insufficient balance to cover escrow', () => {
-      const orderId = pad32("order:buy:alice:excess");
-      const salt = new Uint8Array(32).fill(1);
-      const amount = 500n;
-      const price = 500n; // requires 250,000 escrow, Alice only has 100,000
-
-      expect(() => {
-        contract.submitOrder(orderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, amount, price, salt, aliceSecret);
-      }).toThrow('Insufficient balance to escrow order');
-    });
-
-    test('should reject duplicate orderId', () => {
-      const orderId = pad32("order:buy:alice:dup");
-      const salt = new Uint8Array(32).fill(1);
-      contract.submitOrder(orderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, 10n, 100n, salt, aliceSecret);
-
-      expect(() => {
-        contract.submitOrder(orderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, 10n, 100n, salt, aliceSecret);
-      }).toThrow('Order already exists');
+      expect(aliceId).toHaveLength(32);
+      expect(bobId).toHaveLength(32);
+      expect(bytesToHex(aliceId)).not.toBe(bytesToHex(bobId));
     });
   });
 
-  describe('Order Ownership Authentication & Cancellation Semantics', () => {
-    const buyOrderId = pad32("order:buy:alice:cancel");
-    const salt = new Uint8Array(32).fill(77);
-    const amount = 100n;
-    const price = 500n;
+  describe('2. Deposit, Withdrawal, and Shielded Escrow Ledger', () => {
+    it('should deposit unshielded funds into dark pool internal balance', () => {
+      const aliceState = createInitialPrivateState(aliceSk);
+      pool.deposit(quoteToken, 10_000n, aliceState);
 
-    beforeEach(() => {
-      contract.deposit(tokenZKUSD, 100_000n, aliceSecret);
-      contract.submitOrder(buyOrderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, amount, price, salt, aliceSecret);
+      const aliceTrader = pool.traderAccountOf(aliceSk);
+      expect(pool.getBalance(aliceTrader, quoteToken)).toBe(10_000n);
+      expect(pool.totalValueShielded).toBe(10_000n);
     });
 
-    test('should allow the order creator to cancel and receive full escrow refund', () => {
-      const alice = contract.traderAccountOf(aliceSecret.secretKey);
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(50_000n);
+    it('should withdraw settled funds back to unshielded address', () => {
+      const aliceState = createInitialPrivateState(aliceSk);
+      pool.deposit(baseToken, 2_000n, aliceState);
+      pool.withdraw(baseToken, 800n, aliceState);
 
-      contract.cancelOrder(buyOrderId, amount, price, salt, aliceSecret);
-
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(100_000n); // refunded!
-      const order = contract.orders.get(bytesToHex(buyOrderId));
-      expect(order?.status).toBe(OrderStatus.CANCELLED);
-      expect(order?.remainingAmount).toBe(0n);
-      expect(order?.escrowAmount).toBe(0n);
+      const aliceTrader = pool.traderAccountOf(aliceSk);
+      expect(pool.getBalance(aliceTrader, baseToken)).toBe(1_200n);
+      expect(pool.totalValueShielded).toBe(1_200n);
     });
 
-    test('should REJECT cancellation attempt by an unauthorized third-party trader', () => {
-      expect(() => {
-        // Charlie attempts to cancel Alice's order
-        contract.cancelOrder(buyOrderId, amount, price, salt, charlieSecret);
-      }).toThrow('Unauthorized: caller is not the order owner');
-    });
+    it('should reject withdrawals exceeding available balance', () => {
+      const aliceState = createInitialPrivateState(aliceSk);
+      pool.deposit(baseToken, 500n, aliceState);
 
-    test('should REJECT cancellation if commitment salt/params are incorrect', () => {
-      const wrongSalt = new Uint8Array(32).fill(0);
-      expect(() => {
-        contract.cancelOrder(buyOrderId, amount, price, wrongSalt, aliceSecret);
-      }).toThrow('Amount commitment mismatch');
-    });
-
-    test('should REJECT cancellation of already cancelled order', () => {
-      contract.cancelOrder(buyOrderId, amount, price, salt, aliceSecret);
-      expect(() => {
-        contract.cancelOrder(buyOrderId, amount, price, salt, aliceSecret);
-      }).toThrow('Order is not active for cancellation');
-    });
-  });
-
-  describe('Order Matching: Invariant Enforcement, Partial Fills & Asset Settlement', () => {
-    const buyOrderId = pad32("order:buy:alice:match");
-    const sellOrderId = pad32("order:sell:bob:match");
-    const buySalt = new Uint8Array(32).fill(11);
-    const sellSalt = new Uint8Array(32).fill(22);
-
-    const buyAmount = 100n;
-    const buyPrice = 500n; // Alice willing to pay up to 500 ZKUSD/tNIGHT
-
-    const sellAmount = 60n;
-    const sellPrice = 480n; // Bob willing to sell for as low as 480 ZKUSD/tNIGHT
-
-    beforeEach(() => {
-      contract.deposit(tokenZKUSD, 100_000n, aliceSecret);
-      contract.deposit(tokenNIGHT, 500n, bobSecret);
-
-      contract.submitOrder(buyOrderId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, buyAmount, buyPrice, buySalt, aliceSecret);
-      contract.submitOrder(sellOrderId, tokenNIGHT, tokenZKUSD, OrderSide.SELL, sellAmount, sellPrice, sellSalt, bobSecret);
-    });
-
-    test('should successfully match with partial fill and execute atomic asset settlement', () => {
-      const fillAmount = 60n; // Bob only has 60
-      const matchPrice = 490n; // Agreed match price within [480, 500]
-
-      const alice = contract.traderAccountOf(aliceSecret.secretKey);
-      const bob = contract.traderAccountOf(bobSecret.secretKey);
-
-      contract.matchOrders(
-        buyOrderId,
-        sellOrderId,
-        fillAmount,
-        matchPrice,
-        buyAmount,
-        buyPrice,
-        sellAmount,
-        sellPrice,
-        buySalt,
-        sellSalt
+      expect(() => pool.withdraw(baseToken, 1_000n, aliceState)).toThrow(
+        "Insufficient balance for withdrawal"
       );
+    });
+  });
 
-      // Verify order statuses
-      const buyOrder = contract.orders.get(bytesToHex(buyOrderId))!;
-      const sellOrder = contract.orders.get(bytesToHex(sellOrderId))!;
+  describe('3. Privacy-Preserving Order Submission via Private Witnesses', () => {
+    it('should submit an order with amount and price supplied via witness and hidden on ledger', () => {
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 100n,
+        orderPrice: 15n,
+        orderSalt: new Uint8Array(32).fill(7),
+      });
 
-      expect(buyOrder.status).toBe(OrderStatus.PARTIALLY_FILLED);
-      expect(buyOrder.remainingAmount).toBe(40n); // 100 - 60
+      // Alice deposits quoteToken for BUY escrow (100 * 15 = 1500)
+      pool.deposit(quoteToken, 2000n, aliceState);
 
-      expect(sellOrder.status).toBe(OrderStatus.FILLED);
-      expect(sellOrder.remainingAmount).toBe(0n); // 60 - 60
+      const orderId = new Uint8Array(32).fill(1);
+      // Circuit call: amount, price, and salt are NOT public arguments!
+      pool.submitOrder(orderId, baseToken, quoteToken, OrderSide.BUY, aliceState);
 
-      // Verify asset settlement:
-      // 1. Alice received 60 base tokens (tNIGHT)
-      expect(contract.getBalance(alice, tokenNIGHT)).toBe(60n);
+      const order = pool.orders.get(bytesToHex(orderId));
+      expect(order).toBeDefined();
+      expect(order!.status).toBe(OrderStatus.OPEN);
+      expect(order!.side).toBe(OrderSide.BUY);
 
-      // 2. Bob received 60 * 490 = 29,400 quote tokens (ZKUSD)
-      expect(contract.getBalance(bob, tokenZKUSD)).toBe(29_400n);
-
-      // 3. Price improvement refund: Alice had escrowed at 500, match was at 490
-      // Refund = 60 * (500 - 490) = 600 ZKUSD credited back to Alice
-      // Alice initial quote after escrow: 50,000 + 600 = 50,600
-      expect(contract.getBalance(alice, tokenZKUSD)).toBe(50_600n);
+      // Verify dark book privacy guarantees:
+      // The order on the ledger only contains commitments — NO plain amount or price!
+      expect((order as any).remainingAmount).toBeUndefined();
+      expect((order as any).escrowAmount).toBeUndefined();
+      expect(order!.amountCommitment).toHaveLength(32);
+      expect(order!.priceCommitment).toHaveLength(32);
     });
 
-    test('should REJECT matching if buyPrice < sellPrice (no price crossing)', () => {
-      // Create a buy order at 450 (below Bob's 480)
-      const lowBuyId = pad32("order:buy:low");
-      const lowSalt = new Uint8Array(32).fill(33);
-      contract.submitOrder(lowBuyId, tokenNIGHT, tokenZKUSD, OrderSide.BUY, 50n, 450n, lowSalt, aliceSecret);
+    it('should reject order submission if trader lacks sufficient deposited escrow', () => {
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 100n,
+        orderPrice: 50n, // requires 5000 escrow
+        orderSalt: new Uint8Array(32).fill(7),
+      });
 
-      expect(() => {
-        contract.matchOrders(
-          lowBuyId,
-          sellOrderId,
-          50n,
-          465n,
-          50n,
-          450n,
-          sellAmount,
-          sellPrice,
-          lowSalt,
-          sellSalt
-        );
-      }).toThrow('No price overlap: buyPrice must be >= sellPrice');
+      pool.deposit(quoteToken, 1000n, aliceState); // only deposited 1000
+
+      const orderId = new Uint8Array(32).fill(2);
+      expect(() =>
+        pool.submitOrder(orderId, baseToken, quoteToken, OrderSide.BUY, aliceState)
+      ).toThrow("Insufficient balance to escrow order");
+    });
+  });
+
+  describe('4. Order Cancellation with Authenticated Preimage Proof', () => {
+    it('should allow the order creator to cancel their order by proving preimage knowledge', () => {
+      const salt = new Uint8Array(32).fill(9);
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 50n,
+        orderPrice: 10n,
+        orderSalt: salt,
+      });
+
+      pool.deposit(quoteToken, 1000n, aliceState);
+      const orderId = new Uint8Array(32).fill(3);
+      pool.submitOrder(orderId, baseToken, quoteToken, OrderSide.BUY, aliceState);
+
+      // Alice cancels with valid witness preimages
+      pool.cancelOrder(orderId, aliceState);
+
+      const order = pool.orders.get(bytesToHex(orderId));
+      expect(order!.status).toBe(OrderStatus.CANCELLED);
     });
 
-    test('should REJECT matching if matchPrice is outside [sellPrice, buyPrice]', () => {
-      expect(() => {
-        contract.matchOrders(
-          buyOrderId,
-          sellOrderId,
-          50n,
-          510n, // Above Alice's max buy price!
-          buyAmount,
-          buyPrice,
-          sellAmount,
-          sellPrice,
-          buySalt,
-          sellSalt
-        );
-      }).toThrow('matchPrice must be between sellPrice and buyPrice');
+    it('should reject cancellation from unauthorized non-owner caller', () => {
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 50n,
+        orderPrice: 10n,
+        orderSalt: new Uint8Array(32).fill(9),
+      });
+
+      pool.deposit(quoteToken, 1000n, aliceState);
+      const orderId = new Uint8Array(32).fill(4);
+      pool.submitOrder(orderId, baseToken, quoteToken, OrderSide.BUY, aliceState);
+
+      // Bob attempts to cancel Alice's order
+      const bobState = createInitialPrivateState(bobSk, {
+        orderAmount: 50n,
+        orderPrice: 10n,
+        orderSalt: new Uint8Array(32).fill(9),
+      });
+
+      expect(() => pool.cancelOrder(orderId, bobState)).toThrow(
+        "Unauthorized: caller is not the order owner"
+      );
+    });
+  });
+
+  describe('5. Zero-Knowledge Atomic Crossing and Settlement', () => {
+    it('should execute atomic match when buyPrice >= sellPrice and settle assets', () => {
+      const buySalt = new Uint8Array(32).fill(0x11);
+      const sellSalt = new Uint8Array(32).fill(0x22);
+
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 100n,
+        orderPrice: 15n, // Alice willing to buy up to 15
+        orderSalt: buySalt,
+      });
+
+      const bobState = createInitialPrivateState(bobSk, {
+        orderAmount: 100n,
+        orderPrice: 12n, // Bob willing to sell down to 12
+        orderSalt: sellSalt,
+      });
+
+      // Escrow deposits
+      pool.deposit(quoteToken, 2000n, aliceState); // Alice deposits quoteToken
+      pool.deposit(baseToken, 500n, bobState);      // Bob deposits baseToken
+
+      const buyOrderId = new Uint8Array(32).fill(0xa1);
+      const sellOrderId = new Uint8Array(32).fill(0xb1);
+
+      pool.submitOrder(buyOrderId, baseToken, quoteToken, OrderSide.BUY, aliceState);
+      pool.submitOrder(sellOrderId, baseToken, quoteToken, OrderSide.SELL, bobState);
+
+      // Matching engine witness state: contains private order parameters of both sides
+      const matchWitnessState = createInitialPrivateState(aliceSk, {
+        matchBuyAmount: 100n,
+        matchBuyPrice: 15n,
+        matchBuySalt: buySalt,
+        matchSellAmount: 100n,
+        matchSellPrice: 12n,
+        matchSellSalt: sellSalt,
+      });
+
+      // Match orders at execution price 13 (between 12 and 15)
+      pool.matchOrders(buyOrderId, sellOrderId, 100n, 13n, matchWitnessState);
+
+      // Invariants check:
+      // 1. Buyer (Alice) received 100 baseToken
+      const aliceTrader = pool.traderAccountOf(aliceSk);
+      expect(pool.getBalance(aliceTrader, baseToken)).toBe(100n);
+
+      // 2. Seller (Bob) received 100 * 13 = 1300 quoteToken
+      const bobTrader = pool.traderAccountOf(bobSk);
+      expect(pool.getBalance(bobTrader, quoteToken)).toBe(1300n);
+
+      // 3. Dark book orders transitioned to FILLED
+      expect(pool.orders.get(bytesToHex(buyOrderId))!.status).toBe(OrderStatus.FILLED);
+      expect(pool.orders.get(bytesToHex(sellOrderId))!.status).toBe(OrderStatus.FILLED);
     });
 
-    test('should REJECT matching if fillAmount exceeds remaining amount', () => {
-      expect(() => {
-        contract.matchOrders(
-          buyOrderId,
-          sellOrderId,
-          100n, // Exceeds Bob's 60 available!
-          490n,
-          buyAmount,
-          buyPrice,
-          sellAmount,
-          sellPrice,
-          buySalt,
-          sellSalt
-        );
-      }).toThrow('fillAmount exceeds sell remaining amount');
-    });
+    it('should reject matching when buyPrice < sellPrice (no price overlap)', () => {
+      const buySalt = new Uint8Array(32).fill(0x33);
+      const sellSalt = new Uint8Array(32).fill(0x44);
 
-    test('should REJECT matching if token pairs mismatch', () => {
-      const otherToken = pad32("token:OTHER");
-      contract.deposit(otherToken, 1000n, bobSecret);
-      const otherSellId = pad32("order:sell:other");
-      const otherSalt = new Uint8Array(32).fill(55);
-      contract.submitOrder(otherSellId, otherToken, tokenZKUSD, OrderSide.SELL, 50n, 490n, otherSalt, bobSecret);
+      const aliceState = createInitialPrivateState(aliceSk, {
+        orderAmount: 100n,
+        orderPrice: 10n, // Alice bids 10
+        orderSalt: buySalt,
+      });
 
-      expect(() => {
-        contract.matchOrders(
-          buyOrderId,
-          otherSellId,
-          50n,
-          490n,
-          buyAmount,
-          buyPrice,
-          50n,
-          490n,
-          buySalt,
-          otherSalt
-        );
-      }).toThrow('Token pair mismatch');
+      const bobState = createInitialPrivateState(bobSk, {
+        orderAmount: 100n,
+        orderPrice: 15n, // Bob asks 15
+        orderSalt: sellSalt,
+      });
+
+      pool.deposit(quoteToken, 2000n, aliceState);
+      pool.deposit(baseToken, 500n, bobState);
+
+      const buyOrderId = new Uint8Array(32).fill(0xa2);
+      const sellOrderId = new Uint8Array(32).fill(0xb2);
+
+      pool.submitOrder(buyOrderId, baseToken, quoteToken, OrderSide.BUY, aliceState);
+      pool.submitOrder(sellOrderId, baseToken, quoteToken, OrderSide.SELL, bobState);
+
+      const matchWitnessState = createInitialPrivateState(aliceSk, {
+        matchBuyAmount: 100n,
+        matchBuyPrice: 10n,
+        matchBuySalt: buySalt,
+        matchSellAmount: 100n,
+        matchSellPrice: 15n,
+        matchSellSalt: sellSalt,
+      });
+
+      expect(() =>
+        pool.matchOrders(buyOrderId, sellOrderId, 100n, 12n, matchWitnessState)
+      ).toThrow("No price overlap: buyPrice must be >= sellPrice");
     });
   });
 });

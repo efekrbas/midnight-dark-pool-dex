@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Lock, CheckCircle2, Cpu, Sparkles, X, Database, AlertTriangle, RefreshCw, ExternalLink } from 'lucide-react';
 import { sounds } from '@/lib/sounds';
 import { detectWallet } from '@/lib/midnight';
-import { Contract, OrderSide, INDEXER_URL } from '@/lib/contract';
+import { Contract, OrderSide, INDEXER_URL, DARK_POOL_CONTRACT_ADDRESS } from '@/lib/contract';
 import { useNotification } from '@/context/NotificationContext';
 
 interface ZKProofVisualizerModalProps {
@@ -54,7 +54,7 @@ export default function ZKProofVisualizerModal({
     {
       title: "4. Midnight Preprod Submission & Escrow Lock",
       desc: "Balancing, signing, and broadcasting transaction to Midnight Preprod.",
-      detail: `Endpoint: ${INDEXER_URL} | Escrow Locked in Contract`,
+      detail: `Contract: ${DARK_POOL_CONTRACT_ADDRESS.slice(0, 10)}... | Endpoint: ${INDEXER_URL}`,
       icon: Shield,
       color: "from-zinc-500 to-zinc-600",
     },
@@ -88,28 +88,17 @@ export default function ZKProofVisualizerModal({
       setCurrentStep(2);
       sounds.playZKTick();
 
-      // Step 4: Submission
+      // Step 4: Submission to real deployed Dark Pool contract on Midnight Preprod
       setCurrentStep(3);
       sounds.playZKTick();
 
-      // For deployment/connection: we build providers
-      const providers = await Contract.buildProviders(wallet);
-      if (!providers.proofProvider) {
-        throw new Error('Proving provider is not active in connected wallet.');
-      }
+      const result = await Contract.submitOrderToDarkPool(wallet, {
+        side: orderSide === 'BUY' ? OrderSide.BUY : OrderSide.SELL,
+        amount: amountBigInt,
+        price: priceBigInt,
+      });
 
-      // If submitTransaction is available, execute through wallet
-      let realTxId = '';
-      if (typeof wallet.submitTransaction === 'function') {
-        const dummyIntentPayload = JSON.stringify({
-          action: 'submitOrder',
-          orderId: Array.from(orderId).map((b) => b.toString(16).padStart(2, '0')).join(''),
-          network: 'preprod',
-        });
-        const result = await wallet.submitTransaction(dummyIntentPayload);
-        realTxId = typeof result === 'string' ? result : (result as any)?.txId || (result as any)?.txHash || '';
-      }
-
+      const realTxId = result.txId;
       if (!realTxId) {
         throw new Error('Transaction was not confirmed on Midnight Preprod network.');
       }
@@ -117,7 +106,7 @@ export default function ZKProofVisualizerModal({
       setTxIdentifier(realTxId);
       setIsCompleted(true);
       sounds.playZKSuccess();
-      notify("Order Submitted to Dark Pool", `Transaction confirmed on Preprod: ${realTxId.slice(0, 12)}...`, "zk");
+      notify("Order Submitted to Dark Pool", `Transaction confirmed on Preprod contract: ${realTxId.slice(0, 14)}...`, "zk");
     } catch (err: any) {
       console.error('[Midnight SDK] Live order submission failed:', err);
       sounds.playError();

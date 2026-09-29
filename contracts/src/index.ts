@@ -19,9 +19,7 @@ export interface Order {
   quoteToken: Uint8Array;
   amountCommitment: Uint8Array;
   priceCommitment: Uint8Array;
-  remainingAmount: bigint;
   status: OrderStatus;
-  escrowAmount: bigint;
 }
 
 export interface DarkPoolContractState {

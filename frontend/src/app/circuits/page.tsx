@@ -5,7 +5,7 @@ import { Cpu, ArrowRight, ShieldCheck, Lock, Key, Database, Play, RefreshCw, Che
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
 import { detectWallet } from '@/lib/midnight';
-import { Contract, OrderSide } from '@/lib/contract';
+import { Contract, OrderSide, DARK_POOL_CONTRACT_ADDRESS } from '@/lib/contract';
 
 interface CircuitNode {
   id: string;
@@ -64,14 +64,15 @@ export default function CircuitsPage() {
       // Step 1: Connect to wallet via DApp Connector API
       const dappConnector = await detectWallet();
 
-      // Step 2: Connect to the Dark Pool contract
-      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
-      const contract = await Contract.connect(dappConnector, contractAddress);
+      // Step 2: Connect to the real deployed Dark Pool contract on Midnight Preprod
+      const contract = await Contract.connect(dappConnector, DARK_POOL_CONTRACT_ADDRESS);
 
       // Step 3: Connect and invoke circuit to prove constraint satisfaction
       const orderId = crypto.getRandomValues(new Uint8Array(32));
-      const baseToken = new TextEncoder().encode('tNIGHT'.padEnd(32, '\0')).slice(0, 32);
-      const quoteToken = new TextEncoder().encode('ZKUSD'.padEnd(32, '\0')).slice(0, 32);
+      const baseToken = new Uint8Array(32);
+      baseToken.set(new TextEncoder().encode('tNIGHT'));
+      const quoteToken = new Uint8Array(32);
+      quoteToken.set(new TextEncoder().encode('ZKUSD'));
       const salt = crypto.getRandomValues(new Uint8Array(32));
 
       await contract.callTx.submitOrder(

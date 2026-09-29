@@ -5,7 +5,7 @@ import { Award, Download, Share2, ShieldCheck, Lock, Sparkles, CheckCircle2, Cop
 import { sounds } from '@/lib/sounds';
 import { useNotification } from '@/context/NotificationContext';
 import { detectWallet } from '@/lib/midnight';
-import { Contract } from '@/lib/contract';
+import { Contract, DARK_POOL_CONTRACT_ADDRESS } from '@/lib/contract';
 
 export default function CertificatePage() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -33,8 +33,7 @@ export default function CertificatePage() {
       const dappConnector = await detectWallet();
 
       // Step 2: Connect to the Dark Pool contract
-      const contractAddress = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
-      const contract = await Contract.connect(dappConnector, contractAddress);
+      const contract = await Contract.connect(dappConnector, DARK_POOL_CONTRACT_ADDRESS);
 
       // Step 3: Deposit solvency verification balance
       const tokenBytes = new TextEncoder().encode('ZKUSD'.padEnd(32, '\0')).slice(0, 32);

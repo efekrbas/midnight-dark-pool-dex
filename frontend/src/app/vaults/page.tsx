@@ -30,8 +30,8 @@ const vaults: Vault[] = [
   },
 ];
 
-// Known vault contract address on Midnight Preprod
-const VAULT_CONTRACT_ADDRESS = '09dbe05fa9123847102938471029384710293847102938471029384710293847';
+// Real contract address on Midnight Preprod
+const VAULT_CONTRACT_ADDRESS = '1fca6b4cec100a425db72d769d1ef19f673de7552b4c9196611797f6b565e7ed';
 
 export default function VaultsPage() {
   const [depositAmounts, setDepositAmounts] = useState<Record<string, string>>({});
