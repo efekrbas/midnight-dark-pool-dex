@@ -27,7 +27,6 @@ export default function LiveTradeFeed() {
     const interval = setInterval(() => {
       index = (index + 1) % LIVE_TRADE_STREAM.length;
       setActiveItem(LIVE_TRADE_STREAM[index]);
-      sounds.playZKTick();
     }, 8000);
 
     return () => clearInterval(interval);

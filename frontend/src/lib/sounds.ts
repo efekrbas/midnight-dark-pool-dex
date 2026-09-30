@@ -1,4 +1,4 @@
-// Web Audio API Synthesizer for Cyberpunk / Dark Pool UI Sounds
+// Web Audio API Synthesizer for Midnight Dark Pool UI Events
 
 class SoundSystem {
   private ctx: AudioContext | null = null;
@@ -6,7 +6,7 @@ class SoundSystem {
   private muteListeners: ((muted: boolean) => void)[] = [];
 
   constructor() {
-    // Sound enabled by default
+    // Sound muted by default
   }
 
   public onMuteChange(callback: (muted: boolean) => void) {
@@ -38,31 +38,9 @@ class SoundSystem {
     return this.isMuted;
   }
 
-  // Futuristic UI click / tap sound
+  // Click handler kept as clean no-op to eliminate intrusive synthetic clicks across UI elements
   public playClick() {
-    if (this.isMuted) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.05);
-
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.05);
-    } catch {
-      // Ignore audio errors
-    }
+    // Intentionally silent for institutional-grade UX
   }
 
   // ZK Proof Generation Tick sound (pulsing beep)

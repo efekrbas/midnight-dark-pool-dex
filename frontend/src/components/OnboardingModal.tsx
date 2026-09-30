@@ -128,7 +128,7 @@ export default function OnboardingModal({ onClose }: { onClose: () => void }) {
 
           {step === 4 && (
             <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-8">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-pink-500/20 text-pink-400 mb-6 mx-auto">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mb-6 mx-auto">
                 <CheckCircle2 size={32} />
               </div>
               <h2 className="text-2xl font-bold text-center mb-4">You&apos;re All Set!</h2>

@@ -126,12 +126,12 @@ export default function TradePage() {
         </div>
 
         {/* Middle Column - Dark Order Book */}
-        <div className={`${cols.orderbook} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-zinc-700/30 transition-all duration-500 shadow-2xl bg-zinc-900/70 backdrop-blur-xl rounded-2xl`}>
-          <div className="p-4 border-b border-white/10 bg-zinc-950/40 flex justify-between items-center">
+        <div className={`${cols.orderbook} bento-card overflow-hidden flex flex-col border border-zinc-850 hover:border-zinc-750 transition-all duration-300 shadow-xl bg-zinc-950/80 backdrop-blur-xl rounded-2xl`}>
+          <div className="p-4 border-b border-zinc-850 bg-zinc-950/60 flex justify-between items-center">
             <div>
               <h3 className="font-bold text-sm text-white tracking-wide">Dark Order Book</h3>
-              <p className="text-[10px] text-zinc-300 mt-0.5 font-mono flex items-center">
-                <Lock className="w-2.5 h-2.5 mr-1 inline" /> Volumes cryptographically blurred
+              <p className="text-[10px] text-zinc-400 mt-0.5 font-mono flex items-center">
+                <Lock className="w-2.5 h-2.5 mr-1 inline text-zinc-500" /> Volumes cryptographically blurred
               </p>
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function TradePage() {
         </div>
 
         {/* Right Column - Order Entry Form */}
-        <div className={`${cols.form} glass-panel overflow-hidden flex flex-col border border-white/10 hover:border-zinc-700/30 transition-all duration-500 shadow-2xl bg-zinc-900/70 backdrop-blur-xl rounded-2xl`}>
+        <div className={`${cols.form} bento-card overflow-hidden flex flex-col border border-zinc-850 hover:border-zinc-750 transition-all duration-300 shadow-xl bg-zinc-950/80 backdrop-blur-xl rounded-2xl`}>
           <OrderEntry />
         </div>
       </div>

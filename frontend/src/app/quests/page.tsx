@@ -42,7 +42,7 @@ export default function QuestsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row items-center justify-between glass-panel p-6 rounded-3xl border border-white/10 shadow-2xl bg-zinc-900/80 backdrop-blur-2xl gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-zinc-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(236,72,153,0.3)] border border-white/20">
+          <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-750 flex items-center justify-center text-zinc-100 shadow-[0_0_25px_rgba(255,255,255,0.05)]">
             <Trophy className="w-7 h-7" />
           </div>
           <div>
@@ -58,7 +58,7 @@ export default function QuestsPage() {
         <div className="flex items-center gap-6 font-mono text-xs">
           <div className="text-right">
             <span className="text-zinc-400 block">Total Earned XP</span>
-            <span className="text-xl font-black text-pink-400 flex items-center gap-1">
+            <span className="text-xl font-black text-emerald-400 flex items-center gap-1">
               <Star className="w-4 h-4 fill-current" /> {totalXP} XP
             </span>
           </div>
@@ -71,7 +71,7 @@ export default function QuestsPage() {
           <div
             key={quest.id}
             className={`glass-panel p-6 rounded-3xl border ${
-              quest.completed ? 'border-pink-500/40 bg-zinc-900/80' : 'border-white/10 bg-zinc-900/50'
+              quest.completed ? 'border-emerald-500/30 bg-zinc-900/80 shadow-[0_0_20px_rgba(16,185,129,0.06)]' : 'border-white/10 bg-zinc-900/50'
             } space-y-4 transition-all hover:-translate-y-1`}
           >
             <div className="flex items-start justify-between">
@@ -80,7 +80,7 @@ export default function QuestsPage() {
                 <h3 className="font-black text-lg text-white">{quest.title}</h3>
                 <p className="text-xs text-zinc-400 font-mono mt-1">{quest.description}</p>
               </div>
-              <span className="px-3 py-1 rounded-xl bg-pink-500/20 text-pink-300 text-xs font-mono font-bold border border-pink-500/30">
+              <span className="px-3 py-1 rounded-xl bg-emerald-500/10 text-emerald-300 text-xs font-mono font-bold border border-emerald-500/30">
                 +{quest.xp} XP
               </span>
             </div>
@@ -93,7 +93,7 @@ export default function QuestsPage() {
               </div>
               <div className="w-full h-2 bg-zinc-950 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-pink-500 to-zinc-500 rounded-full transition-all duration-300"
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-300"
                   style={{ width: `${(quest.progress / quest.total) * 100}%` }}
                 />
               </div>

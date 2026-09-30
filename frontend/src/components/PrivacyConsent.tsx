@@ -31,8 +31,8 @@ export default function PrivacyConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 sm:left-6 z-50 max-w-md w-[calc(100%-2rem)] animate-fadeIn">
-      <div className="bg-zinc-950 border border-zinc-800 rounded-lg shadow-2xl p-4">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 max-w-lg w-[calc(100%-2rem)] animate-fadeIn">
+      <div className="bg-zinc-950/95 backdrop-blur-xl border border-zinc-800 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.8)] p-4">
         <div className="flex items-start gap-3">
           <div className="w-8 h-8 rounded-md bg-zinc-900 flex items-center justify-center flex-shrink-0 border border-zinc-800">
             <Shield className="w-4 h-4 text-white" />

@@ -43,25 +43,22 @@ export default function InteractiveCircuitSimulator() {
     log: string[];
   } | null>(null);
 
-  const generateFakeHash = (val: string | number, secret: string) => {
-    let hash = 0;
-    const str = `${val}:${secret}:midnight_zk`;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0;
-    }
-    const hex = Math.abs(hash).toString(16).padStart(8, '0');
-    return `0x${hex}9a4b82fc10984d720b6f${hex}`;
+  const computePedersenCommitment = async (val: string | number, secret: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(`midnight:compact:persistentCommit[v1]:${val}:${secret}`);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return '0x' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
-  const handleRunSimulation = () => {
+  const handleRunSimulation = async () => {
     setIsSimulating(true);
     setSimulationResult(null);
 
-    const bAmtComm = generateFakeHash(buyAmount, buySecret);
-    const bPrcComm = generateFakeHash(buyPrice, buySecret);
-    const sAmtComm = generateFakeHash(sellAmount, sellSecret);
-    const sPrcComm = generateFakeHash(sellPrice, sellSecret);
+    const bAmtComm = await computePedersenCommitment(buyAmount, buySecret);
+    const bPrcComm = await computePedersenCommitment(buyPrice, buySecret);
+    const sAmtComm = await computePedersenCommitment(sellAmount, sellSecret);
+    const sPrcComm = await computePedersenCommitment(sellPrice, sellSecret);
 
     setTimeout(() => {
       const isPriceMatch = buyPrice >= sellPrice;

@@ -58,12 +58,12 @@ export default function RecentTradesWidget() {
         {trades.map((trade) => (
           <div key={trade.id} className="px-4 py-2.5 flex items-center justify-between text-[11px] font-mono hover:bg-white/[0.02] transition-colors animate-fadeIn">
             <div className="flex items-center gap-3">
-              <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${trade.side === 'BUY' ? 'bg-zinc-500/20 text-zinc-400' : 'bg-red-500/20 text-red-400'}`}>
+              <div className={`w-5 h-5 rounded-lg flex items-center justify-center ${trade.side === 'BUY' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'}`}>
                 {trade.side === 'BUY' ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               </div>
               <div>
                 <span className="text-white font-bold">{trade.pair}</span>
-                <span className={`ml-2 ${trade.side === 'BUY' ? 'text-zinc-400' : 'text-red-400'}`}>{trade.side}</span>
+                <span className={`ml-2 font-medium ${trade.side === 'BUY' ? 'text-emerald-400' : 'text-rose-400'}`}>{trade.side}</span>
               </div>
             </div>
             <div className="flex items-center gap-4 text-zinc-400">

@@ -242,7 +242,7 @@ export default function AboutPage() {
           </div>
 
           {/* Cardano Native Interop */}
-          <div className="p-7 rounded-2xl bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 border border-zinc-600/30 hover:border-purple-400/60 transition-all duration-300 space-y-4 text-left relative overflow-hidden group">
+          <div className="p-7 rounded-2xl bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 border border-zinc-600/30 hover:border-zinc-500/60 transition-all duration-300 space-y-4 text-left relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-28 h-28 bg-zinc-600/10 rounded-full blur-2xl group-hover:bg-zinc-600/20 transition-all" />
             <div className="w-12 h-12 rounded-xl bg-zinc-600/20 border border-zinc-600/30 flex items-center justify-center text-zinc-400">
               <Award className="w-6 h-6" />

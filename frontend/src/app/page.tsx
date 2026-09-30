@@ -20,7 +20,6 @@ import {
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import MEVSimulator from '../components/MEVSimulator';
-import ParticleCanvas from '../components/ParticleCanvas';
 import { useTranslation } from '@/context/I18nContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
