@@ -84,22 +84,86 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Podium Top 3 */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {traders.slice(0, 3).map((t, i) => {
-          const heights = ['h-40', 'h-32', 'h-28'];
-          const order = [1, 0, 2];
-          const trader = traders[order[i]];
-          const gradients = [
-            'from-zinc-400/20 to-amber-600/10 border-zinc-600/40',
-            'from-zinc-400/20 to-zinc-500/10 border-zinc-400/40',
-            'from-amber-700/20 to-amber-800/10 border-amber-700/40',
-          ];
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-end pt-4 pb-2">
+        {[
+          {
+            trader: traders[1], // Rank 2
+            place: '2nd Place',
+            medal: '🥈',
+            orderClass: 'order-2 sm:order-1',
+            minHeight: 'min-h-[250px]',
+            border: 'border-zinc-500/40 hover:border-zinc-400/60',
+            glow: 'shadow-[0_4px_24px_rgba(161,161,170,0.08)]',
+            gradient: 'from-zinc-400/10 via-zinc-900/85 to-zinc-950',
+            pillStyle: 'bg-zinc-800/90 text-zinc-300 border-zinc-600/40',
+            badgeBg: 'bg-zinc-800/60 border-zinc-700/50',
+            rankColor: 'text-zinc-200',
+          },
+          {
+            trader: traders[0], // Rank 1
+            place: '1st Place',
+            medal: '🥇',
+            orderClass: 'order-1 sm:order-2',
+            minHeight: 'min-h-[295px]',
+            border: 'border-amber-500/50 hover:border-amber-400/80 ring-1 ring-amber-500/25',
+            glow: 'shadow-[0_8px_32px_rgba(245,158,11,0.18)]',
+            gradient: 'from-amber-500/15 via-zinc-900/90 to-zinc-950',
+            pillStyle: 'bg-amber-500/20 text-amber-300 border-amber-500/50 font-black',
+            badgeBg: 'bg-amber-500/15 border-amber-500/30 ring-2 ring-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]',
+            rankColor: 'text-amber-300',
+          },
+          {
+            trader: traders[2], // Rank 3
+            place: '3rd Place',
+            medal: '🥉',
+            orderClass: 'order-3 sm:order-3',
+            minHeight: 'min-h-[235px]',
+            border: 'border-amber-800/40 hover:border-amber-700/60',
+            glow: 'shadow-[0_4px_24px_rgba(180,83,9,0.08)]',
+            gradient: 'from-amber-900/15 via-zinc-900/85 to-zinc-950',
+            pillStyle: 'bg-amber-950/60 text-amber-500 border-amber-800/40',
+            badgeBg: 'bg-amber-900/20 border-amber-800/40',
+            rankColor: 'text-amber-500',
+          },
+        ].map((podium) => {
+          const t = podium.trader;
+          const creatureEmoji = t.badge.split(' ')[0];
           return (
-            <div key={trader.rank} className={`glass-panel rounded-2xl border bg-gradient-to-b ${gradients[i]} p-5 flex flex-col items-center justify-end ${heights[i]} transition-all hover:-translate-y-1`}>
-              <span className="text-2xl mb-1">{trader.badge.split(' ')[0]}</span>
-              <span className="text-lg font-black text-white">#{trader.rank}</span>
-              <span className="text-xs font-mono text-zinc-300 mt-1">{showWallets ? trader.wallet : 'mn1••••••'}</span>
-              <span className="text-xs font-bold text-zinc-400 mt-1">{trader.pnl}</span>
+            <div
+              key={t.rank}
+              className={`glass-panel rounded-3xl border bg-gradient-to-b ${podium.gradient} ${podium.border} ${podium.glow} ${podium.minHeight} ${podium.orderClass} p-5 flex flex-col items-center justify-between transition-all duration-300 hover:-translate-y-1.5 overflow-hidden relative group`}
+            >
+              {/* Top Podium Place Pill */}
+              <div className="w-full flex items-center justify-between">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold border flex items-center gap-1 ${podium.pillStyle}`}>
+                  <span>{podium.medal}</span>
+                  <span>{podium.place}</span>
+                </span>
+                <span className="text-[11px] font-mono text-zinc-400 font-semibold">{t.volume}</span>
+              </div>
+
+              {/* Center Creature Avatar & Rank */}
+              <div className="flex flex-col items-center my-3">
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl mb-2.5 border transition-transform duration-300 group-hover:scale-110 ${podium.badgeBg}`}>
+                  <span>{creatureEmoji}</span>
+                </div>
+                <div className={`text-2xl font-black tracking-tight ${podium.rankColor}`}>
+                  #{t.rank}
+                </div>
+                <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-400 mt-1">
+                  <Shield className="w-3 h-3 text-zinc-500" />
+                  <span>{showWallets ? t.wallet : 'mn1••••••'}</span>
+                </div>
+              </div>
+
+              {/* Bottom PnL & Trade Count */}
+              <div className="w-full pt-3 border-t border-white/5 flex items-center justify-between text-xs">
+                <span className="font-mono text-zinc-400 text-[11px]">{t.trades.toLocaleString()} trades</span>
+                <span className="font-mono font-bold text-emerald-400 flex items-center gap-1">
+                  <span>{t.pnl}</span>
+                  <span className="text-[10px] text-emerald-500/80 font-normal">(+{t.pnlPercent}%)</span>
+                </span>
+              </div>
             </div>
           );
         })}
