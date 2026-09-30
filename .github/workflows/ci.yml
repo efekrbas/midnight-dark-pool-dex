@@ -52,21 +52,40 @@ jobs:
       run: npm install --legacy-peer-deps
 
     - name: Install Midnight Compact Compiler
-      run: curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+      env:
+        COMPACT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "$HOME/.compact/bin" >> $GITHUB_PATH
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
     - name: Compile Compact Contract
       working-directory: ./contracts
+      env:
+        COMPACT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        export PATH="$HOME/.compact/bin:$PATH"
-        compact update
-        mkdir -p src/managed/darkpool
-        compact compile --skip-zk src/darkpool.compact src/managed/darkpool
+        export PATH="$HOME/.local/bin:$HOME/.compact/bin:$HOME/.cargo/bin:$PATH"
+        if command -v compact &> /dev/null; then
+          echo "Compact CLI found at: $(which compact)"
+          compact --version || true
+          compact update || true
+          mkdir -p src/managed/darkpool
+          compact compile --skip-zk src/darkpool.compact src/managed/darkpool
+        else
+          echo "Error: compact CLI not found in PATH"
+          find $HOME -name "compact" -type f 2>/dev/null || true
+          exit 1
+        fi
 
     - name: Upload Compiled Contract Bindings
       uses: actions/upload-artifact@v4
       with:
         name: midnight-compact-bindings
         path: contracts/src/managed/darkpool/
+        if-no-files-found: ignore
 
     - name: Run Contract Compact Runtime & Preprod E2E Tests
       working-directory: ./contracts

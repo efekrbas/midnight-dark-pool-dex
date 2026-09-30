@@ -112,7 +112,7 @@ export circuit submitOrder(
 
     // Verify trader holds sufficient deposited balance for escrow
     const escrowRequired: Uint<128> = (side == OrderSide.BUY)
-        ? (((amount as Field) * (price as Field)) as Uint<128>)
+        ? (((amount as Uint<128>) * (price as Uint<128>)) as Uint<128>)
         : (amount as Uint<128>);
     const escrowToken: Bytes<32> = (side == OrderSide.BUY) ? quoteToken : baseToken;
 
@@ -162,7 +162,7 @@ export circuit cancelOrder(
 
     // Refund escrowed tokens back to trader's internal balance
     const escrowRefund: Uint<128> = (order.side == OrderSide.BUY)
-        ? (((amount as Field) * (price as Field)) as Uint<128>)
+        ? (((amount as Uint<128>) * (price as Uint<128>)) as Uint<128>)
         : (amount as Uint<128>);
     const escrowToken: Bytes<32> = (order.side == OrderSide.BUY) ? order.quoteToken : order.baseToken;
     const escrowKey = balanceKey(order.trader, escrowToken);
@@ -235,14 +235,14 @@ export circuit matchOrders(
     balances.insert(disBuyerBaseKey, disclose((buyerBaseBal + (fillAmount as Uint<128>)) as Uint<128>));
 
     // 2. Seller receives (fillAmount * matchPrice) of quoteToken (from buyer's debited escrow)
-    const quoteProceeds: Uint<128> = ((fillAmount as Field) * (matchPrice as Field)) as Uint<128>;
+    const quoteProceeds: Uint<128> = (((fillAmount as Uint<128>) * (matchPrice as Uint<128>)) as Uint<128>);
     const sellerQuoteKey = balanceKey(sellOrder.trader, sellOrder.quoteToken);
     const disSellerQuoteKey = disclose(sellerQuoteKey);
     const sellerQuoteBal = balances.member(disSellerQuoteKey) ? balances.lookup(disSellerQuoteKey) : (0 as Uint<128>);
     balances.insert(disSellerQuoteKey, disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
 
     // 3. Refund excess quote escrow to buyer (price improvement surplus + any unfilled portion)
-    const buyEscrowTotal: Uint<128> = ((buyAmount as Field) * (buyPrice as Field)) as Uint<128>;
+    const buyEscrowTotal: Uint<128> = (((buyAmount as Uint<128>) * (buyPrice as Uint<128>)) as Uint<128>);
     const buyerRefund: Uint<128> = (buyEscrowTotal - quoteProceeds) as Uint<128>;
     const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
     const disBuyerQuoteKey = disclose(buyerQuoteKey);
