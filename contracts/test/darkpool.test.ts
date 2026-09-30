@@ -104,6 +104,7 @@ class DarkPoolCompactRuntime {
     if (available < escrowRequired) {
       throw new Error("Insufficient balance to escrow order");
     }
+    this.balances.set(escrowKeyHex, available - escrowRequired);
 
     // Cryptographic commitments via native compact-runtime
     const amtComm = runtime.persistentCommit(u64Type, amount, salt);
@@ -157,6 +158,13 @@ class DarkPoolCompactRuntime {
     if (bytesToHex(prcComm) !== bytesToHex(order.priceCommitment)) {
       throw new Error("Price commitment mismatch");
     }
+
+    // Refund escrowed tokens back to trader's internal balance
+    const escrowRefund = order.side === OrderSide.BUY ? amount * price : amount;
+    const escrowToken = order.side === OrderSide.BUY ? order.quoteToken : order.baseToken;
+    const escrowKeyHex = bytesToHex(this.balanceKey(order.trader, escrowToken));
+    const current = this.balances.get(escrowKeyHex) ?? 0n;
+    this.balances.set(escrowKeyHex, current + escrowRefund);
 
     order.status = OrderStatus.CANCELLED;
     this.orders.set(orderIdHex, order);
@@ -233,17 +241,32 @@ class DarkPoolCompactRuntime {
     if (fillAmount > buyAmount) throw new Error("fillAmount exceeds buy order amount");
     if (fillAmount > sellAmount) throw new Error("fillAmount exceeds sell order amount");
 
-    // Atomic Asset Settlement
-    // 1. Buyer receives fillAmount baseToken
+    // Atomic Asset Settlement settled from escrow
+    // 1. Buyer receives fillAmount baseToken (from seller's debited escrow)
     const buyerBaseKey = bytesToHex(this.balanceKey(buyOrder.trader, buyOrder.baseToken));
     const buyerBaseBal = this.balances.get(buyerBaseKey) ?? 0n;
     this.balances.set(buyerBaseKey, buyerBaseBal + fillAmount);
 
-    // 2. Seller receives fillAmount * matchPrice quoteToken
+    // 2. Seller receives fillAmount * matchPrice quoteToken (from buyer's debited escrow)
     const quoteProceeds = fillAmount * matchPrice;
     const sellerQuoteKey = bytesToHex(this.balanceKey(sellOrder.trader, sellOrder.quoteToken));
     const sellerQuoteBal = this.balances.get(sellerQuoteKey) ?? 0n;
     this.balances.set(sellerQuoteKey, sellerQuoteBal + quoteProceeds);
+
+    // 3. Excess quote escrow refund to buyer (price improvement + unfilled portion)
+    const buyEscrowTotal = buyAmount * buyPrice;
+    const buyerRefund = buyEscrowTotal - quoteProceeds;
+    const buyerQuoteKey = bytesToHex(this.balanceKey(buyOrder.trader, buyOrder.quoteToken));
+    const buyerQuoteBal = this.balances.get(buyerQuoteKey) ?? 0n;
+    this.balances.set(buyerQuoteKey, buyerQuoteBal + buyerRefund);
+
+    // 4. Excess base escrow refund to seller (if fillAmount < sellAmount)
+    if (sellAmount > fillAmount) {
+      const sellerBaseRefund = sellAmount - fillAmount;
+      const sellerBaseKey = bytesToHex(this.balanceKey(sellOrder.trader, sellOrder.baseToken));
+      const sellerBaseBal = this.balances.get(sellerBaseKey) ?? 0n;
+      this.balances.set(sellerBaseKey, sellerBaseBal + sellerBaseRefund);
+    }
 
     // Update statuses on dark book
     buyOrder.status = OrderStatus.FILLED;
@@ -347,6 +370,11 @@ describe('Midnight Compact Dark Pool Contract Tests (@midnight-ntwrk/compact-run
       expect(order!.status).toBe(OrderStatus.OPEN);
       expect(order!.side).toBe(OrderSide.BUY);
 
+      // Verify that escrow was debited from Alice's internal balance:
+      // Initial deposit: 2000 quoteToken. Escrow required: 100 * 15 = 1500. Remaining: 500.
+      const aliceTrader = pool.traderAccountOf(aliceSk);
+      expect(pool.getBalance(aliceTrader, quoteToken)).toBe(500n);
+
       // Verify dark book privacy guarantees:
       // The order on the ledger only contains commitments — NO plain amount or price!
       expect((order as any).remainingAmount).toBeUndefined();
@@ -389,6 +417,10 @@ describe('Midnight Compact Dark Pool Contract Tests (@midnight-ntwrk/compact-run
 
       const order = pool.orders.get(bytesToHex(orderId));
       expect(order!.status).toBe(OrderStatus.CANCELLED);
+
+      // Verify that escrow was fully refunded back to Alice's balance (500 + 500 = 1000)
+      const aliceTrader = pool.traderAccountOf(aliceSk);
+      expect(pool.getBalance(aliceTrader, quoteToken)).toBe(1000n);
     });
 
     it('should reject cancellation from unauthorized non-owner caller', () => {
@@ -460,11 +492,24 @@ describe('Midnight Compact Dark Pool Contract Tests (@midnight-ntwrk/compact-run
       const aliceTrader = pool.traderAccountOf(aliceSk);
       expect(pool.getBalance(aliceTrader, baseToken)).toBe(100n);
 
-      // 2. Seller (Bob) received 100 * 13 = 1300 quoteToken
+      // 2. Buyer (Alice) received price improvement refund: (15 - 13) * 100 = 200 quoteToken.
+      // Deposited 2000, debited 1500 escrow (leaving 500), refunded 200 surplus => 700 quoteToken.
+      expect(pool.getBalance(aliceTrader, quoteToken)).toBe(700n);
+
+      // 3. Seller (Bob) received 100 * 13 = 1300 quoteToken from Alice's debited escrow
       const bobTrader = pool.traderAccountOf(bobSk);
       expect(pool.getBalance(bobTrader, quoteToken)).toBe(1300n);
 
-      // 3. Dark book orders transitioned to FILLED
+      // 4. Seller (Bob) baseToken balance was debited 100 escrow, leaving 400 baseToken
+      expect(pool.getBalance(bobTrader, baseToken)).toBe(400n);
+
+      // 5. Total token conservation invariant:
+      // Total quote tokens in system: Alice (700) + Bob (1300) = 2000 (equal to initial deposit)
+      // Total base tokens in system: Alice (100) + Bob (400) = 500 (equal to initial deposit)
+      expect(pool.getBalance(aliceTrader, quoteToken) + pool.getBalance(bobTrader, quoteToken)).toBe(2000n);
+      expect(pool.getBalance(aliceTrader, baseToken) + pool.getBalance(bobTrader, baseToken)).toBe(500n);
+
+      // 6. Dark book orders transitioned to FILLED
       expect(pool.orders.get(bytesToHex(buyOrderId))!.status).toBe(OrderStatus.FILLED);
       expect(pool.orders.get(bytesToHex(sellOrderId))!.status).toBe(OrderStatus.FILLED);
     });

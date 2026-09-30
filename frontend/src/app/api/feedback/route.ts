@@ -65,7 +65,7 @@ export async function GET() {
     storageTarget: "Google Sheets",
     sheetUrl: GOOGLE_SHEET_URL,
     formUrl: GOOGLE_FORM_URL,
-    activeTesters: 75,
+    liveSync: true,
     averageRating: "4.91 / 5.00"
   });
 }

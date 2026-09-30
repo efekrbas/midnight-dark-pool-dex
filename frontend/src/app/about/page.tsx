@@ -385,7 +385,7 @@ export default function AboutPage() {
           <h3 className="text-2xl font-bold text-white">Built for the Midnight Ecosystem</h3>
           <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             Midnight Dark Pool DEX originated during the <strong>Midnight Supermoon Hackathon</strong> and has grown into an active testnet deployment with 
-            <strong> 75+ active community testers</strong>, verified on-chain Preprod transactions, and continuous integration pipelines.
+            <strong> active community testers</strong>, verified on-chain Preprod transactions, and continuous integration pipelines.
           </p>
           <div className="pt-2 flex flex-col gap-2 font-mono text-xs text-zinc-400">
             <div className="flex items-center justify-between py-1.5 border-b border-white/5">
@@ -412,7 +412,7 @@ export default function AboutPage() {
               <span className="px-2 py-0.5 rounded bg-zinc-500/20 text-zinc-300 text-[10px] font-bold uppercase mt-0.5">Completed</span>
               <div>
                 <p className="font-bold text-white">Phase 1: Compact Circuit Architecture & Preprod Deployment</p>
-                <p className="text-zinc-400 text-[11px] mt-0.5">Deployed darkpool.compact, client-side WASM prover, and blurred liquidity heatmap with 75+ verified testers.</p>
+                <p className="text-zinc-400 text-[11px] mt-0.5">Deployed darkpool.compact, client-side WASM prover, and blurred liquidity heatmap on Midnight Preprod.</p>
               </div>
             </div>
 

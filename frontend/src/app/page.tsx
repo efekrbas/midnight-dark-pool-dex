@@ -128,8 +128,8 @@ export default function LandingPage() {
               <p className="text-xl font-bold text-white mt-0.5">~1.2s WASM</p>
             </div>
             <div className="p-4 bg-zinc-950 text-left">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Pilot Testers</p>
-              <p className="text-xl font-bold text-zinc-400 mt-0.5">75 Verified</p>
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Testnet Status</p>
+              <p className="text-xl font-bold text-zinc-400 mt-0.5">Preprod Active</p>
             </div>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-base font-semibold text-white">Live Google Sheets Feedback Telemetry</h3>
                 </div>
-                <Badge variant="success">75 Verified Testers</Badge>
+                <Badge variant="success">Community Feedback</Badge>
               </div>
               <p className="text-xs text-zinc-400 leading-relaxed max-w-xl">
                 In compliance with evaluation guidelines, all tester reviews, ratings, and feature requests are maintained live in Google Sheets for transparent institutional audit.

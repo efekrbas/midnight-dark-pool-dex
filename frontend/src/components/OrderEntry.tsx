@@ -2,10 +2,12 @@
 
 import React, { useState, useRef } from 'react';
 import { useNotification } from '../context/NotificationContext';
-import { Loader2, Fingerprint, ShieldCheck, Cpu, Sparkles, Clock, Layers } from 'lucide-react';
+import { Loader2, Fingerprint, ShieldCheck, Cpu, Sparkles, Clock, Layers, Eye } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { sounds } from '@/lib/sounds';
+import { detectWallet } from '@/lib/midnight';
+import { Contract, OrderSide } from '@/lib/contract';
 import ZKProofVisualizerModal from './ZKProofVisualizerModal';
 import PrivacyScoreWidget from './PrivacyScoreWidget';
 
@@ -14,6 +16,7 @@ export default function OrderEntry() {
   const [orderType, setOrderType] = useState<'LIMIT' | 'TWAP' | 'ICEBERG'>('LIMIT');
   const [amount, setAmount] = useState('');
   const [price, setPrice] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const { notify } = useNotification();
   const formRef = useRef<HTMLFormElement>(null);
@@ -29,10 +32,10 @@ export default function OrderEntry() {
     });
   }, { scope: formRef });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     sounds.playClick();
-    if (!amount || !price) {
+    if (!amount || !price || parseFloat(amount) <= 0 || parseFloat(price) <= 0) {
       sounds.playError();
       notify("Invalid Order", "Please enter valid amount and price thresholds.", "error");
       
@@ -45,8 +48,37 @@ export default function OrderEntry() {
       return;
     }
 
-    // Open step-by-step interactive ZK Proof Visualizer modal!
-    setShowVisualizer(true);
+    setIsSubmitting(true);
+    try {
+      // Step 1: Detect & connect Midnight wallet
+      const wallet = await detectWallet();
+
+      // Step 2: Format order amount & price
+      const amountBigInt = BigInt(Math.max(1, Math.floor(parseFloat(amount))));
+      const priceBigInt = BigInt(Math.max(1, Math.floor(parseFloat(price) * 1000)));
+
+      // Step 3: Broadcast through real callTx.submitOrder using persistent deposit secret
+      const result = await Contract.submitOrderToDarkPool(wallet, {
+        side: side === 'BUY' ? OrderSide.BUY : OrderSide.SELL,
+        amount: amountBigInt,
+        price: priceBigInt,
+      });
+
+      sounds.playZKSuccess();
+      notify(
+        `Shielded ${side} Order Submitted`,
+        `Confirmed on Preprod contract: ${result.txId.slice(0, 16)}... (Order ID: ${result.orderId.slice(0, 10)}...)`,
+        "zk"
+      );
+      setAmount('');
+      setPrice('');
+    } catch (err: any) {
+      console.error('[Trade Form] Order submission error:', err);
+      sounds.playError();
+      notify("Order Submission Failed", err?.message || "Could not submit order to Dark Pool.", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -191,19 +223,39 @@ export default function OrderEntry() {
             <button 
               ref={buttonRef}
               type="submit"
-              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              disabled={isSubmitting}
+              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                 side === 'BUY' 
                   ? 'bg-white text-black hover:bg-zinc-200 shadow-sm' 
                   : 'bg-rose-600 text-white hover:bg-rose-500 shadow-sm'
               }`}
             >
-              <Fingerprint className="w-4 h-4 opacity-75" />
-              <span className="text-xs font-semibold">Submit Shielded {side} Order</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-xs font-semibold">Submitting via callTx...</span>
+                </>
+              ) : (
+                <>
+                  <Fingerprint className="w-4 h-4 opacity-75" />
+                  <span className="text-xs font-semibold">Submit Shielded {side} Order</span>
+                </>
+              )}
             </button>
             
-            <div className="flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 mt-2 font-mono">
-              <ShieldCheck className="w-3 h-3 text-zinc-400" /> 
-              <span>Client-side proof generation on Midnight Preprod</span>
+            <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-2 font-mono">
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-zinc-400" /> 
+                Client-side proof on Preprod
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowVisualizer(true)}
+                className="text-zinc-400 hover:text-white underline cursor-pointer flex items-center gap-1"
+              >
+                <Eye className="w-3 h-3" />
+                Inspect Circuit
+              </button>
             </div>
           </div>
         </form>

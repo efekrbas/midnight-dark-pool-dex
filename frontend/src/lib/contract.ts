@@ -275,6 +275,30 @@ export class Contract {
   }
 
   /**
+   * Helper to retrieve or initialize persistent trader secret.
+   * Ensures the exact same callerSecret used for deposits is reused for all orders and cancellations.
+   */
+  async getOrCreateTraderSecret(): Promise<Uint8Array> {
+    const existing = await this.providers.privateStateProvider.get('darkpoolPrivateState');
+    if (existing?.secretKey) {
+      if (existing.secretKey instanceof Uint8Array) {
+        return existing.secretKey;
+      }
+      return new Uint8Array(Object.values(existing.secretKey));
+    }
+    const storedSecret = await this.providers.privateStateProvider.get('traderSecretKey');
+    if (storedSecret) {
+      if (storedSecret instanceof Uint8Array) {
+        return storedSecret;
+      }
+      return new Uint8Array(Object.values(storedSecret));
+    }
+    const freshSecret = crypto.getRandomValues(new Uint8Array(32));
+    await this.providers.privateStateProvider.set('traderSecretKey', Array.from(freshSecret));
+    return freshSecret;
+  }
+
+  /**
    * High-level entry point to submit a shielded order from the UI trade form.
    * Directly sets up the private state witness context and broadcasts to Midnight Preprod.
    */
@@ -298,6 +322,7 @@ export class Contract {
     const quoteToken = new Uint8Array(32);
     quoteToken.set(new TextEncoder().encode(params.quoteToken ?? 'ZKUSD'));
 
+    // Submit strictly via real callTx.submitOrder — fails visibly if binding missing or transaction fails
     const txResult = await contract.callTx.submitOrder(
       orderId,
       baseToken,
@@ -314,7 +339,11 @@ export class Contract {
 
     const txId = typeof txResult === 'string'
       ? txResult
-      : (txResult as any)?.txId || (txResult as any)?.txHash || (txResult as any)?.transactionId || 'tx_preprod_submitted';
+      : (txResult as any)?.txId || (txResult as any)?.txHash || (txResult as any)?.transactionId;
+
+    if (!txId) {
+      throw new Error('Transaction submission failed on Midnight Preprod: empty transaction identifier returned.');
+    }
 
     return {
       txId,
@@ -331,27 +360,31 @@ export class Contract {
   get callTx() {
     return {
       deposit: async (token: Uint8Array, amount: bigint) => {
-        if (this.midnightContract?.callTx?.deposit) {
-          return await this.midnightContract.callTx.deposit(token, amount);
-        }
-        return await this.providers.midnightProvider.submitTx({
-          contractAddress: this.contractAddress,
-          circuit: 'deposit',
-          args: [token, amount],
-          network: 'preprod',
+        const secretKey = await this.getOrCreateTraderSecret();
+        const existing = (await this.providers.privateStateProvider.get('darkpoolPrivateState')) || {};
+        await this.providers.privateStateProvider.set('darkpoolPrivateState', {
+          ...existing,
+          secretKey: Array.from(secretKey),
         });
+
+        if (!this.midnightContract?.callTx?.deposit) {
+          throw new Error('Deployed contract binding callTx.deposit is missing. Ensure the contract is deployed on Preprod.');
+        }
+        return await this.midnightContract.callTx.deposit(token, amount);
       },
 
-      withdraw: async (token: Uint8Array, amount: bigint) => {
-        if (this.midnightContract?.callTx?.withdraw) {
-          return await this.midnightContract.callTx.withdraw(token, amount);
-        }
-        return await this.providers.midnightProvider.submitTx({
-          contractAddress: this.contractAddress,
-          circuit: 'withdraw',
-          args: [token, amount],
-          network: 'preprod',
+      withdraw: async (token: Uint8Array, amount: bigint, recipient?: any) => {
+        const secretKey = await this.getOrCreateTraderSecret();
+        const existing = (await this.providers.privateStateProvider.get('darkpoolPrivateState')) || {};
+        await this.providers.privateStateProvider.set('darkpoolPrivateState', {
+          ...existing,
+          secretKey: Array.from(secretKey),
         });
+
+        if (!this.midnightContract?.callTx?.withdraw) {
+          throw new Error('Deployed contract binding callTx.withdraw is missing. Ensure the contract is deployed on Preprod.');
+        }
+        return await this.midnightContract.callTx.withdraw(token, amount, recipient);
       },
 
       submitOrder: async (
@@ -364,30 +397,27 @@ export class Contract {
         salt?: Uint8Array
       ) => {
         // Enforce witness isolation: store private parameters in local encrypted storage
-        if (amount !== undefined && price !== undefined) {
-          await this.providers.privateStateProvider.set('darkpoolPrivateState', {
-            secretKey: crypto.getRandomValues(new Uint8Array(32)),
-            orderAmount: amount,
-            orderPrice: price,
-            orderSalt: salt ?? crypto.getRandomValues(new Uint8Array(32)),
-          });
-        }
-
-        if (this.midnightContract?.callTx?.submitOrder) {
-          return await this.midnightContract.callTx.submitOrder(
-            orderId,
-            baseToken,
-            quoteToken,
-            side
-          );
-        }
-
-        return await this.providers.midnightProvider.submitTx({
-          contractAddress: this.contractAddress,
-          circuit: 'submitOrder',
-          args: [orderId, baseToken, quoteToken, side],
-          network: 'preprod',
+        // Re-use the SAME caller secret that deposited!
+        const secretKey = await this.getOrCreateTraderSecret();
+        const existing = (await this.providers.privateStateProvider.get('darkpoolPrivateState')) || {};
+        await this.providers.privateStateProvider.set('darkpoolPrivateState', {
+          ...existing,
+          secretKey: Array.from(secretKey),
+          ...(amount !== undefined ? { orderAmount: amount.toString() } : {}),
+          ...(price !== undefined ? { orderPrice: price.toString() } : {}),
+          ...(salt !== undefined ? { orderSalt: Array.from(salt) } : {}),
         });
+
+        if (!this.midnightContract?.callTx?.submitOrder) {
+          throw new Error('Deployed contract binding callTx.submitOrder is missing. Ensure the contract is deployed on Preprod.');
+        }
+
+        return await this.midnightContract.callTx.submitOrder(
+          orderId,
+          baseToken,
+          quoteToken,
+          side
+        );
       },
 
       cancelOrder: async (
@@ -396,25 +426,21 @@ export class Contract {
         price?: bigint,
         salt?: Uint8Array
       ) => {
-        if (amount !== undefined && price !== undefined) {
-          await this.providers.privateStateProvider.set('darkpoolPrivateState', {
-            secretKey: crypto.getRandomValues(new Uint8Array(32)),
-            orderAmount: amount,
-            orderPrice: price,
-            orderSalt: salt ?? crypto.getRandomValues(new Uint8Array(32)),
-          });
-        }
-
-        if (this.midnightContract?.callTx?.cancelOrder) {
-          return await this.midnightContract.callTx.cancelOrder(orderId);
-        }
-
-        return await this.providers.midnightProvider.submitTx({
-          contractAddress: this.contractAddress,
-          circuit: 'cancelOrder',
-          args: [orderId],
-          network: 'preprod',
+        const secretKey = await this.getOrCreateTraderSecret();
+        const existing = (await this.providers.privateStateProvider.get('darkpoolPrivateState')) || {};
+        await this.providers.privateStateProvider.set('darkpoolPrivateState', {
+          ...existing,
+          secretKey: Array.from(secretKey),
+          ...(amount !== undefined ? { orderAmount: amount.toString() } : {}),
+          ...(price !== undefined ? { orderPrice: price.toString() } : {}),
+          ...(salt !== undefined ? { orderSalt: Array.from(salt) } : {}),
         });
+
+        if (!this.midnightContract?.callTx?.cancelOrder) {
+          throw new Error('Deployed contract binding callTx.cancelOrder is missing. Ensure the contract is deployed on Preprod.');
+        }
+
+        return await this.midnightContract.callTx.cancelOrder(orderId);
       },
 
       matchOrders: async (
@@ -432,32 +458,28 @@ export class Contract {
         }
       ) => {
         if (matchingWitnesses) {
+          const secretKey = await this.getOrCreateTraderSecret();
           await this.providers.privateStateProvider.set('darkpoolPrivateState', {
-            secretKey: crypto.getRandomValues(new Uint8Array(32)),
-            matchBuyAmount: matchingWitnesses.buyAmount,
-            matchBuyPrice: matchingWitnesses.buyPrice,
-            matchBuySalt: matchingWitnesses.buySalt,
-            matchSellAmount: matchingWitnesses.sellAmount,
-            matchSellPrice: matchingWitnesses.sellPrice,
-            matchSellSalt: matchingWitnesses.sellSalt,
+            secretKey: Array.from(secretKey),
+            matchBuyAmount: matchingWitnesses.buyAmount.toString(),
+            matchBuyPrice: matchingWitnesses.buyPrice.toString(),
+            matchBuySalt: Array.from(matchingWitnesses.buySalt),
+            matchSellAmount: matchingWitnesses.sellAmount.toString(),
+            matchSellPrice: matchingWitnesses.sellPrice.toString(),
+            matchSellSalt: Array.from(matchingWitnesses.sellSalt),
           });
         }
 
-        if (this.midnightContract?.callTx?.matchOrders) {
-          return await this.midnightContract.callTx.matchOrders(
-            buyOrderId,
-            sellOrderId,
-            fillAmount,
-            matchPrice
-          );
+        if (!this.midnightContract?.callTx?.matchOrders) {
+          throw new Error('Deployed contract binding callTx.matchOrders is missing. Ensure the contract is deployed on Preprod.');
         }
 
-        return await this.providers.midnightProvider.submitTx({
-          contractAddress: this.contractAddress,
-          circuit: 'matchOrders',
-          args: [buyOrderId, sellOrderId, fillAmount, matchPrice],
-          network: 'preprod',
-        });
+        return await this.midnightContract.callTx.matchOrders(
+          buyOrderId,
+          sellOrderId,
+          fillAmount,
+          matchPrice
+        );
       },
     };
   }

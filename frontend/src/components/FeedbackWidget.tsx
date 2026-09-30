@@ -322,7 +322,7 @@ export default function FeedbackWidget() {
                       </div>
                       <div>
                         <h4 className="text-xs font-semibold text-white">Public Responses Google Sheet</h4>
-                        <p className="text-[10px] text-zinc-500">75+ verified preprod trader records.</p>
+                        <p className="text-[10px] text-zinc-500">Live preprod feedback records.</p>
                       </div>
                     </div>
 
@@ -331,7 +331,7 @@ export default function FeedbackWidget() {
                     <div className="grid grid-cols-2 gap-2 text-center text-xs">
                       <div className="p-2 rounded bg-zinc-900/60 border border-zinc-850">
                         <p className="text-[10px] text-zinc-500">TOTAL ENTRIES</p>
-                        <p className="text-base font-bold text-white">75 Records</p>
+                        <p className="text-base font-bold text-white">Live Sync</p>
                       </div>
                       <div className="p-2 rounded bg-zinc-900/60 border border-zinc-850">
                         <p className="text-[10px] text-zinc-500">AVG SCORE</p>

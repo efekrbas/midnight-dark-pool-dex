@@ -73,7 +73,7 @@ Standard sealed-bid auction dApps rely on a vulnerable 2-phase commit-reveal mec
 |---|---|
 | Live Production dApp on Vercel | ✅ Deployed |
 | `darkpool.compact` Smart Contract (Preprod) | ✅ Deployed |
-| 75+ Verified Preprod Testers | ✅ Active |
+| Community Preprod Testing & Validation | ✅ Active |
 | About Us & USP Showcase Page (`/about`) | ✅ Live |
 | Documentation & Guide Portal (`/docs`) | ✅ Live |
 | Interactive ZK Matching Circuit Simulator | ✅ Embedded in Docs |

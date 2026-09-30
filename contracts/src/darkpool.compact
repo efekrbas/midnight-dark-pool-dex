@@ -121,6 +121,7 @@ export circuit submitOrder(
     assert(balances.member(disEscrowKey), "No escrow balance available for token");
     const available = balances.lookup(disEscrowKey);
     assert(available >= escrowRequired, "Insufficient balance to escrow order");
+    balances.insert(disEscrowKey, disclose((available - escrowRequired) as Uint<128>));
 
     // Cryptographic commitments: hiding exact amount and price in Zero-Knowledge
     const amtComm = persistentCommit<Uint<64>>(amount, salt);
@@ -158,6 +159,16 @@ export circuit cancelOrder(
     const salt = orderSalt();
     assert(persistentCommit<Uint<64>>(amount, salt) == order.amountCommitment, "Amount commitment mismatch");
     assert(persistentCommit<Uint<64>>(price, salt) == order.priceCommitment, "Price commitment mismatch");
+
+    // Refund escrowed tokens back to trader's internal balance
+    const escrowRefund: Uint<128> = (order.side == OrderSide.BUY)
+        ? (((amount as Field) * (price as Field)) as Uint<128>)
+        : (amount as Uint<128>);
+    const escrowToken: Bytes<32> = (order.side == OrderSide.BUY) ? order.quoteToken : order.baseToken;
+    const escrowKey = balanceKey(order.trader, escrowToken);
+    const disEscrowKey = disclose(escrowKey);
+    const currentBal = balances.member(disEscrowKey) ? balances.lookup(disEscrowKey) : (0 as Uint<128>);
+    balances.insert(disEscrowKey, disclose((currentBal + escrowRefund) as Uint<128>));
 
     orders.insert(disOrderId, disclose(Order {
         trader: order.trader,
@@ -216,19 +227,34 @@ export circuit matchOrders(
     assert(fillAmount <= buyAmount, "fillAmount exceeds buy order amount");
     assert(fillAmount <= sellAmount, "fillAmount exceeds sell order amount");
 
-    // Real Asset Settlement
-    // 1. Buyer receives fillAmount of baseToken
+    // Real Asset Settlement settled from escrow
+    // 1. Buyer receives fillAmount of baseToken (from seller's debited escrow)
     const buyerBaseKey = balanceKey(buyOrder.trader, buyOrder.baseToken);
     const disBuyerBaseKey = disclose(buyerBaseKey);
     const buyerBaseBal = balances.member(disBuyerBaseKey) ? balances.lookup(disBuyerBaseKey) : (0 as Uint<128>);
     balances.insert(disBuyerBaseKey, disclose((buyerBaseBal + (fillAmount as Uint<128>)) as Uint<128>));
 
-    // 2. Seller receives (fillAmount * matchPrice) of quoteToken
+    // 2. Seller receives (fillAmount * matchPrice) of quoteToken (from buyer's debited escrow)
     const quoteProceeds: Uint<128> = ((fillAmount as Field) * (matchPrice as Field)) as Uint<128>;
     const sellerQuoteKey = balanceKey(sellOrder.trader, sellOrder.quoteToken);
     const disSellerQuoteKey = disclose(sellerQuoteKey);
     const sellerQuoteBal = balances.member(disSellerQuoteKey) ? balances.lookup(disSellerQuoteKey) : (0 as Uint<128>);
     balances.insert(disSellerQuoteKey, disclose((sellerQuoteBal + quoteProceeds) as Uint<128>));
+
+    // 3. Refund excess quote escrow to buyer (price improvement surplus + any unfilled portion)
+    const buyEscrowTotal: Uint<128> = ((buyAmount as Field) * (buyPrice as Field)) as Uint<128>;
+    const buyerRefund: Uint<128> = (buyEscrowTotal - quoteProceeds) as Uint<128>;
+    const buyerQuoteKey = balanceKey(buyOrder.trader, buyOrder.quoteToken);
+    const disBuyerQuoteKey = disclose(buyerQuoteKey);
+    const buyerQuoteBal = balances.member(disBuyerQuoteKey) ? balances.lookup(disBuyerQuoteKey) : (0 as Uint<128>);
+    balances.insert(disBuyerQuoteKey, disclose((buyerQuoteBal + buyerRefund) as Uint<128>));
+
+    // 4. Refund excess base escrow to seller (if fillAmount < sellAmount)
+    const sellerBaseRefund: Uint<128> = (sellAmount > fillAmount) ? ((sellAmount - fillAmount) as Uint<128>) : (0 as Uint<128>);
+    const sellerBaseKey = balanceKey(sellOrder.trader, sellOrder.baseToken);
+    const disSellerBaseKey = disclose(sellerBaseKey);
+    const sellerBaseBal = balances.member(disSellerBaseKey) ? balances.lookup(disSellerBaseKey) : (0 as Uint<128>);
+    balances.insert(disSellerBaseKey, disclose((sellerBaseBal + sellerBaseRefund) as Uint<128>));
 
     // Update dark book status
     orders.insert(disBuyOrderId, disclose(Order {

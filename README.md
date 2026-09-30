@@ -112,7 +112,7 @@ We release regular bi-weekly updates incorporating tester feedback:
 
 ## 📊 User Feedback & Product Improvements
 
-We collected detailed quantitative and qualitative feedback from **75 active Preprod traders** using our public Google Form and exported sheet:
+We collected detailed quantitative and qualitative feedback from early Preprod testers and community reviewers using our public Google Form and exported sheet:
 
 - **Public Google Feedback Form:** [Midnight Dark Pool Survey](https://docs.google.com/forms/d/e/1FAIpQLSd-Dn6hy4C4p_jsU2KtNdebh_mUUYm03XKZFepFSLSD08yHjA/viewform)
 - **Live Google Sheet Response Database:** [Live Google Sheets Database](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing) *(Note: User feedback is actively maintained and synced in Google Sheets rather than in static markdown files)*

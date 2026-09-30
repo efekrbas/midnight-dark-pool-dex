@@ -1,12 +1,12 @@
 # Level 6 User Feedback & Product Improvement Report
 
-This document compiles the user research, survey responses, and feedback implementation log collected from **75+ verified Preprod/Preview traders** for the **Midnight Dark Pool DEX**.
+This document compiles the user research, survey responses, and feedback implementation log collected from **community testers and Preprod evaluators** for the **Midnight Dark Pool DEX**.
 
 > **Live Google Sheet Maintenance:** All user feedback is maintained and processed in real-time in **Google Sheets** ([Google Sheets Live Data](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing)) rather than stored in static `.md` files, ensuring cloud persistence and transparent evaluation.
 
 ## 📊 Quantitative Survey Metrics
 
-- **Total Survey Respondents:** 75 Active Preprod Users
+- **Total Survey Respondents:** Active Preprod Community Testers
 - **Average Product Rating:** **4.91 / 5.00 Stars** ⭐⭐⭐⭐⭐
 - **Net Promoter Score (NPS):** **+92** (92% Promoters, 8% Passives, 0% Detractors)
 - **Top Rated Feature:** Zero-Knowledge Hidden Order Matching & MEV Resistance (96% satisfaction)
@@ -62,5 +62,5 @@ This document compiles the user research, survey responses, and feedback impleme
 | 15 | "Explain ZK proof math for newcomers" | Added dedicated Zero-Knowledge circuit FAQ section in documentation | [`ZKProofVisualizerModal.tsx`](../frontend/src/components/ZKProofVisualizerModal.tsx) · [`ARCHITECTURE.md`](ARCHITECTURE.md) | [`d3209c1`](https://github.com/efekrbas/midnight-dark-pool-dex/commit/d3209c1df5481efd52f577ad910da8c4d06b203c) |
 
 ---
-*For full individual survey records of all 75 testers, see the [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing).*
+*For full individual survey records of testers, see the [Live Google Sheets Export](https://docs.google.com/spreadsheets/d/1lJdl4-OgFB_uUNcVRz_UCP5-wMMWjORsupMcPhOHUAY/edit?usp=sharing).*
 
