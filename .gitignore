@@ -6,3 +6,5 @@ frontend/.next
 *.tsbuildinfo
 .DS_Store
 *.log
+.agents
+.claude
