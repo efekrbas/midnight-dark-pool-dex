@@ -134,8 +134,8 @@ export default function LandingPage() {
 
           </div>
 
-          {/* Right Column: 3D Liquid-Metal ZK Nexus (Seamless, Unboxed) */}
-          <div className="hero-elem lg:col-span-5 w-full flex items-center justify-center relative">
+          {/* Right Column: 3D Liquid-Metal ZK Nexus (Seamless, Unboxed, Lifted to align with headline) */}
+          <div className="hero-elem lg:col-span-5 w-full flex items-center justify-center relative lg:-translate-y-10 xl:-translate-y-14">
             <MidnightZKCore3D className="w-full h-[460px] sm:h-[520px] lg:h-[560px]" />
           </div>
 

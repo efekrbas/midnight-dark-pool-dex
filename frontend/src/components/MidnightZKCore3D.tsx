@@ -376,8 +376,8 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
         rotationVelocity.y *= 0.94;
       }
 
-      // Organic Zero-Gravity Floating
-      rootGroup.position.y = Math.sin(elapsedTime * 1.0) * 0.09;
+      // Organic Zero-Gravity Floating (Slightly raised for hero headline optical alignment)
+      rootGroup.position.y = 0.22 + Math.sin(elapsedTime * 1.0) * 0.09;
 
       // 1. Glass Core Tumbling & Counter-Spin of Inner Faceted Diamond
       coreGroup.rotation.y = elapsedTime * 0.28;
