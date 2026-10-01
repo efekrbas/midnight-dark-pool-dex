@@ -31,7 +31,7 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     renderer.toneMappingExposure = 1.35;
     container.appendChild(renderer.domElement);
 
-    // 3. Studio Lighting Environment Map (High-End Chrome & Cyan Sheen)
+    // 3. Studio Lighting Environment Map (High-End Chrome, Glass & Cyan Sheen)
     const envCanvas = document.createElement('canvas');
     envCanvas.width = 1024;
     envCanvas.height = 512;
@@ -62,10 +62,10 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       ctx.fillStyle = softbox2;
       ctx.fillRect(100, 40, 220, 430);
 
-      // Overhead Soft Light
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+      // Overhead Glint Light
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.beginPath();
-      ctx.arc(512, 100, 80, 0, Math.PI * 2);
+      ctx.arc(512, 90, 75, 0, Math.PI * 2);
       ctx.fill();
     }
     const envTexture = new THREE.CanvasTexture(envCanvas);
@@ -103,53 +103,127 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       color: 0x00f0ff,
     });
 
-    // 5. THE CORE: FLOATING ZERO-KNOWLEDGE HYPER-CUBE (Encrypted Private Ledger)
+    // 5. THE CORE: FROSTED OPTICAL CRYSTAL GLASS BLOCK & ZK DIAMOND PRISM
     const coreGroup = new THREE.Group();
     rootGroup.add(coreGroup);
 
-    // Inner Glowing Translucent ZK Data Matrix
-    const innerCubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-    const innerCubeMat = new THREE.MeshPhysicalMaterial({
+    // Ultra-Reflective Optical Crystal Glass Material (Volumetric Refraction & Caustic Glow)
+    const crystalGlassMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0xf8fafc),
+      transmission: 0.92,            // High realistic glass transmission
+      opacity: 1,
+      transparent: true,
+      ior: 1.56,                     // Optical crystal crown glass
+      roughness: 0.02,               // Mirror-smooth polish
+      metalness: 0.04,
+      clearcoat: 1.0,                // Razor-sharp surface reflection
+      clearcoatRoughness: 0.015,
+      reflectivity: 1.0,
+      thickness: 1.8,                // Volumetric depth for light rays
+      attenuationColor: new THREE.Color(0x38bdf8), // Luminous cyan internal refraction
+      attenuationDistance: 0.72,
+      specularIntensity: 2.4,
+      specularColor: new THREE.Color(0xffffff),
+      envMapIntensity: 3.6,
+    });
+
+    const glassCubeGeo = new THREE.BoxGeometry(0.96, 0.96, 0.96);
+    const glassCube = new THREE.Mesh(glassCubeGeo, crystalGlassMat);
+    coreGroup.add(glassCube);
+
+    // Prismatic Glass Edge Glint Lines (Chiseled Bevel Highlight)
+    const glassEdgesGeo = new THREE.EdgesGeometry(glassCubeGeo);
+    const glassEdgesMat = new THREE.LineBasicMaterial({
+      color: 0xe0f2fe,
+      transparent: true,
+      opacity: 0.8,
+      linewidth: 1.5,
+    });
+    const glassEdges = new THREE.LineSegments(glassEdgesGeo, glassEdgesMat);
+    glassCube.add(glassEdges);
+
+    // Inner Faceted ZK Diamond Core (Refracted and magnified through the glass)
+    const innerGemGeo = new THREE.OctahedronGeometry(0.52, 1);
+    const innerGemMat = new THREE.MeshPhysicalMaterial({
       color: 0x0284c7,
       emissive: 0x00f0ff,
-      emissiveIntensity: 0.85,
+      emissiveIntensity: 1.15,
       roughness: 0.06,
-      transmission: 0.75,
-      thickness: 1.2,
-      transparent: true,
-      opacity: 0.9,
-      metalness: 0.1,
+      metalness: 0.25,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.03,
+      transmission: 0.45,
     });
-    const innerCube = new THREE.Mesh(innerCubeGeo, innerCubeMat);
-    coreGroup.add(innerCube);
+    const innerGem = new THREE.Mesh(innerGemGeo, innerGemMat);
+    coreGroup.add(innerGem);
 
-    // Inner Crystal Octahedron Heart (The Secret Commitment Seed)
-    const heartGeo = new THREE.OctahedronGeometry(0.48, 0);
-    const heartMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+    // Inner Luminous Wireframe Facets
+    const gemWireGeo = new THREE.OctahedronGeometry(0.55, 1);
+    const gemWireMat = new THREE.MeshBasicMaterial({
+      color: 0xe0f2fe,
       wireframe: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.65,
     });
-    const heartMesh = new THREE.Mesh(heartGeo, heartMat);
-    coreGroup.add(heartMesh);
+    const gemWire = new THREE.Mesh(gemWireGeo, gemWireMat);
+    coreGroup.add(gemWire);
 
-    // Outer Obsidian Exoskeleton Cage (Shielding the Inner Data)
-    const outerCageGeo = new THREE.BoxGeometry(1.22, 1.22, 1.22);
+    // Dynamic Diamond Glimmer Stars (Parıltı Efekti)
+    const sparkleGroup = new THREE.Group();
+    coreGroup.add(sparkleGroup);
+
+    // Procedural 4-point Diamond Star Shape
+    const starShape = new THREE.Shape();
+    starShape.moveTo(0, 0.16);
+    starShape.quadraticCurveTo(0.015, 0.015, 0.16, 0);
+    starShape.quadraticCurveTo(0.015, -0.015, 0, -0.16);
+    starShape.quadraticCurveTo(-0.015, -0.015, -0.16, 0);
+    starShape.quadraticCurveTo(-0.015, 0.015, 0, 0.16);
+
+    const starGeo = new THREE.ShapeGeometry(starShape);
+    const starMat1 = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+    });
+    const starMat2 = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.75,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+    });
+
+    const sparkle1 = new THREE.Mesh(starGeo, starMat1);
+    sparkle1.position.set(0.48, 0.48, 0.48);
+    sparkleGroup.add(sparkle1);
+
+    const sparkle2 = new THREE.Mesh(starGeo, starMat2);
+    sparkle2.position.set(-0.48, -0.48, 0.48);
+    sparkleGroup.add(sparkle2);
+
+    const sparkle3 = new THREE.Mesh(starGeo, starMat1);
+    sparkle3.position.set(0.48, -0.48, -0.48);
+    sparkleGroup.add(sparkle3);
+
+    // Outer Obsidian Exoskeleton Cage (Shielding the Glass Core)
+    const outerCageGeo = new THREE.BoxGeometry(1.24, 1.24, 1.24);
     const outerCageWire = new THREE.WireframeGeometry(outerCageGeo);
     const outerCageMat = new THREE.LineBasicMaterial({
       color: 0x38bdf8,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.38,
       linewidth: 1.5,
     });
     const outerCage = new THREE.LineSegments(outerCageWire, outerCageMat);
     coreGroup.add(outerCage);
 
     // Corner Nodes on Exoskeleton (Titanium Nodes)
-    const cornerGeo = new THREE.SphereGeometry(0.06, 12, 12);
+    const cornerGeo = new THREE.SphereGeometry(0.055, 12, 12);
     const cornerMat = polishedLiquidChromeMat;
-    const cornerOffsets = [-0.61, 0.61];
+    const cornerOffsets = [-0.62, 0.62];
     cornerOffsets.forEach(x => {
       cornerOffsets.forEach(y => {
         cornerOffsets.forEach(z => {
@@ -241,12 +315,12 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     const particles = new THREE.Points(particleGeo, particleMat);
     rootGroup.add(particles);
 
-    // 10. CINEMATIC LIGHTING (Cold Electric Cyan Rim & Volumetric Core Light)
+    // 10. CINEMATIC LIGHTING (Cold Electric Cyan Rim & Caustic Sparkle Light)
     const ambientLight = new THREE.AmbientLight(0x020817, 2.2);
     scene.add(ambientLight);
 
     // Key Light: Razor-Sharp Electric Cyan Rim Light (Right & Top-Back)
-    const cyanRimLight = new THREE.DirectionalLight(0x00f0ff, 4.0);
+    const cyanRimLight = new THREE.DirectionalLight(0x00f0ff, 4.2);
     cyanRimLight.position.set(5.5, 4.5, 3.5);
     scene.add(cyanRimLight);
 
@@ -255,14 +329,15 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     blueRimLight.position.set(-5.5, -3.5, -2.5);
     scene.add(blueRimLight);
 
-    // Front-Top Specular Glint Light
-    const frontSpot = new THREE.PointLight(0xffffff, 20, 15);
+    // Front-Top Specular Glint Light (Creates Caustic Shimmer on Glass)
+    const frontSpot = new THREE.PointLight(0xffffff, 24, 15);
     frontSpot.position.set(1.5, 3.5, 5.5);
     scene.add(frontSpot);
 
-    // Volumetric Inner Core Glow (Illuminating the Vault Rings from Within)
-    const coreLight = new THREE.PointLight(0x00f0ff, 18, 6.5);
-    coreGroup.add(coreLight);
+    // Dedicated Caustic Prism Glint Light (Casts moving sparkles across glass facets)
+    const causticLight = new THREE.PointLight(0x38bdf8, 16, 5);
+    causticLight.position.set(0.6, 0.8, 1.2);
+    coreGroup.add(causticLight);
 
     // 11. INTERACTIVE MOUSE PARALLAX & DRAG TO ORBIT
     let isDragging = false;
@@ -345,15 +420,35 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       // Organic Zero-Gravity Floating
       rootGroup.position.y = Math.sin(elapsedTime * 1.1) * 0.11;
 
-      // 1. Core Hyper-Cube Tumbling
+      // 1. Glass Core Tumbling & Counter-Spin of Inner Faceted Diamond
       coreGroup.rotation.y = elapsedTime * 0.35;
       coreGroup.rotation.x = Math.sin(elapsedTime * 0.5) * 0.25;
       coreGroup.rotation.z = Math.cos(elapsedTime * 0.4) * 0.15;
 
-      // Subtle Pulsing of ZK Core
-      const corePulse = 1.0 + Math.sin(elapsedTime * 2.2) * 0.04;
-      innerCube.scale.set(corePulse, corePulse, corePulse);
-      heartMesh.scale.set(corePulse * 1.05, corePulse * 1.05, corePulse * 1.05);
+      // Inner Diamond Counter-Rotation (Creates mesmerizing light refractions through the glass)
+      innerGem.rotation.y = -elapsedTime * 0.55;
+      innerGem.rotation.z = Math.sin(elapsedTime * 0.8) * 0.3;
+      gemWire.rotation.y = -elapsedTime * 0.55;
+      gemWire.rotation.z = Math.sin(elapsedTime * 0.8) * 0.3;
+
+      // Dynamic Diamond Glimmer Flare (Parıltı / Sparkle Pulse)
+      const glintFactor1 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6)), 8);
+      const glintFactor2 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6 + 2.0)), 8);
+      const glintFactor3 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6 + 4.0)), 8);
+
+      sparkle1.scale.setScalar(0.7 + glintFactor1 * 1.8);
+      starMat1.opacity = 0.35 + glintFactor1 * 0.65;
+      sparkle1.rotation.z += 0.015;
+
+      sparkle2.scale.setScalar(0.7 + glintFactor2 * 1.8);
+      starMat2.opacity = 0.35 + glintFactor2 * 0.65;
+      sparkle2.rotation.z -= 0.015;
+
+      sparkle3.scale.setScalar(0.7 + glintFactor3 * 1.8);
+      sparkle3.rotation.z += 0.02;
+
+      // Subtle Glass Clearcoat Shimmer
+      crystalGlassMat.clearcoat = 0.92 + Math.sin(elapsedTime * 2.0) * 0.08;
 
       // 2. Ring 1 (Inner Cipher Ring) Clockwise Rotation
       ring1Group.rotation.z = elapsedTime * 0.22;
@@ -385,24 +480,31 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
       renderer.dispose();
       envTexture.dispose();
-      innerCubeGeo.dispose();
-      innerCubeMat.dispose();
-      heartGeo.dispose();
-      heartMat.dispose();
+      glassCubeGeo.dispose();
+      glassEdgesGeo.dispose();
+      innerGemGeo.dispose();
+      gemWireGeo.dispose();
+      starGeo.dispose();
       outerCageGeo.dispose();
       outerCageWire.dispose();
-      outerCageMat.dispose();
       cornerGeo.dispose();
       ring1Geo.dispose();
       tickGeo.dispose();
       ring2Geo.dispose();
       ring2ChannelGeo.dispose();
       particleGeo.dispose();
-      particleMat.dispose();
 
+      crystalGlassMat.dispose();
+      glassEdgesMat.dispose();
+      innerGemMat.dispose();
+      gemWireMat.dispose();
+      starMat1.dispose();
+      starMat2.dispose();
+      outerCageMat.dispose();
       darkObsidianMat.dispose();
       polishedLiquidChromeMat.dispose();
       cyanGlowMat.dispose();
+      particleMat.dispose();
 
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
