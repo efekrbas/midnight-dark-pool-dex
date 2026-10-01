@@ -16,10 +16,10 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
     // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0, 9.2);
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 0, 8.8);
 
-    // 2. High-Performance WebGL Renderer
+    // 2. High-Performance WebGL Renderer with Filmic Tone Mapping
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -28,286 +28,243 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.45;
+    renderer.toneMappingExposure = 1.35;
     container.appendChild(renderer.domElement);
 
-    // 3. Studio Lighting Environment Map (High-End Chrome & Cyan Reflections)
+    // 3. Studio Lighting Environment Map (High-End Chrome & Cyan Sheen)
     const envCanvas = document.createElement('canvas');
     envCanvas.width = 1024;
     envCanvas.height = 512;
     const ctx = envCanvas.getContext('2d');
     if (ctx) {
-      // Deep studio background with gradient
+      // Deep studio background with subtle dark navy gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 1024, 512);
       bgGrad.addColorStop(0, '#020617');
-      bgGrad.addColorStop(0.35, '#07162c');
-      bgGrad.addColorStop(0.55, '#021f3f');
-      bgGrad.addColorStop(0.85, '#082f49');
+      bgGrad.addColorStop(0.35, '#051329');
+      bgGrad.addColorStop(0.65, '#011936');
       bgGrad.addColorStop(1, '#020617');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, 1024, 512);
 
-      // Bright Studio Softbox 1 (Right Cyan Rim Highlight Strip)
-      const softbox1 = ctx.createLinearGradient(640, 0, 880, 0);
+      // Studio Softbox 1: Electric Cyan Rim Strip (Right)
+      const softbox1 = ctx.createLinearGradient(650, 0, 900, 0);
       softbox1.addColorStop(0, 'rgba(0, 240, 255, 0)');
-      softbox1.addColorStop(0.5, 'rgba(255, 255, 255, 1)');
+      softbox1.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
       softbox1.addColorStop(1, 'rgba(56, 189, 248, 0)');
       ctx.fillStyle = softbox1;
-      ctx.fillRect(640, 20, 240, 470);
+      ctx.fillRect(650, 20, 250, 470);
 
-      // Bright Studio Softbox 2 (Left Blue Rim Highlight Strip)
-      const softbox2 = ctx.createLinearGradient(120, 0, 320, 0);
+      // Studio Softbox 2: Midnight Blue Rim Strip (Left)
+      const softbox2 = ctx.createLinearGradient(100, 0, 320, 0);
       softbox2.addColorStop(0, 'rgba(30, 58, 138, 0)');
-      softbox2.addColorStop(0.5, 'rgba(59, 130, 246, 0.9)');
+      softbox2.addColorStop(0.5, 'rgba(59, 130, 246, 0.85)');
       softbox2.addColorStop(1, 'rgba(2, 132, 199, 0)');
       ctx.fillStyle = softbox2;
-      ctx.fillRect(120, 40, 200, 430);
+      ctx.fillRect(100, 40, 220, 430);
 
-      // Top Specular Gleam
-      ctx.fillStyle = '#ffffff';
+      // Overhead Soft Light
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
       ctx.beginPath();
-      ctx.arc(512, 90, 70, 0, Math.PI * 2);
+      ctx.arc(512, 100, 80, 0, Math.PI * 2);
       ctx.fill();
     }
     const envTexture = new THREE.CanvasTexture(envCanvas);
     envTexture.mapping = THREE.EquirectangularReflectionMapping;
     scene.environment = envTexture;
 
-    // 4. Central Group
+    // 4. Central Cyber Vault Group
     const rootGroup = new THREE.Group();
-    // Default slight isometric tilt to show off depth and metallic bevels
-    rootGroup.rotation.y = -0.32;
-    rootGroup.rotation.x = 0.16;
+    rootGroup.rotation.y = -0.25;
+    rootGroup.rotation.x = 0.18;
     scene.add(rootGroup);
 
-    // Common Materials
-    const darkTitaniumMat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0x0f172a),
-      metalness: 0.92,
-      roughness: 0.2,
-      clearcoat: 0.6,
-      clearcoatRoughness: 0.1,
-      reflectivity: 0.9,
-      envMapIntensity: 2.0,
-    });
-
-    const polishedChromeMat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color(0xdbeafe),
-      metalness: 0.98,
-      roughness: 0.08,
+    // Common High-End Shader Materials
+    const darkObsidianMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0x0a101d),
+      metalness: 0.94,
+      roughness: 0.14,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.04,
+      clearcoatRoughness: 0.06,
+      reflectivity: 0.95,
+      envMapIntensity: 2.2,
+    });
+
+    const polishedLiquidChromeMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(0xe2e8f0),
+      metalness: 0.98,
+      roughness: 0.06,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.03,
       reflectivity: 1.0,
-      envMapIntensity: 2.6,
+      envMapIntensity: 2.8,
     });
 
-    const deepSteelMat = new THREE.MeshStandardMaterial({
-      color: 0x050b14,
-      metalness: 0.85,
-      roughness: 0.35,
-      envMapIntensity: 1.2,
-    });
-
-    const cyanEmissiveMat = new THREE.MeshBasicMaterial({
+    const cyanGlowMat = new THREE.MeshBasicMaterial({
       color: 0x00f0ff,
     });
 
-    // 5. Heavy Outer Vault Bezel & Backplate
-    // Outer Bezel Torus
-    const outerBezelGeo = new THREE.TorusGeometry(2.35, 0.22, 28, 96);
-    const outerBezel = new THREE.Mesh(outerBezelGeo, darkTitaniumMat);
-    rootGroup.add(outerBezel);
+    // 5. THE CORE: FLOATING ZERO-KNOWLEDGE HYPER-CUBE (Encrypted Private Ledger)
+    const coreGroup = new THREE.Group();
+    rootGroup.add(coreGroup);
 
-    // Inner Bezel Lip
-    const innerLipGeo = new THREE.TorusGeometry(2.15, 0.06, 16, 96);
-    const innerLip = new THREE.Mesh(innerLipGeo, polishedChromeMat);
-    innerLip.position.z = 0.12;
-    rootGroup.add(innerLip);
-
-    // Vault Rear Armor Backplate
-    const backplateGeo = new THREE.CylinderGeometry(2.28, 2.28, 0.25, 64);
-    const backplate = new THREE.Mesh(backplateGeo, deepSteelMat);
-    backplate.rotation.x = Math.PI / 2;
-    backplate.position.z = -0.15;
-    rootGroup.add(backplate);
-
-    // 12 Heavy Industrial Locking Bolts around the perimeter
-    const boltGroup = new THREE.Group();
-    const boltGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.18, 16);
-    const boltHeadGeo = new THREE.SphereGeometry(0.08, 12, 12);
-    const boltCount = 12;
-
-    for (let i = 0; i < boltCount; i++) {
-      const angle = (i / boltCount) * Math.PI * 2;
-      const x = Math.cos(angle) * 2.35;
-      const y = Math.sin(angle) * 2.35;
-
-      const bolt = new THREE.Mesh(boltGeo, polishedChromeMat);
-      bolt.rotation.x = Math.PI / 2;
-      bolt.position.set(x, y, 0.12);
-
-      const boltHead = new THREE.Mesh(boltHeadGeo, darkTitaniumMat);
-      boltHead.position.set(x, y, 0.21);
-
-      boltGroup.add(bolt);
-      boltGroup.add(boltHead);
-    }
-    rootGroup.add(boltGroup);
-
-    // 6. Primary Rotating Cryptographic Cipher Dial (Outer Ring)
-    const dialOuterGroup = new THREE.Group();
-    rootGroup.add(dialOuterGroup);
-
-    const dialRingGeo = new THREE.TorusGeometry(1.88, 0.07, 16, 80);
-    const dialRing = new THREE.Mesh(dialRingGeo, polishedChromeMat);
-    dialRing.position.z = 0.18;
-    dialOuterGroup.add(dialRing);
-
-    // Engraved Hash Notches on Outer Dial
-    const notchGeo = new THREE.BoxGeometry(0.04, 0.14, 0.05);
-    const notchCount = 36;
-    for (let i = 0; i < notchCount; i++) {
-      const angle = (i / notchCount) * Math.PI * 2;
-      const isMajor = i % 6 === 0;
-      const notch = new THREE.Mesh(
-        notchGeo,
-        isMajor ? cyanEmissiveMat : polishedChromeMat
-      );
-      notch.position.set(Math.cos(angle) * 1.88, Math.sin(angle) * 1.88, 0.22);
-      notch.rotation.z = angle;
-      if (isMajor) notch.scale.set(1.4, 1.4, 1.4);
-      dialOuterGroup.add(notch);
-    }
-
-    // 7. Middle Counter-Rotating Combination Disk
-    const dialMidGroup = new THREE.Group();
-    rootGroup.add(dialMidGroup);
-
-    const midRingGeo = new THREE.TorusGeometry(1.42, 0.06, 16, 72);
-    const midRing = new THREE.Mesh(midRingGeo, darkTitaniumMat);
-    midRing.position.z = 0.26;
-    dialMidGroup.add(midRing);
-
-    // Cyan Neon Circuit Ring inside Middle Disk
-    const circuitRingGeo = new THREE.TorusGeometry(1.3, 0.02, 16, 72);
-    const circuitRing = new THREE.Mesh(circuitRingGeo, cyanEmissiveMat);
-    circuitRing.position.z = 0.27;
-    dialMidGroup.add(circuitRing);
-
-    // 8. 4-Spoke Heavy Mechanical Vault Wheel Handle (Central Lock)
-    const wheelGroup = new THREE.Group();
-    wheelGroup.position.z = 0.32;
-    rootGroup.add(wheelGroup);
-
-    // Central Wheel Hub
-    const hubGeo = new THREE.CylinderGeometry(0.48, 0.52, 0.22, 32);
-    const hub = new THREE.Mesh(hubGeo, polishedChromeMat);
-    hub.rotation.x = Math.PI / 2;
-    wheelGroup.add(hub);
-
-    // 4 Heavy Spoke Grips
-    const spokeGeo = new THREE.CylinderGeometry(0.055, 0.055, 1.25, 16);
-    const handleGripGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.28, 16);
-    const handleSphereGeo = new THREE.SphereGeometry(0.09, 16, 16);
-
-    for (let i = 0; i < 4; i++) {
-      const angle = (i * Math.PI) / 2;
-      const spoke = new THREE.Mesh(spokeGeo, darkTitaniumMat);
-      spoke.rotation.z = angle;
-      wheelGroup.add(spoke);
-
-      const grip = new THREE.Mesh(handleGripGeo, polishedChromeMat);
-      grip.position.set(Math.cos(angle) * 0.72, Math.sin(angle) * 0.72, 0.08);
-      grip.rotation.x = Math.PI / 2;
-      wheelGroup.add(grip);
-
-      const sphere = new THREE.Mesh(handleSphereGeo, polishedChromeMat);
-      sphere.position.set(Math.cos(angle) * 0.72, Math.sin(angle) * 0.72, 0.22);
-      wheelGroup.add(sphere);
-    }
-
-    // 9. Core Shielded Liquidity Aperture (Inside Central Hub)
-    // Translucent Glowing Blue Crystal Viewport
-    const coreCrystalGeo = new THREE.IcosahedronGeometry(0.32, 1);
-    const coreCrystalMat = new THREE.MeshPhysicalMaterial({
-      color: 0x38bdf8,
-      emissive: 0x0284c7,
-      emissiveIntensity: 1.1,
-      roughness: 0.05,
-      transmission: 0.65,
-      thickness: 1.0,
+    // Inner Glowing Translucent ZK Data Matrix
+    const innerCubeGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+    const innerCubeMat = new THREE.MeshPhysicalMaterial({
+      color: 0x0284c7,
+      emissive: 0x00f0ff,
+      emissiveIntensity: 0.85,
+      roughness: 0.06,
+      transmission: 0.75,
+      thickness: 1.2,
       transparent: true,
-      opacity: 0.95,
+      opacity: 0.9,
       metalness: 0.1,
     });
-    const coreCrystal = new THREE.Mesh(coreCrystalGeo, coreCrystalMat);
-    coreCrystal.position.z = 0.18;
-    wheelGroup.add(coreCrystal);
+    const innerCube = new THREE.Mesh(innerCubeGeo, innerCubeMat);
+    coreGroup.add(innerCube);
 
-    // Glowing Aperture Ring
-    const apertureRingGeo = new THREE.TorusGeometry(0.38, 0.025, 16, 48);
-    const apertureRing = new THREE.Mesh(apertureRingGeo, cyanEmissiveMat);
-    apertureRing.position.z = 0.16;
-    wheelGroup.add(apertureRing);
+    // Inner Crystal Octahedron Heart (The Secret Commitment Seed)
+    const heartGeo = new THREE.OctahedronGeometry(0.48, 0);
+    const heartMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const heartMesh = new THREE.Mesh(heartGeo, heartMat);
+    coreGroup.add(heartMesh);
 
-    // 4 Hydraulic Radial Locking Bars extending to outer frame
-    const pistonGroup = new THREE.Group();
-    pistonGroup.position.z = 0.08;
-    rootGroup.add(pistonGroup);
+    // Outer Obsidian Exoskeleton Cage (Shielding the Inner Data)
+    const outerCageGeo = new THREE.BoxGeometry(1.22, 1.22, 1.22);
+    const outerCageWire = new THREE.WireframeGeometry(outerCageGeo);
+    const outerCageMat = new THREE.LineBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.4,
+      linewidth: 1.5,
+    });
+    const outerCage = new THREE.LineSegments(outerCageWire, outerCageMat);
+    coreGroup.add(outerCage);
 
-    const pistonGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.85, 16);
-    for (let i = 0; i < 4; i++) {
-      const angle = (i * Math.PI) / 2 + Math.PI / 4;
-      const piston = new THREE.Mesh(pistonGeo, polishedChromeMat);
-      piston.position.set(Math.cos(angle) * 1.62, Math.sin(angle) * 1.62, 0);
-      piston.rotation.z = angle + Math.PI / 2;
-      pistonGroup.add(piston);
+    // Corner Nodes on Exoskeleton (Titanium Nodes)
+    const cornerGeo = new THREE.SphereGeometry(0.06, 12, 12);
+    const cornerMat = polishedLiquidChromeMat;
+    const cornerOffsets = [-0.61, 0.61];
+    cornerOffsets.forEach(x => {
+      cornerOffsets.forEach(y => {
+        cornerOffsets.forEach(z => {
+          const corner = new THREE.Mesh(cornerGeo, cornerMat);
+          corner.position.set(x, y, z);
+          coreGroup.add(corner);
+        });
+      });
+    });
+
+    // 6. RING 1: INNER GYROSCOPIC CIPHER RING (Verification Proofs)
+    const ring1Group = new THREE.Group();
+    rootGroup.add(ring1Group);
+
+    const ring1Geo = new THREE.TorusGeometry(1.72, 0.045, 16, 96);
+    const ring1Mesh = new THREE.Mesh(ring1Geo, polishedLiquidChromeMat);
+    ring1Group.add(ring1Mesh);
+
+    // Neon Ticks around Ring 1
+    const tickGeo = new THREE.BoxGeometry(0.025, 0.12, 0.03);
+    const tickCount = 24;
+    for (let i = 0; i < tickCount; i++) {
+      const angle = (i / tickCount) * Math.PI * 2;
+      const tick = new THREE.Mesh(tickGeo, i % 4 === 0 ? cyanGlowMat : polishedLiquidChromeMat);
+      tick.position.set(Math.cos(angle) * 1.72, Math.sin(angle) * 1.72, 0);
+      tick.rotation.z = angle;
+      ring1Group.add(tick);
     }
 
-    // 10. Precision Orbital ZK Verification Rail
-    const railMat = new THREE.MeshStandardMaterial({
+    // 7. RING 2: MID SHIELDED LIQUIDITY VAULT BAND (Segmented Titanium)
+    const ring2Group = new THREE.Group();
+    ring2Group.rotation.x = Math.PI / 3.2;
+    ring2Group.rotation.y = Math.PI / 6;
+    rootGroup.add(ring2Group);
+
+    const ring2Geo = new THREE.TorusGeometry(2.18, 0.05, 16, 96);
+    const ring2Mesh = new THREE.Mesh(ring2Geo, darkObsidianMat);
+    ring2Group.add(ring2Mesh);
+
+    // Inset Cyan Neon Channel inside Ring 2
+    const ring2ChannelGeo = new THREE.TorusGeometry(2.18, 0.015, 16, 96);
+    const ring2Channel = new THREE.Mesh(ring2ChannelGeo, cyanGlowMat);
+    ring2Group.add(ring2Channel);
+
+    // 8. RING 3: OUTER FLOATING CYBER-SHIELD APERTURE (Aperture Iris Segments)
+    const ring3Group = new THREE.Group();
+    ring3Group.rotation.x = -Math.PI / 3.8;
+    ring3Group.rotation.z = Math.PI / 4.5;
+    rootGroup.add(ring3Group);
+
+    const ring3Radius = 2.68;
+    const arcCount = 4;
+    const arcLength = (Math.PI * 2) / arcCount;
+
+    for (let i = 0; i < arcCount; i++) {
+      const startAngle = i * arcLength + 0.18;
+      const arcGeo = new THREE.TorusGeometry(ring3Radius, 0.04, 16, 36, arcLength - 0.36);
+      const arcMesh = new THREE.Mesh(arcGeo, polishedLiquidChromeMat);
+      arcMesh.rotation.z = startAngle;
+      ring3Group.add(arcMesh);
+
+      // Neon Endpoint Beacon on Each Segment
+      const beaconGeo = new THREE.SphereGeometry(0.065, 12, 12);
+      const beacon = new THREE.Mesh(beaconGeo, cyanGlowMat);
+      const beaconAngle = startAngle;
+      beacon.position.set(Math.cos(beaconAngle) * ring3Radius, Math.sin(beaconAngle) * ring3Radius, 0);
+      ring3Group.add(beacon);
+    }
+
+    // 9. DISSOLVING ZERO-KNOWLEDGE PROOF PARTICLES (Volumetric Starfield)
+    const particleCount = 75;
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      const radius = 1.4 + Math.random() * 2.1;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      particlePositions[i] = radius * Math.sin(phi) * Math.cos(theta);
+      particlePositions[i + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      particlePositions[i + 2] = radius * Math.cos(phi);
+    }
+    const particleGeo = new THREE.BufferGeometry();
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
       color: 0x38bdf8,
-      emissive: 0x0284c7,
-      emissiveIntensity: 0.4,
-      metalness: 0.9,
-      roughness: 0.2,
+      size: 0.04,
+      transparent: true,
+      opacity: 0.65,
     });
-    const railGeo = new THREE.TorusGeometry(2.78, 0.016, 16, 120);
-    const rail = new THREE.Mesh(railGeo, railMat);
-    rail.rotation.x = Math.PI / 2.8;
-    rootGroup.add(rail);
+    const particles = new THREE.Points(particleGeo, particleMat);
+    rootGroup.add(particles);
 
-    // Orbiting Verification Satellite
-    const satGeo = new THREE.SphereGeometry(0.07, 16, 16);
-    const sat = new THREE.Mesh(satGeo, cyanEmissiveMat);
-    sat.position.set(2.78, 0, 0);
-    rail.add(sat);
-
-    // 11. Cinematic Lighting Setup (Cold Cyan & Royal Blue Rim Light)
-    const ambientLight = new THREE.AmbientLight(0x050b14, 2.5);
+    // 10. CINEMATIC LIGHTING (Cold Electric Cyan Rim & Volumetric Core Light)
+    const ambientLight = new THREE.AmbientLight(0x020817, 2.2);
     scene.add(ambientLight);
 
-    // Sharp Electric Cyan Rim Light (Right & Top-Back)
-    const cyanRimLight = new THREE.DirectionalLight(0x00f0ff, 4.2);
-    cyanRimLight.position.set(5.5, 4.0, 3.5);
+    // Key Light: Razor-Sharp Electric Cyan Rim Light (Right & Top-Back)
+    const cyanRimLight = new THREE.DirectionalLight(0x00f0ff, 4.0);
+    cyanRimLight.position.set(5.5, 4.5, 3.5);
     scene.add(cyanRimLight);
 
-    // Royal Blue Counter Rim Light (Left-Back)
-    const blueRimLight = new THREE.DirectionalLight(0x1d4ed8, 3.0);
+    // Counter Light: Deep Royal Blue (Left-Back)
+    const blueRimLight = new THREE.DirectionalLight(0x1d4ed8, 2.8);
     blueRimLight.position.set(-5.5, -3.5, -2.5);
     scene.add(blueRimLight);
 
-    // Front-Top Specular Spotlight
-    const frontSpot = new THREE.PointLight(0xffffff, 22, 14);
+    // Front-Top Specular Glint Light
+    const frontSpot = new THREE.PointLight(0xffffff, 20, 15);
     frontSpot.position.set(1.5, 3.5, 5.5);
     scene.add(frontSpot);
 
-    // Inner Core Pulsing Glow
-    const corePointLight = new THREE.PointLight(0x00f0ff, 15, 5);
-    corePointLight.position.set(0, 0, 0.4);
-    wheelGroup.add(corePointLight);
+    // Volumetric Inner Core Glow (Illuminating the Vault Rings from Within)
+    const coreLight = new THREE.PointLight(0x00f0ff, 18, 6.5);
+    coreGroup.add(coreLight);
 
-    // 12. Interactive Drag to Orbit & Mouse Parallax
+    // 11. INTERACTIVE MOUSE PARALLAX & DRAG TO ORBIT
     let isDragging = false;
     let previousPointerPosition = { x: 0, y: 0 };
     let rotationVelocity = { x: 0, y: 0 };
@@ -365,7 +322,7 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     window.addEventListener('touchend', handlePointerUp);
     window.addEventListener('resize', handleResize);
 
-    // 13. Smooth Mechanical Render Loop
+    // 12. SMOOTH TIER-1 ANIMATION LOOP
     let animationFrameId: number;
     const clock = new THREE.Clock();
 
@@ -373,46 +330,49 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
 
-      // Mouse Parallax Lerping
-      mouseX += (targetX - mouseX) * 0.06;
-      mouseY += (targetY - mouseY) * 0.06;
+      // Damped Mouse Parallax Lerping
+      mouseX += (targetX - mouseX) * 0.05;
+      mouseY += (targetY - mouseY) * 0.05;
 
       if (!isDragging) {
-        // Base Isometric Angle with Gentle Parallax Response
-        rootGroup.rotation.y = -0.32 + mouseX * 0.6 + rotationVelocity.y;
-        rootGroup.rotation.x = 0.16 + mouseY * 0.45 + rotationVelocity.x;
+        // Base Tilt with Organic Inertia
+        rootGroup.rotation.y = -0.25 + mouseX * 0.5 + rotationVelocity.y;
+        rootGroup.rotation.x = 0.18 + mouseY * 0.4 + rotationVelocity.x;
         rotationVelocity.x *= 0.94;
         rotationVelocity.y *= 0.94;
       }
 
-      // Zero-Gravity Organic Floating
-      rootGroup.position.y = Math.sin(elapsedTime * 1.3) * 0.09;
+      // Organic Zero-Gravity Floating
+      rootGroup.position.y = Math.sin(elapsedTime * 1.1) * 0.11;
 
-      // Mechanical Vault Rotations:
-      // 1. Outer dial turns steadily clockwise
-      dialOuterGroup.rotation.z = elapsedTime * 0.12;
+      // 1. Core Hyper-Cube Tumbling
+      coreGroup.rotation.y = elapsedTime * 0.35;
+      coreGroup.rotation.x = Math.sin(elapsedTime * 0.5) * 0.25;
+      coreGroup.rotation.z = Math.cos(elapsedTime * 0.4) * 0.15;
 
-      // 2. Middle dial turns counter-clockwise
-      dialMidGroup.rotation.z = -elapsedTime * 0.18;
+      // Subtle Pulsing of ZK Core
+      const corePulse = 1.0 + Math.sin(elapsedTime * 2.2) * 0.04;
+      innerCube.scale.set(corePulse, corePulse, corePulse);
+      heartMesh.scale.set(corePulse * 1.05, corePulse * 1.05, corePulse * 1.05);
 
-      // 3. Central wheel handle rotates with cadence
-      wheelGroup.rotation.z = Math.sin(elapsedTime * 0.6) * 0.35;
+      // 2. Ring 1 (Inner Cipher Ring) Clockwise Rotation
+      ring1Group.rotation.z = elapsedTime * 0.22;
 
-      // 4. Inner crystal counter-spins & pulses
-      coreCrystal.rotation.x = -elapsedTime * 0.5;
-      coreCrystal.rotation.y = elapsedTime * 0.7;
-      const crystalPulse = 1.0 + Math.sin(elapsedTime * 2.8) * 0.06;
-      coreCrystal.scale.set(crystalPulse, crystalPulse, crystalPulse);
+      // 3. Ring 2 (Mid Shielded Ring) Counter-Clockwise Rotation
+      ring2Group.rotation.z = -elapsedTime * 0.16;
 
-      // 5. Verification rail satellite turns
-      rail.rotation.z = elapsedTime * 0.35;
+      // 4. Ring 3 (Outer Iris Aperture) Gentle Drift
+      ring3Group.rotation.z = elapsedTime * 0.1;
+
+      // 5. Particles Gentle Cosmic Drift
+      particles.rotation.y = -elapsedTime * 0.03;
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    // 14. Cleanup on Unmount
+    // 13. Comprehensive Disposal & Cleanup
     return () => {
       container.removeEventListener('mousedown', handlePointerDown);
       window.removeEventListener('mousemove', handlePointerMove);
@@ -425,31 +385,24 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
       renderer.dispose();
       envTexture.dispose();
-      outerBezelGeo.dispose();
-      innerLipGeo.dispose();
-      backplateGeo.dispose();
-      boltGeo.dispose();
-      boltHeadGeo.dispose();
-      dialRingGeo.dispose();
-      notchGeo.dispose();
-      midRingGeo.dispose();
-      circuitRingGeo.dispose();
-      hubGeo.dispose();
-      spokeGeo.dispose();
-      handleGripGeo.dispose();
-      handleSphereGeo.dispose();
-      coreCrystalGeo.dispose();
-      apertureRingGeo.dispose();
-      pistonGeo.dispose();
-      railGeo.dispose();
-      satGeo.dispose();
+      innerCubeGeo.dispose();
+      innerCubeMat.dispose();
+      heartGeo.dispose();
+      heartMat.dispose();
+      outerCageGeo.dispose();
+      outerCageWire.dispose();
+      outerCageMat.dispose();
+      cornerGeo.dispose();
+      ring1Geo.dispose();
+      tickGeo.dispose();
+      ring2Geo.dispose();
+      ring2ChannelGeo.dispose();
+      particleGeo.dispose();
+      particleMat.dispose();
 
-      darkTitaniumMat.dispose();
-      polishedChromeMat.dispose();
-      deepSteelMat.dispose();
-      cyanEmissiveMat.dispose();
-      coreCrystalMat.dispose();
-      railMat.dispose();
+      darkObsidianMat.dispose();
+      polishedLiquidChromeMat.dispose();
+      cyanGlowMat.dispose();
 
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
@@ -467,23 +420,26 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       <div
         ref={mountRef}
         className="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"
-        title="Midnight Cryptographic Vault: Drag to rotate"
+        title="Institutional Cyber Vault: Drag to inspect cryptographic layers"
       />
 
-      {/* Atmospheric Cyan / Royal Blue Back-Glow (Direct Match to Reference Image) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[440px] h-[440px] bg-gradient-to-tr from-cyan-500/25 via-blue-600/15 to-transparent rounded-full blur-[95px] pointer-events-none -z-10 animate-pulse-glow" />
+      {/* Atmospheric Soft Cyan & Midnight Blue Glow (Seamless Page Integration) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-gradient-to-tr from-cyan-500/20 via-blue-600/10 to-transparent rounded-full blur-[110px] pointer-events-none -z-10 animate-pulse-glow" />
 
-      {/* Floating Minimalist Vault Status Badge */}
+      {/* Secondary Diffuse Outer Halo */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] bg-cyan-400/10 rounded-full blur-[80px] pointer-events-none -z-10" />
+
+      {/* Floating Minimalist Telemetry Pill */}
       <div
         className={`absolute bottom-3 right-6 z-20 transition-opacity duration-300 pointer-events-none ${
           isHovered ? 'opacity-100' : 'opacity-70'
         }`}
       >
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950/75 border border-zinc-800/80 backdrop-blur-md text-[10px] font-mono text-zinc-400">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-md text-[10px] font-mono text-zinc-400 shadow-xl">
           <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-zinc-200 font-medium">MIDNIGHT SHIELDED VAULT</span>
+          <span className="text-zinc-200 font-medium">CYBER VAULT LOCK</span>
           <span className="text-zinc-600">/</span>
-          <span className="text-cyan-400">0xDARKPOOL</span>
+          <span className="text-cyan-400">ZK COMMITMENT ACTIVE</span>
         </div>
       </div>
     </div>
