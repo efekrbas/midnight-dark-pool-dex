@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { className?: string }) {
   const mountRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const container = mountRef.current;
@@ -74,8 +73,8 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
     // 4. Central Cyber Vault Group
     const rootGroup = new THREE.Group();
-    rootGroup.rotation.y = -0.25;
-    rootGroup.rotation.x = 0.18;
+    rootGroup.rotation.y = -0.22;
+    rootGroup.rotation.x = 0.16;
     scene.add(rootGroup);
 
     // Common High-End Shader Materials
@@ -110,17 +109,17 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     // Ultra-Reflective Optical Crystal Glass Material (Volumetric Refraction & Caustic Glow)
     const crystalGlassMat = new THREE.MeshPhysicalMaterial({
       color: new THREE.Color(0xf8fafc),
-      transmission: 0.92,            // High realistic glass transmission
+      transmission: 0.93,
       opacity: 1,
       transparent: true,
-      ior: 1.56,                     // Optical crystal crown glass
-      roughness: 0.02,               // Mirror-smooth polish
+      ior: 1.56,
+      roughness: 0.02,
       metalness: 0.04,
-      clearcoat: 1.0,                // Razor-sharp surface reflection
+      clearcoat: 1.0,
       clearcoatRoughness: 0.015,
       reflectivity: 1.0,
-      thickness: 1.8,                // Volumetric depth for light rays
-      attenuationColor: new THREE.Color(0x38bdf8), // Luminous cyan internal refraction
+      thickness: 1.8,
+      attenuationColor: new THREE.Color(0x38bdf8),
       attenuationDistance: 0.72,
       specularIntensity: 2.4,
       specularColor: new THREE.Color(0xffffff),
@@ -136,7 +135,7 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     const glassEdgesMat = new THREE.LineBasicMaterial({
       color: 0xe0f2fe,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.75,
       linewidth: 1.5,
     });
     const glassEdges = new THREE.LineSegments(glassEdgesGeo, glassEdgesMat);
@@ -168,53 +167,13 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     const gemWire = new THREE.Mesh(gemWireGeo, gemWireMat);
     coreGroup.add(gemWire);
 
-    // Dynamic Diamond Glimmer Stars (Parıltı Efekti)
-    const sparkleGroup = new THREE.Group();
-    coreGroup.add(sparkleGroup);
-
-    // Procedural 4-point Diamond Star Shape
-    const starShape = new THREE.Shape();
-    starShape.moveTo(0, 0.16);
-    starShape.quadraticCurveTo(0.015, 0.015, 0.16, 0);
-    starShape.quadraticCurveTo(0.015, -0.015, 0, -0.16);
-    starShape.quadraticCurveTo(-0.015, -0.015, -0.16, 0);
-    starShape.quadraticCurveTo(-0.015, 0.015, 0, 0.16);
-
-    const starGeo = new THREE.ShapeGeometry(starShape);
-    const starMat1 = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0.85,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-    const starMat2 = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.75,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-
-    const sparkle1 = new THREE.Mesh(starGeo, starMat1);
-    sparkle1.position.set(0.48, 0.48, 0.48);
-    sparkleGroup.add(sparkle1);
-
-    const sparkle2 = new THREE.Mesh(starGeo, starMat2);
-    sparkle2.position.set(-0.48, -0.48, 0.48);
-    sparkleGroup.add(sparkle2);
-
-    const sparkle3 = new THREE.Mesh(starGeo, starMat1);
-    sparkle3.position.set(0.48, -0.48, -0.48);
-    sparkleGroup.add(sparkle3);
-
     // Outer Obsidian Exoskeleton Cage (Shielding the Glass Core)
     const outerCageGeo = new THREE.BoxGeometry(1.24, 1.24, 1.24);
     const outerCageWire = new THREE.WireframeGeometry(outerCageGeo);
     const outerCageMat = new THREE.LineBasicMaterial({
       color: 0x38bdf8,
       transparent: true,
-      opacity: 0.38,
+      opacity: 0.35,
       linewidth: 1.5,
     });
     const outerCage = new THREE.LineSegments(outerCageWire, outerCageMat);
@@ -242,9 +201,9 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     const ring1Mesh = new THREE.Mesh(ring1Geo, polishedLiquidChromeMat);
     ring1Group.add(ring1Mesh);
 
-    // Neon Ticks around Ring 1
-    const tickGeo = new THREE.BoxGeometry(0.025, 0.12, 0.03);
-    const tickCount = 24;
+    // Clean Micro-Notches around Ring 1
+    const tickGeo = new THREE.BoxGeometry(0.02, 0.1, 0.025);
+    const tickCount = 20;
     for (let i = 0; i < tickCount; i++) {
       const angle = (i / tickCount) * Math.PI * 2;
       const tick = new THREE.Mesh(tickGeo, i % 4 === 0 ? cyanGlowMat : polishedLiquidChromeMat);
@@ -294,7 +253,7 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     }
 
     // 9. DISSOLVING ZERO-KNOWLEDGE PROOF PARTICLES (Volumetric Starfield)
-    const particleCount = 75;
+    const particleCount = 60;
     const particlePositions = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
       const radius = 1.4 + Math.random() * 2.1;
@@ -308,9 +267,9 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particleMat = new THREE.PointsMaterial({
       color: 0x38bdf8,
-      size: 0.04,
+      size: 0.035,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.6,
     });
     const particles = new THREE.Points(particleGeo, particleMat);
     rootGroup.add(particles);
@@ -371,8 +330,8 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
         const rect = container.getBoundingClientRect();
         const x = (clientX - rect.left) / rect.width - 0.5;
         const y = (clientY - rect.top) / rect.height - 0.5;
-        targetX = x * 0.55;
-        targetY = y * 0.45;
+        targetX = x * 0.5;
+        targetY = y * 0.4;
       }
     };
 
@@ -411,56 +370,40 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
       if (!isDragging) {
         // Base Tilt with Organic Inertia
-        rootGroup.rotation.y = -0.25 + mouseX * 0.5 + rotationVelocity.y;
-        rootGroup.rotation.x = 0.18 + mouseY * 0.4 + rotationVelocity.x;
+        rootGroup.rotation.y = -0.22 + mouseX * 0.45 + rotationVelocity.y;
+        rootGroup.rotation.x = 0.16 + mouseY * 0.35 + rotationVelocity.x;
         rotationVelocity.x *= 0.94;
         rotationVelocity.y *= 0.94;
       }
 
       // Organic Zero-Gravity Floating
-      rootGroup.position.y = Math.sin(elapsedTime * 1.1) * 0.11;
+      rootGroup.position.y = Math.sin(elapsedTime * 1.0) * 0.09;
 
       // 1. Glass Core Tumbling & Counter-Spin of Inner Faceted Diamond
-      coreGroup.rotation.y = elapsedTime * 0.35;
-      coreGroup.rotation.x = Math.sin(elapsedTime * 0.5) * 0.25;
-      coreGroup.rotation.z = Math.cos(elapsedTime * 0.4) * 0.15;
+      coreGroup.rotation.y = elapsedTime * 0.28;
+      coreGroup.rotation.x = Math.sin(elapsedTime * 0.4) * 0.2;
+      coreGroup.rotation.z = Math.cos(elapsedTime * 0.35) * 0.12;
 
       // Inner Diamond Counter-Rotation (Creates mesmerizing light refractions through the glass)
-      innerGem.rotation.y = -elapsedTime * 0.55;
-      innerGem.rotation.z = Math.sin(elapsedTime * 0.8) * 0.3;
-      gemWire.rotation.y = -elapsedTime * 0.55;
-      gemWire.rotation.z = Math.sin(elapsedTime * 0.8) * 0.3;
+      innerGem.rotation.y = -elapsedTime * 0.45;
+      innerGem.rotation.z = Math.sin(elapsedTime * 0.6) * 0.25;
+      gemWire.rotation.y = -elapsedTime * 0.45;
+      gemWire.rotation.z = Math.sin(elapsedTime * 0.6) * 0.25;
 
-      // Dynamic Diamond Glimmer Flare (Parıltı / Sparkle Pulse)
-      const glintFactor1 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6)), 8);
-      const glintFactor2 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6 + 2.0)), 8);
-      const glintFactor3 = Math.pow(Math.max(0, Math.sin(elapsedTime * 2.6 + 4.0)), 8);
+      // Subtle Glass Clearcoat Shimmer (Natural Optical Specular Reflection)
+      crystalGlassMat.clearcoat = 0.94 + Math.sin(elapsedTime * 1.8) * 0.06;
 
-      sparkle1.scale.setScalar(0.7 + glintFactor1 * 1.8);
-      starMat1.opacity = 0.35 + glintFactor1 * 0.65;
-      sparkle1.rotation.z += 0.015;
-
-      sparkle2.scale.setScalar(0.7 + glintFactor2 * 1.8);
-      starMat2.opacity = 0.35 + glintFactor2 * 0.65;
-      sparkle2.rotation.z -= 0.015;
-
-      sparkle3.scale.setScalar(0.7 + glintFactor3 * 1.8);
-      sparkle3.rotation.z += 0.02;
-
-      // Subtle Glass Clearcoat Shimmer
-      crystalGlassMat.clearcoat = 0.92 + Math.sin(elapsedTime * 2.0) * 0.08;
-
-      // 2. Ring 1 (Inner Cipher Ring) Clockwise Rotation
-      ring1Group.rotation.z = elapsedTime * 0.22;
+      // 2. Ring 1 (Inner Cipher Ring) Stately Clockwise Rotation
+      ring1Group.rotation.z = elapsedTime * 0.14;
 
       // 3. Ring 2 (Mid Shielded Ring) Counter-Clockwise Rotation
-      ring2Group.rotation.z = -elapsedTime * 0.16;
+      ring2Group.rotation.z = -elapsedTime * 0.11;
 
       // 4. Ring 3 (Outer Iris Aperture) Gentle Drift
-      ring3Group.rotation.z = elapsedTime * 0.1;
+      ring3Group.rotation.z = elapsedTime * 0.07;
 
       // 5. Particles Gentle Cosmic Drift
-      particles.rotation.y = -elapsedTime * 0.03;
+      particles.rotation.y = -elapsedTime * 0.02;
 
       renderer.render(scene, camera);
     };
@@ -484,7 +427,6 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       glassEdgesGeo.dispose();
       innerGemGeo.dispose();
       gemWireGeo.dispose();
-      starGeo.dispose();
       outerCageGeo.dispose();
       outerCageWire.dispose();
       cornerGeo.dispose();
@@ -498,8 +440,6 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
       glassEdgesMat.dispose();
       innerGemMat.dispose();
       gemWireMat.dispose();
-      starMat1.dispose();
-      starMat2.dispose();
       outerCageMat.dispose();
       darkObsidianMat.dispose();
       polishedLiquidChromeMat.dispose();
@@ -513,16 +453,11 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
   }, []);
 
   return (
-    <div
-      className={`relative ${className} flex items-center justify-center select-none group`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <div className={`relative ${className} flex items-center justify-center select-none`}>
       {/* 3D WebGL Canvas Container */}
       <div
         ref={mountRef}
         className="w-full h-full relative z-10 cursor-grab active:cursor-grabbing"
-        title="Institutional Cyber Vault: Drag to inspect cryptographic layers"
       />
 
       {/* Atmospheric Soft Cyan & Midnight Blue Glow (Seamless Page Integration) */}
@@ -530,20 +465,6 @@ export default function MidnightZKCore3D({ className = "w-full h-[520px]" }: { c
 
       {/* Secondary Diffuse Outer Halo */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] bg-cyan-400/10 rounded-full blur-[80px] pointer-events-none -z-10" />
-
-      {/* Floating Minimalist Telemetry Pill */}
-      <div
-        className={`absolute bottom-3 right-6 z-20 transition-opacity duration-300 pointer-events-none ${
-          isHovered ? 'opacity-100' : 'opacity-70'
-        }`}
-      >
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-950/80 border border-zinc-800/80 backdrop-blur-md text-[10px] font-mono text-zinc-400 shadow-xl">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-          <span className="text-zinc-200 font-medium">CYBER VAULT LOCK</span>
-          <span className="text-zinc-600">/</span>
-          <span className="text-cyan-400">ZK COMMITMENT ACTIVE</span>
-        </div>
-      </div>
     </div>
   );
 }

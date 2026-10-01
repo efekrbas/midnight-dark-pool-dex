@@ -85,9 +85,9 @@ export default function LandingPage() {
             </div>
 
             {/* Hero Headline */}
-            <h1 className="hero-elem text-4xl sm:text-6xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white leading-[1.08]">
-              Institutional Dark Pool <br />
-              <span className="text-zinc-400 font-light">for Midnight Network</span>
+            <h1 className="hero-elem text-3xl sm:text-5xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.12]">
+              Institutional <span className="inline-block whitespace-nowrap">Dark Pool</span> <br />
+              <span className="text-zinc-400 font-light text-[0.82em]">for Midnight Network</span>
             </h1>
             
             {/* Subtitle */}
