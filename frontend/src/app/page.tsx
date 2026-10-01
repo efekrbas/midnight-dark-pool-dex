@@ -20,6 +20,7 @@ import {
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import MEVSimulator from '../components/MEVSimulator';
+import MidnightZKCore3D from '../components/MidnightZKCore3D';
 import { useTranslation } from '@/context/I18nContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,62 +58,109 @@ export default function LandingPage() {
       {/* Subtle Monochrome Top Spotlight */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[360px] bg-gradient-to-b from-white/[0.07] via-white/[0.02] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* HERO SECTION */}
-      <div className="max-w-4xl w-full text-center space-y-7 relative z-10 pt-4">
-        
-        {/* Minimalist Announcement Pills */}
-        <div className="hero-elem flex flex-wrap items-center justify-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-zinc-300 text-xs font-mono">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-pulse" />
-            <span>Midnight Preprod Testnet</span>
+      {/* HERO SECTION - SPLIT 2-COLUMN LAYOUT WITH 3D ZK CORE */}
+      <div className="max-w-7xl w-full relative z-10 pt-4 space-y-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column: Institutional Copy & Actions */}
+          <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
+            
+            {/* Minimalist Announcement Pills */}
+            <div className="hero-elem flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-800 text-zinc-300 text-xs font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span>Midnight Preprod Testnet</span>
+              </div>
+
+              <a
+                href={GOOGLE_SHEET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors text-xs font-mono"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-zinc-300" />
+                <span>Google Sheets Feedback (4.91/5.00 ⭐)</span>
+                <ExternalLink className="w-3 h-3 text-zinc-500" />
+              </a>
+            </div>
+
+            {/* Hero Headline */}
+            <h1 className="hero-elem text-4xl sm:text-6xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white leading-[1.08]">
+              Institutional Dark Pool <br />
+              <span className="text-zinc-400 font-light">for Midnight Network</span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="hero-elem text-base sm:text-lg text-zinc-400 max-w-xl leading-relaxed font-normal">
+              Execute multi-million dollar block trades with mathematical confidentiality. Order volumes, strike prices, and account balances remain shielded by client-side zero-knowledge proofs.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="hero-elem flex flex-wrap items-center gap-3 pt-2 w-full sm:w-auto">
+              <Link href="/trade" className="w-full sm:w-auto">
+                <Button variant="default" size="lg" className="w-full sm:w-auto h-11 px-7 font-semibold">
+                  <span>Launch Terminal</span>
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+              <Link href="/circuits" className="w-full sm:w-auto">
+                <Button variant="outline" size="lg" className="w-full sm:w-auto h-11 px-6 font-mono text-xs">
+                  <Terminal className="mr-2 w-4 h-4 text-zinc-400" />
+                  <span>Compact Circuits</span>
+                </Button>
+              </Link>
+              <Link href="/otc" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto h-11 px-6 font-mono text-xs">
+                  <span>OTC RFQ Desk</span>
+                </Button>
+              </Link>
+            </div>
+
+            {/* Cryptographic Guarantees Badges */}
+            <div className="hero-elem flex flex-wrap items-center gap-4 pt-2 text-xs font-mono text-zinc-400">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                <span>Shielded Orders</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span>0% MEV Slippage</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span>In-Browser WASM Prover</span>
+              </div>
+            </div>
+
           </div>
 
-          <a
-            href={GOOGLE_SHEET_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors text-xs font-mono"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-zinc-300" />
-            <span>Google Sheets Feedback (4.91/5.00 ⭐)</span>
-            <ExternalLink className="w-3 h-3 text-zinc-500" />
-          </a>
-        </div>
+          {/* Right Column: 3D Obsidian ZK Core */}
+          <div className="lg:col-span-5 w-full flex items-center justify-center">
+            <div className="hero-elem relative w-full h-[420px] sm:h-[480px] lg:h-[510px] rounded-2xl border border-zinc-800/80 bg-gradient-to-b from-zinc-950/60 to-black/80 backdrop-blur-sm overflow-hidden flex items-center justify-center shadow-2xl shadow-cyan-950/20 group">
+              {/* Subtle Tech Corner Brackets */}
+              <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-zinc-700/80 pointer-events-none z-20" />
+              <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-zinc-700/80 pointer-events-none z-20" />
+              <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-zinc-700/80 pointer-events-none z-20" />
+              <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-zinc-700/80 pointer-events-none z-20" />
 
-        {/* Hero Headline */}
-        <h1 className="hero-elem text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
-          Institutional Dark Pool <br className="hidden sm:inline" />
-          <span className="text-zinc-400 font-light">for Midnight Network</span>
-        </h1>
-        
-        {/* Subtitle */}
-        <p className="hero-elem text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-normal">
-          Execute multi-million dollar block trades with mathematical confidentiality. Order volumes, strike prices, and account balances remain shielded by client-side zero-knowledge proofs.
-        </p>
+              {/* HUD Telemetry Top Header */}
+              <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-zinc-500 pointer-events-none z-20">
+                <span className="flex items-center gap-1.5 text-zinc-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                  ZK_CORE // 0x4D6964
+                </span>
+                <span className="text-zinc-600">PARALLAX ACTIVE</span>
+              </div>
 
-        {/* CTA Buttons */}
-        <div className="hero-elem flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
-          <Link href="/trade" className="w-full sm:w-auto">
-            <Button variant="default" size="lg" className="w-full sm:w-auto h-11 px-7 font-semibold">
-              <span>Launch Terminal</span>
-              <ArrowRight className="ml-2 w-4 h-4" />
-            </Button>
-          </Link>
-          <Link href="/circuits" className="w-full sm:w-auto">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto h-11 px-6 font-mono text-xs">
-              <Terminal className="mr-2 w-4 h-4 text-zinc-400" />
-              <span>Compact Circuits</span>
-            </Button>
-          </Link>
-          <Link href="/otc" className="w-full sm:w-auto">
-            <Button variant="secondary" size="lg" className="w-full sm:w-auto h-11 px-6 font-mono text-xs">
-              <span>OTC RFQ Desk</span>
-            </Button>
-          </Link>
+              {/* Interactive Three.js Obsidian Core */}
+              <MidnightZKCore3D className="w-full h-full" />
+            </div>
+          </div>
+
         </div>
 
         {/* Institutional Metrics Strip */}
-        <div className="hero-elem pt-8">
+        <div className="hero-elem pt-2">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-zinc-800/80 rounded-xl overflow-hidden border border-zinc-800">
             <div className="p-4 bg-zinc-950 text-left">
               <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">Mempool Leakage</p>
