@@ -8,16 +8,25 @@ export default function SplashScreen() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    // Check if splash was already shown this session
+    if (sessionStorage.getItem('midnight_splash_viewed')) {
+      setPhase('done');
+      return;
+    }
+
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setPhase('done'), 400);
+          sessionStorage.setItem('midnight_splash_viewed', 'true');
+          setTimeout(() => setPhase('done'), 300);
           return 100;
         }
-        return prev + Math.random() * 12 + 6;
+        // Smooth linear progression with slight easing near the end
+        const step = prev < 70 ? 4 : 2.5;
+        return Math.min(100, prev + step);
       });
-    }, 110);
+    }, 40);
 
     return () => clearInterval(interval);
   }, []);
@@ -28,7 +37,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center transition-opacity duration-500 selection:bg-none"
+      className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center transition-opacity duration-400 selection:bg-none"
       style={{ opacity: progress >= 100 ? 0 : 1 }}
     >
       {/* Rotating Logo */}
@@ -53,32 +62,30 @@ export default function SplashScreen() {
 
       {/* Cryptographic Subtitle */}
       <p className="text-[11px] font-mono text-zinc-400 mb-6 flex items-center gap-1.5">
-        <Lock className="w-3 h-3 text-zinc-400" />
+        <Lock className="w-3 h-3 text-cyan-400" />
         <span>Initializing Zero-Knowledge circuits...</span>
       </p>
 
-      {/* High-Tech Progress Bar */}
-      <div className="w-64 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 relative shadow-inner mb-3">
+      {/* High-Tech Progress Bar (Clearly visible track + Vibrant Neon Cyan fill) */}
+      <div className="w-64 h-2 bg-zinc-800/90 rounded-full overflow-hidden border border-zinc-700/80 relative shadow-inner mb-3">
         <div
-          className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-150 shadow-[0_0_10px_rgba(6,182,212,0.8)]"
+          className="h-full bg-cyan-400 rounded-full transition-all duration-75 shadow-[0_0_14px_#06b6d4]"
           style={{ width: `${currentPercent}%` }}
         />
       </div>
 
       {/* Telemetry Status Line */}
       <div className="flex items-center justify-between w-64 text-[10px] font-mono text-zinc-400 uppercase tracking-wider">
-        <span>
-          {progress < 25
+        <span className="text-zinc-300">
+          {progress < 30
             ? 'Loading Compact Circuits...'
-            : progress < 55
+            : progress < 65
             ? 'Preparing Client Prover...'
-            : progress < 85
-            ? 'Connecting Preprod Gateway...'
-            : progress < 99
-            ? 'Verifying State Commitments...'
+            : progress < 95
+            ? 'Syncing Shielded Ledger...'
             : 'Ready'}
         </span>
-        <span className="font-bold text-zinc-300">{currentPercent}%</span>
+        <span className="font-semibold text-cyan-400">{currentPercent}%</span>
       </div>
     </div>
   );
