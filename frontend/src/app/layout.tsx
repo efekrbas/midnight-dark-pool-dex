@@ -13,7 +13,6 @@ import Navbar from "@/components/Navbar";
 import Marquee from "@/components/Marquee";
 import Breadcrumb from "@/components/Breadcrumb";
 import FeedbackWidget from "@/components/FeedbackWidget";
-import LiveTradeFeed from "@/components/LiveTradeFeed";
 import ScrollToTop from "@/components/ScrollToTop";
 
 import SplashScreen from "@/components/SplashScreen";
@@ -41,7 +40,6 @@ export default function RootLayout({
               <Breadcrumb />
               {children}
               <Footer />
-              <LiveTradeFeed />
               <ScrollToTop />
               <PrivacyConsent />
               <FeedbackWidget />

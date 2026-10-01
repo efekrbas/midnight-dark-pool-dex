@@ -53,13 +53,13 @@ export default function LandingPage() {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="flex flex-col min-h-screen items-center justify-start pt-12 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden space-y-24">
+    <div ref={containerRef} className="flex flex-col min-h-screen items-center justify-start pt-3 sm:pt-5 lg:pt-6 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden space-y-20">
       
       {/* Subtle Monochrome Top Spotlight */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[360px] bg-gradient-to-b from-white/[0.07] via-white/[0.02] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
       {/* HERO SECTION - SPLIT 2-COLUMN LAYOUT WITH 3D ZK CORE */}
-      <div className="max-w-7xl w-full relative z-10 pt-4 space-y-12">
+      <div className="max-w-7xl w-full relative z-10 pt-1 sm:pt-2 space-y-10 sm:space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Institutional Copy & Actions */}
@@ -135,7 +135,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right Column: 3D Liquid-Metal ZK Nexus (Seamless, Unboxed, Lifted to align with headline) */}
-          <div className="hero-elem lg:col-span-5 w-full flex items-center justify-center relative lg:-translate-y-10 xl:-translate-y-14">
+          <div className="hero-elem lg:col-span-5 w-full flex items-center justify-center relative lg:-translate-y-6 xl:-translate-y-8">
             <MidnightZKCore3D className="w-full h-[460px] sm:h-[520px] lg:h-[560px]" />
           </div>
 
