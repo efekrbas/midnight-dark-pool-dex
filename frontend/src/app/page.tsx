@@ -134,27 +134,9 @@ export default function LandingPage() {
 
           </div>
 
-          {/* Right Column: 3D Obsidian ZK Core */}
-          <div className="lg:col-span-5 w-full flex items-center justify-center">
-            <div className="hero-elem relative w-full h-[420px] sm:h-[480px] lg:h-[510px] rounded-2xl border border-zinc-800/80 bg-gradient-to-b from-zinc-950/60 to-black/80 backdrop-blur-sm overflow-hidden flex items-center justify-center shadow-2xl shadow-cyan-950/20 group">
-              {/* Subtle Tech Corner Brackets */}
-              <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-zinc-700/80 pointer-events-none z-20" />
-              <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-zinc-700/80 pointer-events-none z-20" />
-              <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-zinc-700/80 pointer-events-none z-20" />
-              <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-zinc-700/80 pointer-events-none z-20" />
-
-              {/* HUD Telemetry Top Header */}
-              <div className="absolute top-3.5 left-4 right-4 flex items-center justify-between text-[11px] font-mono text-zinc-500 pointer-events-none z-20">
-                <span className="flex items-center gap-1.5 text-zinc-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                  ZK_CORE // 0x4D6964
-                </span>
-                <span className="text-zinc-600">PARALLAX ACTIVE</span>
-              </div>
-
-              {/* Interactive Three.js Obsidian Core */}
-              <MidnightZKCore3D className="w-full h-full" />
-            </div>
+          {/* Right Column: 3D Liquid-Metal ZK Nexus (Seamless, Unboxed) */}
+          <div className="hero-elem lg:col-span-5 w-full flex items-center justify-center relative">
+            <MidnightZKCore3D className="w-full h-[460px] sm:h-[520px] lg:h-[560px]" />
           </div>
 
         </div>
