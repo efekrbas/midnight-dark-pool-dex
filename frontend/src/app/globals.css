@@ -51,22 +51,22 @@
 
 /* 21st.dev / Linear Bento Card & Surface Tokens */
 .bento-card {
-  background: rgba(9, 9, 11, 0.75);
+  background: rgba(12, 16, 24, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
   box-shadow: 
     0 10px 30px -10px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .bento-card:hover {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.24);
   box-shadow: 
     0 20px 40px -15px rgba(0, 0, 0, 0.9),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
 }
 
 .bento-spotlight {

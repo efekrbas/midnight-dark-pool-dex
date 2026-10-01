@@ -58,13 +58,11 @@ export default function SplashScreen() {
       </p>
 
       {/* High-Tech Progress Bar */}
-      <div className="w-64 h-[3px] bg-zinc-900 rounded-full overflow-hidden border border-white/5 relative shadow-inner mb-3">
+      <div className="w-64 h-1.5 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800 relative shadow-inner mb-3">
         <div
-          className="h-full bg-gradient-to-r from-sky-400 via-white to-indigo-400 transition-all duration-200 shadow-[0_0_12px_rgba(255,255,255,0.6)]"
+          className="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full transition-all duration-150 shadow-[0_0_10px_rgba(6,182,212,0.8)]"
           style={{ width: `${currentPercent}%` }}
         />
-        {/* Shimmer sweep effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer pointer-events-none" />
       </div>
 
       {/* Telemetry Status Line */}

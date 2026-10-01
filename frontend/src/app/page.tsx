@@ -35,25 +35,16 @@ export default function LandingPage() {
 
   useGSAP(() => {
     gsap.from(".hero-elem", {
-      y: 24,
-      opacity: 0,
-      duration: 0.7,
-      stagger: 0.1,
-      ease: "power2.out"
-    });
-
-    gsap.from(".bento-item", {
-      y: 32,
+      y: 20,
       opacity: 0,
       duration: 0.6,
-      stagger: 0.12,
-      delay: 0.35,
+      stagger: 0.08,
       ease: "power2.out"
     });
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="flex flex-col min-h-screen items-center justify-start pt-3 sm:pt-5 lg:pt-6 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden space-y-20">
+    <div ref={containerRef} className="flex flex-col min-h-screen items-center justify-start pt-3 sm:pt-5 lg:pt-6 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden space-y-14">
       
       {/* Subtle Monochrome Top Spotlight */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[360px] bg-gradient-to-b from-white/[0.07] via-white/[0.02] to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
